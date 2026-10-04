@@ -54,12 +54,37 @@ def init_db():
         rating INTEGER DEFAULT 0,
         is_favorite INTEGER DEFAULT 0,
         is_new INTEGER DEFAULT 1,
+        pets_allowed INTEGER DEFAULT 0,
         first_seen TEXT,
         last_seen TEXT,
         price_history TEXT DEFAULT '[]'
     )
     """)
     
+    # Run migration to add pets_allowed if existing db lacks it
+    try:
+        cursor.execute("ALTER TABLE listings ADD COLUMN pets_allowed INTEGER DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass
+        
+    # Mark verified pet friendly listings
+    pet_addresses = [
+        '%St Anns%',
+        '%Sampson%',
+        '%16 Stuart%',
+        '%5 Burr%',
+        '%22 Mcmahons%',
+        '%1/2 Mcmahons%',
+        '%Aspromonte%',
+        '%Mattes Way%',
+        '%Wondalga%',
+        '%Castle Glen%',
+        '%Curta Place%',
+        '%Kauri Street%'
+    ]
+    for addr in pet_addresses:
+        cursor.execute("UPDATE listings SET pets_allowed = 1 WHERE street LIKE ?", (addr,))
+
     # Settings table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS settings (
@@ -129,6 +154,7 @@ def upsert_listing(item: Dict[str, Any]) -> bool:
             lng = COALESCE(?, lng),
             inspection_date = COALESCE(?, inspection_date),
             description = COALESCE(?, description),
+            pets_allowed = COALESCE(?, pets_allowed),
             last_seen = ?,
             price_history = ?
         WHERE id = ?
@@ -146,6 +172,7 @@ def upsert_listing(item: Dict[str, Any]) -> bool:
             item.get("lng"),
             item.get("inspection"),
             item.get("desc"),
+            item.get("pets_allowed"),
             now_str,
             json.dumps(history),
             current_id
@@ -157,8 +184,8 @@ def upsert_listing(item: Dict[str, Any]) -> bool:
         INSERT INTO listings (
             id, url, title, street, suburb, postcode, price, beds, baths, cars,
             prop_type, image_url, lat, lng, inspection_date, description,
-            source, status, notes, rating, is_favorite, is_new, first_seen, last_seen, price_history
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'discovered', '', 0, 0, 1, ?, ?, '[]')
+            source, status, notes, rating, is_favorite, is_new, pets_allowed, first_seen, last_seen, price_history
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'discovered', '', 0, 0, 1, ?, ?, ?, '[]')
         """, (
             lid,
             url,
@@ -177,6 +204,7 @@ def upsert_listing(item: Dict[str, Any]) -> bool:
             item.get("inspection"),
             item.get("desc"),
             item.get("source", "rent.com.au"),
+            item.get("pets_allowed", 0),
             now_str,
             now_str
         ))
@@ -195,6 +223,7 @@ def get_listings(
     status: Optional[str] = None,
     only_inspections: bool = False,
     only_favorites: bool = False,
+    only_pets: bool = False,
     query: Optional[str] = None,
     sort_by: str = "price_asc"
 ) -> List[Dict[str, Any]]:
@@ -237,6 +266,9 @@ def get_listings(
         
     if only_favorites:
         sql += " AND is_favorite = 1"
+        
+    if only_pets:
+        sql += " AND pets_allowed = 1"
         
     if query:
         q = f"%{query}%"
@@ -282,7 +314,8 @@ def get_listing_by_id(lid: str) -> Optional[Dict[str, Any]]:
     return None
 
 def update_listing_meta(lid: str, status: Optional[str] = None, notes: Optional[str] = None,
-                        rating: Optional[int] = None, is_favorite: Optional[int] = None) -> bool:
+                        rating: Optional[int] = None, is_favorite: Optional[int] = None,
+                        pets_allowed: Optional[int] = None) -> bool:
     conn = get_connection()
     cursor = conn.cursor()
     
@@ -301,6 +334,9 @@ def update_listing_meta(lid: str, status: Optional[str] = None, notes: Optional[
     if is_favorite is not None:
         updates.append("is_favorite = ?")
         params.append(is_favorite)
+    if pets_allowed is not None:
+        updates.append("pets_allowed = ?")
+        params.append(pets_allowed)
         
     if not updates:
         conn.close()
@@ -330,8 +366,8 @@ def add_custom_listing(data: Dict[str, Any]) -> str:
     INSERT INTO listings (
         id, url, title, street, suburb, postcode, price, beds, baths, cars,
         prop_type, image_url, lat, lng, inspection_date, description,
-        source, status, notes, rating, is_favorite, is_new, first_seen, last_seen, price_history
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'manual', 'discovered', ?, 0, 1, 0, ?, ?, '[]')
+        source, status, notes, rating, is_favorite, is_new, pets_allowed, first_seen, last_seen, price_history
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'manual', 'discovered', ?, 0, 1, 0, ?, ?, ?, '[]')
     """, (
         lid,
         data.get("url", ""),
@@ -350,6 +386,7 @@ def add_custom_listing(data: Dict[str, Any]) -> str:
         data.get("inspection_date"),
         data.get("description", ""),
         data.get("notes", ""),
+        data.get("pets_allowed", 0),
         now_str,
         now_str
     ))
@@ -388,6 +425,9 @@ def get_stats() -> Dict[str, Any]:
     cursor.execute("SELECT COUNT(*) FROM listings WHERE is_new = 1 AND price <= 550")
     new_count = cursor.fetchone()[0]
     
+    cursor.execute("SELECT COUNT(*) FROM listings WHERE pets_allowed = 1 AND price <= 550")
+    pets_count = cursor.fetchone()[0]
+    
     cursor.execute("""
     SELECT suburb, COUNT(*), ROUND(AVG(price), 0)
     FROM listings
@@ -416,6 +456,7 @@ def get_stats() -> Dict[str, Any]:
         "favorites_count": favorites_count,
         "inspections_count": inspections_count,
         "new_count": new_count,
+        "pets_count": pets_count,
         "suburbs": suburbs,
         "property_types": property_types
     }

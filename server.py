@@ -25,6 +25,7 @@ class ListingMetaUpdate(BaseModel):
     notes: Optional[str] = None
     rating: Optional[int] = None
     is_favorite: Optional[int] = None
+    pets_allowed: Optional[int] = None
 
 class CustomListingInput(BaseModel):
     title: Optional[str] = None
@@ -41,6 +42,7 @@ class CustomListingInput(BaseModel):
     inspection_date: Optional[str] = None
     description: Optional[str] = ""
     notes: Optional[str] = ""
+    pets_allowed: Optional[int] = 0
     lat: Optional[float] = None
     lng: Optional[float] = None
 
@@ -97,17 +99,18 @@ api = APIRouter()
 
 @api.get("/listings")
 def get_listings(
-    max_price: Optional[int] = Query(550),
-    suburb: Optional[str] = Query("all"),
-    min_beds: Optional[int] = Query(0),
-    min_baths: Optional[int] = Query(0),
-    min_cars: Optional[int] = Query(0),
-    prop_type: Optional[str] = Query("all"),
-    status: Optional[str] = Query("all"),
-    only_inspections: bool = Query(False),
-    only_favorites: bool = Query(False),
-    query: Optional[str] = Query(None),
-    sort_by: str = Query("price_asc")
+    max_price: Optional[int] = 550,
+    suburb: Optional[str] = "all",
+    min_beds: Optional[int] = 0,
+    min_baths: Optional[int] = 0,
+    min_cars: Optional[int] = 0,
+    prop_type: Optional[str] = "all",
+    status: Optional[str] = "all",
+    only_inspections: bool = False,
+    only_favorites: bool = False,
+    only_pets: bool = False,
+    query: Optional[str] = None,
+    sort_by: str = "price_asc"
 ):
     items = database.get_listings(
         max_price=max_price,
@@ -119,6 +122,7 @@ def get_listings(
         status=status,
         only_inspections=only_inspections,
         only_favorites=only_favorites,
+        only_pets=only_pets,
         query=query,
         sort_by=sort_by
     )
@@ -312,7 +316,7 @@ def export_csv(max_price: int = 550):
     writer = csv.writer(output)
     writer.writerow([
         "ID", "Price ($/wk)", "Street", "Suburb", "Postcode", "Beds", "Baths", "Cars",
-        "Property Type", "Status", "Inspection Date", "Favorite", "Notes", "Listing URL"
+        "Property Type", "Status", "Pets Allowed", "Inspection Date", "Favorite", "Notes", "Listing URL"
     ])
     for it in items:
         writer.writerow([
@@ -326,6 +330,7 @@ def export_csv(max_price: int = 550):
             it.get("cars"),
             it.get("prop_type"),
             it.get("status"),
+            "Yes" if it.get("pets_allowed") else "No / Contact Agent",
             it.get("inspection_date"),
             "Yes" if it.get("is_favorite") else "No",
             it.get("notes"),

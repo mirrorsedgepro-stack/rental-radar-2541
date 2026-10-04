@@ -49,6 +49,18 @@ def clean_suburb(suburb_raw: str) -> str:
             return known
     return s
 
+def detect_pets_allowed(text: str = "", desc: str = "", has_pet_tag: bool = False, prop_type: str = "House") -> int:
+    if has_pet_tag:
+        return 1
+    combined = f"{text} {desc}".lower()
+    if re.search(r'\b(no pets?|strictly no pets?|not suitable for pets?|pets? not permitted|pets? not allowed|sorry,? no pets?)\b', combined):
+        return 0
+    if re.search(r'\b(pets?\s*(?:considered|allowed|welcome|friendly|ok|permitted|negotiable|approved|upon application|on application))\b', combined):
+        return 1
+    if re.search(r'\b(dog|cat|pets?)\s*(?:friendly|allowed|welcome|ok)\b', combined):
+        return 1
+    return 0
+
 def scrape_2541_rentals(max_price: int = 550) -> List[Dict[str, Any]]:
     """
     Scrapes rental listings in postcode 2541 from Rent.com.au.
@@ -181,6 +193,10 @@ def scrape_2541_rentals(max_price: int = 550) -> List[Dict[str, Any]]:
             # Title
             title = res.get('name') or f"{beds or ''} Bed {prop_type} in {suburb}".strip()
             
+            # Pets allowed detection
+            has_pet_tag = bool(art.find(attrs={'data-testid': 'feature-pets-allowed'}) or art.find('img', alt=lambda x: x and 'pet' in x.lower()))
+            pets_allowed = detect_pets_allowed(text, raw_desc, has_pet_tag, prop_type)
+
             # Extract Listing ID
             lid_match = re.search(r'-(\d+)$', full_url)
             lid = lid_match.group(1) if lid_match else str(abs(hash(full_url)))
@@ -202,6 +218,7 @@ def scrape_2541_rentals(max_price: int = 550) -> List[Dict[str, Any]]:
                 'lng': lng,
                 'inspection': inspection,
                 'desc': raw_desc or text[:250],
+                'pets_allowed': pets_allowed,
                 'source': 'rent.com.au'
             })
             
@@ -270,6 +287,7 @@ def scrape_raywhite_shoalhaven(max_price: int = 550) -> List[Dict[str, Any]]:
                     
             lid_m = re.search(r'/(\d+)$', full_url)
             lid = "rw_" + (lid_m.group(1) if lid_m else str(abs(hash(full_url))))
+            pets_allowed = detect_pets_allowed(text, '', ('pet' in text.lower() or prop_type == 'House'), prop_type)
             
             results.append({
                 'id': lid,
@@ -288,6 +306,7 @@ def scrape_raywhite_shoalhaven(max_price: int = 550) -> List[Dict[str, Any]]:
                 'lng': lng,
                 'inspection': None,
                 'desc': text[:250],
+                'pets_allowed': pets_allowed,
                 'source': 'Ray White Nowra'
             })
     except Exception as e:

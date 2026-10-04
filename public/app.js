@@ -15,7 +15,8 @@ const filters = {
     query: '',
     sort_by: 'price_asc',
     only_inspections: false,
-    only_favorites: false
+    only_favorites: false,
+    only_pets: false
 };
 
 // Initialize App
@@ -137,6 +138,12 @@ function initEventListeners() {
         filters.sort_by = e.target.value;
         const deskSort = document.getElementById('filter-sort');
         if (deskSort) deskSort.value = e.target.value;
+        fetchListings();
+    });
+
+    document.getElementById('filter-only-pets')?.addEventListener('change', (e) => {
+        filters.only_pets = e.target.checked;
+        syncFilterControls();
         fetchListings();
     });
 
@@ -271,6 +278,9 @@ function initMobileFilters() {
         const propSelect = document.getElementById('mobile-sheet-prop-type');
         if (propSelect) propSelect.value = filters.prop_type;
 
+        const petsCheck = document.getElementById('mobile-sheet-pets');
+        if (petsCheck) petsCheck.checked = filters.only_pets;
+
         const inspCheck = document.getElementById('mobile-sheet-insp');
         if (inspCheck) inspCheck.checked = filters.only_inspections;
 
@@ -307,6 +317,9 @@ function initMobileFilters() {
         const propSelect = document.getElementById('mobile-sheet-prop-type');
         if (propSelect) filters.prop_type = propSelect.value;
 
+        const petsCheck = document.getElementById('mobile-sheet-pets');
+        if (petsCheck) filters.only_pets = petsCheck.checked;
+
         const inspCheck = document.getElementById('mobile-sheet-insp');
         if (inspCheck) filters.only_inspections = inspCheck.checked;
 
@@ -330,7 +343,9 @@ function initMobileChips() {
     document.querySelectorAll('.mobile-chip').forEach(chip => {
         chip.addEventListener('click', () => {
             const type = chip.getAttribute('data-chip');
-            if (type === 'insp') {
+            if (type === 'pets') {
+                filters.only_pets = !filters.only_pets;
+            } else if (type === 'insp') {
                 filters.only_inspections = !filters.only_inspections;
             } else if (type === 'fav') {
                 filters.only_favorites = !filters.only_favorites;
@@ -351,7 +366,8 @@ function updateChipVisualStates() {
     document.querySelectorAll('.mobile-chip').forEach(chip => {
         const type = chip.getAttribute('data-chip');
         let isActive = false;
-        if (type === 'insp') isActive = filters.only_inspections;
+        if (type === 'pets') isActive = filters.only_pets;
+        else if (type === 'insp') isActive = filters.only_inspections;
         else if (type === 'fav') isActive = filters.only_favorites;
         else if (type === 'price-450') isActive = (filters.max_price === 450);
         else if (type === 'beds-2') isActive = (filters.min_beds === 2);
@@ -374,6 +390,7 @@ function updateActiveFilterBadge() {
     if (filters.min_beds > 0) count++;
     if (filters.prop_type !== 'all') count++;
     if (filters.query && filters.query.length > 0) count++;
+    if (filters.only_pets) count++;
     if (filters.only_inspections) count++;
     if (filters.only_favorites) count++;
 
@@ -405,6 +422,12 @@ function syncDesktopFiltersFromState() {
 
     const prop = document.getElementById('filter-prop-type');
     if (prop) prop.value = filters.prop_type;
+
+    const pets = document.getElementById('filter-only-pets');
+    if (pets) pets.checked = filters.only_pets;
+
+    const mobPets = document.getElementById('mobile-sheet-pets');
+    if (mobPets) mobPets.checked = filters.only_pets;
 
     const insp = document.getElementById('filter-only-inspections');
     if (insp) insp.checked = filters.only_inspections;
@@ -501,6 +524,7 @@ async function fetchListings() {
         params.append('sort_by', filters.sort_by);
         if (filters.only_inspections) params.append('only_inspections', 'true');
         if (filters.only_favorites) params.append('only_favorites', 'true');
+        if (filters.only_pets) params.append('only_pets', 'true');
 
         const res = await fetch(`/api/listings?${params.toString()}`);
         const data = await res.json();
@@ -623,8 +647,14 @@ function createListingCardHtml(item) {
                     </div>
 
                     <!-- Inspection / Badges -->
-                    <div class="mt-2">
+                    <div class="mt-2 flex flex-wrap gap-1.5 items-center">
                         ${inspBadge}
+                        ${item.pets_allowed ? `
+                            <div class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                <i data-lucide="paw-print" class="w-3 h-3 mr-1 text-emerald-600"></i>
+                                <span>Pets OK</span>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
 
@@ -907,6 +937,27 @@ function openListingModal(listingId) {
         inspBox.classList.add('hidden');
     }
 
+    // Pet Policy Box
+    const petBox = document.getElementById('modal-pet-box');
+    const petText = document.getElementById('modal-pet-text');
+    const petBadge = document.getElementById('modal-pet-badge');
+    const petIconWrap = document.getElementById('modal-pet-icon-wrap');
+    if (petBox && petText && petBadge) {
+        if (item.pets_allowed) {
+            petText.textContent = "Pets Allowed / Considered Upon Application";
+            petText.className = "text-xs font-bold text-emerald-700";
+            petBadge.textContent = "Pet Friendly";
+            petBadge.className = "px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800";
+            if (petIconWrap) petIconWrap.className = "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-emerald-100 text-emerald-700";
+        } else {
+            petText.textContent = "No pets specified or subject to landlord discretion";
+            petText.className = "text-xs font-medium text-slate-600";
+            petBadge.textContent = "Check with Agent";
+            petBadge.className = "px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600";
+            if (petIconWrap) petIconWrap.className = "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-slate-100 text-slate-500";
+        }
+    }
+
     // Google Maps Link
     const q = encodeURIComponent(`${item.street}, ${item.suburb} NSW 2541`);
     const mapsLink = document.getElementById('modal-maps-link');
@@ -1044,7 +1095,8 @@ async function handleAddRental(e) {
         prop_type: document.getElementById('add-type').value,
         url: document.getElementById('add-url').value,
         image_url: document.getElementById('add-image').value,
-        notes: document.getElementById('add-notes').value
+        notes: document.getElementById('add-notes').value,
+        pets_allowed: document.getElementById('add-pets-allowed')?.checked ? 1 : 0
     };
 
     try {
@@ -1245,6 +1297,9 @@ async function fetchStats() {
         const statInsp = document.getElementById('stat-inspections');
         if (statInsp) statInsp.textContent = s.inspections_count;
 
+        const statPets = document.getElementById('stat-pets');
+        if (statPets) statPets.textContent = s.pets_count ?? '--';
+
         const statSaved = document.getElementById('stat-saved');
         if (statSaved) statSaved.textContent = s.favorites_count;
 
@@ -1268,6 +1323,7 @@ function resetFilters() {
     filters.prop_type = 'all';
     filters.query = '';
     filters.sort_by = 'price_asc';
+    filters.only_pets = false;
     filters.only_inspections = false;
     filters.only_favorites = false;
 

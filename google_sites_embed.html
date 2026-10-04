@@ -327,8 +327,8 @@ button, a, select, input[type="range"] {
     <!-- Main Content Container -->
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6 flex-1 w-full space-y-3 sm:space-y-6 pb-24 md:pb-8">
 
-        <!-- Stat Highlights Cards (Swipeable horizontal strip on mobile, 5 cols on desktop) -->
-        <div class="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-2.5 pb-1 lg:grid lg:grid-cols-5 lg:gap-4">
+        <!-- Stat Highlights Cards (Swipeable horizontal strip on mobile, 6 cols on desktop) -->
+        <div class="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-2.5 pb-1 lg:grid lg:grid-cols-6 lg:gap-3">
             <!-- Active Under 550 -->
             <div class="flex-shrink-0 w-[145px] sm:w-48 lg:w-auto snap-start bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
@@ -376,6 +376,20 @@ button, a, select, input[type="range"] {
                 </div>
                 <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
                     <i data-lucide="calendar" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </div>
+            </div>
+
+            <!-- Pet Friendly -->
+            <div class="flex-shrink-0 w-[145px] sm:w-48 lg:w-auto snap-start bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">Pet Friendly</p>
+                    <h3 id="stat-pets" class="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5">--</h3>
+                    <p class="text-[10px] sm:text-xs text-emerald-600 font-medium mt-0.5 flex items-center">
+                        <i data-lucide="paw-print" class="w-3 h-3 mr-1 text-emerald-600"></i> Pets allowed
+                    </p>
+                </div>
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="paw-print" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </div>
             </div>
 
@@ -451,6 +465,9 @@ button, a, select, input[type="range"] {
 
             <!-- Quick Filter Chips Row (1-Tap toggles on mobile) -->
             <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar text-xs pt-1">
+                <button class="mobile-chip px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-chip="pets">
+                    🐾 Pets Allowed
+                </button>
                 <button class="mobile-chip px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-chip="insp">
                     📅 Inspections
                 </button>
@@ -487,7 +504,7 @@ button, a, select, input[type="range"] {
                         <label class="text-xs font-semibold text-slate-600">Max Rent / wk</label>
                         <span id="price-slider-val" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">$550</span>
                     </div>
-                    <input type="range" id="filter-max-price" min="300" max="650" step="10" value="550" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    <input type="range" id="filter-max-price" min="300" max="650" step="10" value="550" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
                 </div>
 
                 <!-- Bedrooms -->
@@ -530,8 +547,14 @@ button, a, select, input[type="range"] {
             </div>
 
             <!-- Checkbox toggles -->
-            <div class="flex flex-wrap items-center justify-between pt-2 border-t border-slate-100 text-xs">
-                <div class="flex items-center space-x-5">
+            <div class="flex flex-wrap items-center justify-between pt-2 border-t border-slate-100 text-xs gap-2">
+                <div class="flex flex-wrap items-center gap-4 sm:gap-6">
+                    <label class="inline-flex items-center cursor-pointer select-none">
+                        <input type="checkbox" id="filter-only-pets" class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+                        <span class="ml-2 font-medium text-slate-700 flex items-center">
+                            <i data-lucide="paw-print" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i> Pets Allowed Only
+                        </span>
+                    </label>
                     <label class="inline-flex items-center cursor-pointer select-none">
                         <input type="checkbox" id="filter-only-inspections" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
                         <span class="ml-2 font-medium text-slate-700">Has Upcoming Inspection</span>
@@ -1001,6 +1024,12 @@ button, a, select, input[type="range"] {
                 <!-- Toggles -->
                 <div class="space-y-3 pt-2 border-t border-slate-100">
                     <label class="flex items-center justify-between cursor-pointer select-none py-1">
+                        <span class="font-semibold text-slate-700 flex items-center">
+                            <i data-lucide="paw-print" class="w-3.5 h-3.5 mr-1.5 text-emerald-600"></i> Pets Allowed Only
+                        </span>
+                        <input type="checkbox" id="mobile-sheet-pets" class="w-5 h-5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+                    </label>
+                    <label class="flex items-center justify-between cursor-pointer select-none py-1">
                         <span class="font-semibold text-slate-700">Has Upcoming Inspection</span>
                         <input type="checkbox" id="mobile-sheet-insp" class="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
                     </label>
@@ -1080,6 +1109,20 @@ button, a, select, input[type="range"] {
                     <a id="modal-ical-btn" href="#" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition flex items-center shadow-sm whitespace-nowrap active:scale-95">
                         <i data-lucide="calendar-plus" class="w-3.5 h-3.5 mr-1"></i> Add .ics
                     </a>
+                </div>
+
+                <!-- Pet Policy Box -->
+                <div id="modal-pet-box" class="p-3 sm:p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+                    <div class="flex items-center space-x-2.5">
+                        <div id="modal-pet-icon-wrap" class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-emerald-100 text-emerald-700">
+                            <i data-lucide="paw-print" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="text-[11px] font-bold block text-slate-500">Pet Policy</span>
+                            <span id="modal-pet-text" class="text-xs font-bold text-slate-800">Pets Allowed / Considered</span>
+                        </div>
+                    </div>
+                    <span id="modal-pet-badge" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Pet Friendly</span>
                 </div>
 
                 <!-- Description -->
@@ -1210,6 +1253,12 @@ button, a, select, input[type="range"] {
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Personal Notes</label>
                     <textarea id="add-notes" rows="2" placeholder="Found on Facebook group, landlord contact John 04..." class="w-full p-2 border border-slate-300 rounded-lg"></textarea>
+                </div>
+                <div class="flex items-center space-x-2 pt-1">
+                    <input type="checkbox" id="add-pets-allowed" class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+                    <label for="add-pets-allowed" class="font-semibold text-slate-700 flex items-center cursor-pointer select-none">
+                        <i data-lucide="paw-print" class="w-3.5 h-3.5 mr-1.5 text-emerald-600"></i> Pets Allowed / Pet Friendly
+                    </label>
                 </div>
                 <div class="pt-3 border-t border-slate-200 flex justify-end space-x-2">
                     <button type="button" id="modal-add-cancel" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold active:scale-95 transition">Cancel</button>
@@ -1433,9 +1482,26 @@ button, a, select, input[type="range"] {
             console.log("Using embedded 2541 dataset:", args[0]);
             const url = args[0] || '';
             if (url.includes('/api/listings')) {
+                let items = [...INITIAL_LISTINGS];
+                try {
+                    const parsedUrl = new URL(url, 'http://localhost');
+                    const maxP = parseInt(parsedUrl.searchParams.get('max_price') || '550');
+                    items = items.filter(l => (l.price || 0) <= maxP);
+                    const sub = parsedUrl.searchParams.get('suburb');
+                    if (sub && sub !== 'all') items = items.filter(l => (l.suburb || '').toLowerCase() === sub.toLowerCase());
+                    const beds = parseInt(parsedUrl.searchParams.get('min_beds') || '0');
+                    if (beds > 0) items = items.filter(l => (l.beds || 0) >= beds);
+                    const ptype = parsedUrl.searchParams.get('prop_type');
+                    if (ptype && ptype !== 'all') items = items.filter(l => (l.prop_type || '').toLowerCase() === ptype.toLowerCase());
+                    if (parsedUrl.searchParams.get('only_pets') === 'true') items = items.filter(l => l.pets_allowed === 1);
+                    if (parsedUrl.searchParams.get('only_inspections') === 'true') items = items.filter(l => !!l.inspection_date);
+                    if (parsedUrl.searchParams.get('only_favorites') === 'true') items = items.filter(l => !!l.is_favorite);
+                    const q = (parsedUrl.searchParams.get('query') || '').toLowerCase().trim();
+                    if (q) items = items.filter(l => (l.street || '').toLowerCase().includes(q) || (l.suburb || '').toLowerCase().includes(q) || (l.description || '').toLowerCase().includes(q));
+                } catch(err) {}
                 return {
                     ok: true,
-                    json: async () => ({ count: INITIAL_LISTINGS.length, listings: INITIAL_LISTINGS })
+                    json: async () => ({ count: items.length, listings: items })
                 };
             }
             if (url.includes('/api/stats')) {
@@ -1449,6 +1515,7 @@ button, a, select, input[type="range"] {
                         min_price: 360,
                         max_price: 550,
                         inspections_count: INITIAL_LISTINGS.filter(l => l.inspection_date).length,
+                        pets_count: INITIAL_LISTINGS.filter(l => l.pets_allowed === 1).length,
                         favorites_count: 0,
                         suburbs: [
                             { suburb: 'Nowra', count: 7 },
@@ -1483,7 +1550,7 @@ button, a, select, input[type="range"] {
     
 
     // Pre-baked live listings for Google Sites
-    const INITIAL_LISTINGS = [{"id": "6481203", "url": "https://www.rent.com.au/property/9b-mattes-way-bomaderry-nsw-2541-6481203", "title": "9B Mattes Way, bomaderry NSW 2541", "street": "9B Mattes Way", "suburb": "Bomaderry", "postcode": "2541", "price": 360, "beds": 1, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267750297/695972de7be195435a101686-uploads_2F1764635789248-v7fpiwggjeg-3f6b98543d827cf02025a90a44fb5004_2Fimage__2810_29-1788747273-primary.jpg?1788747273", "lat": -34.85913, "lng": 150.598707, "inspection_date": "2026-10-06T10:35:00+11:00", "description": "$360 pw 1 bed, 1 bath property at 9B Mattes Way, bomaderry NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.292785", "last_seen": "2026-10-04T14:28:09.521079", "price_history": []}, {"id": "6494234", "url": "https://www.rent.com.au/property/14f-yeovil-dr-bomaderry-nsw-2541-6494234", "title": "14F Yeovil Drive, bomaderry NSW 2541", "street": "14F Yeovil Drive", "suburb": "Bomaderry", "postcode": "2541", "price": 390, "beds": 1, "baths": 1, "cars": 1, "prop_type": "Duplex", "image_url": "https://cdn.rent.com.au/photos/images/267965582/773e193271939ac427ca67bb-176784990146525578-rsd-1789966969-primary.jpg?1789966969", "lat": -34.841115, "lng": 150.607954, "inspection_date": null, "description": "$390 pw 1 bed, 1 bath property at 14F Yeovil Drive, bomaderry NSW 2541. Available 15th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.289861", "last_seen": "2026-10-04T14:28:09.518112", "price_history": []}, {"id": "6502936", "url": "https://www.rent.com.au/property/3-73-plunkett-st-nowra-nsw-2541-6502936", "title": "3/73 Plunkett Street, nowra NSW 2541", "street": "3/73 Plunkett Street", "suburb": "Nowra", "postcode": "2541", "price": 425, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Unit", "image_url": "https://cdn.rent.com.au/photos/images/268126827/3726bce6713f26af3cae951f-images_2F25974264_2F442730908-image-M-1790898612-primary.jpg?1790898612", "lat": -34.878086, "lng": 150.60022, "inspection_date": "2026-10-08T16:00:00+11:00", "description": "$425 pw 2 bed, 1 bath property at 3/73 Plunkett Street, nowra NSW 2541. Available 5th November 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.244892", "last_seen": "2026-10-04T14:28:09.477987", "price_history": []}, {"id": "6490495", "url": "https://www.rent.com.au/property/1-22-hawthorn-ave-nowra-nsw-2541-6490495", "title": "1/22 Hawthorn Avenue, nowra NSW 2541", "street": "1/22 Hawthorn Avenue", "suburb": "Nowra", "postcode": "2541", "price": 430, "beds": 2, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267993673/e4d40a5f7db5de6cb546190c-179011676653074164-rsd-1790116790-primary.jpg?1790116790", "lat": -34.867716, "lng": 150.603186, "inspection_date": null, "description": "$430 pw 2 bed, 1 bath property at 1/22 Hawthorn Avenue, nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.269218", "last_seen": "2026-10-04T14:28:09.498941", "price_history": []}, {"id": "6453612", "url": "https://www.rent.com.au/property/1-5-albatross-rd-nowra-nsw-2541-6453612", "title": "1/5 Albatross Road, nowra NSW 2541", "street": "1/5 Albatross Road", "suburb": "Nowra", "postcode": "2541", "price": 460, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Unit", "image_url": "https://cdn.rent.com.au/photos/images/267305390/d9a722cbdc9c22d0c3ca86b4-213092739__1785896588-213092739__1785895490-250664-7-1786070542-primary.png?1786070542", "lat": -34.887349, "lng": 150.599425, "inspection_date": null, "description": "$460 pw 2 bed, 1 bath property at 1/5 Albatross Road, nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.275238", "last_seen": "2026-10-04T14:28:09.504362", "price_history": []}, {"id": "6504892", "url": "https://www.rent.com.au/property/10-102-kalandar-st-nowra-nsw-2541-6504892", "title": "10/102 Kalandar Street, nowra NSW 2541", "street": "10/102 Kalandar Street", "suburb": "Nowra", "postcode": "2541", "price": 460, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/268140174/2626cb00bf024287a667b3f8-187512649__1771304948-187512649__1771304910-98930-IMG2504-1790922144-primary.jpg?1790922144", "lat": -34.888617, "lng": 150.606805, "inspection_date": "2026-10-06T12:45:00+11:00", "description": "$460 pw 2 bed, 1 bath property at 10/102 Kalandar Street, nowra NSW 2541. Available 12th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.239257", "last_seen": "2026-10-04T14:28:09.472820", "price_history": []}, {"id": "6497826", "url": "https://www.rent.com.au/property/1-2-mcmahons-rd-north-nowra-nsw-2541-6497826", "title": "1/2 Mcmahons Road, north nowra NSW 2541", "street": "1/2 Mcmahons Road", "suburb": "North Nowra", "postcode": "2541", "price": 500, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/268027489/ef901c83c10a6ef0a15e4f18-179023073005287703-rsd-1790230984-primary.jpg?1790230984", "lat": -34.858653, "lng": 150.583709, "inspection_date": null, "description": "$500 pw 2 bed, 1 bath property at 1/2 Mcmahons Road, north nowra NSW 2541. Available 21st October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.281091", "last_seen": "2026-10-04T14:28:09.509975", "price_history": []}, {"id": "6494267", "url": "https://www.rent.com.au/property/4-95-albatross-rd-west-nowra-nsw-2541-6494267", "title": "4/95 Albatross Road, west nowra NSW 2541", "street": "4/95 Albatross Road", "suburb": "West Nowra", "postcode": "2541", "price": 500, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/267969354/a2220eed0f8238b43d2f5c6e-178997101005287703-rsd-1789971593-primary.jpg?1789971593", "lat": -34.894336, "lng": 150.590801, "inspection_date": null, "description": "$500 pw 2 bed, 1 bath property at 4/95 Albatross Road, west nowra NSW 2541. Available 18th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.219726", "last_seen": "2026-10-04T14:28:09.454598", "price_history": []}, {"id": "6502205", "url": "https://www.rent.com.au/property/16-stuart-st-nowra-nsw-2541-6502205", "title": "16 Stuart Street, nowra NSW 2541", "street": "16 Stuart Street", "suburb": "Nowra", "postcode": "2541", "price": 510, "beds": 3, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268098821/3b30e3303dc1357a57c8091b-179074480516564160-rsd-1790745114-primary.jpg?1790745114", "lat": -34.889852, "lng": 150.61007, "inspection_date": null, "description": "$510 pw 3 bed, 1 bath property at 16 Stuart Street, nowra NSW 2541. Available 16th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.250944", "last_seen": "2026-10-04T14:28:09.483119", "price_history": []}, {"id": "6498545", "url": "https://www.rent.com.au/property/11-aspromonte-dr-south-nowra-nsw-2541-6498545", "title": "11 Aspromonte Drive, south nowra NSW 2541", "street": "11 Aspromonte Drive", "suburb": "South Nowra", "postcode": "2541", "price": 520, "beds": 2, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268036583/dd35228966ebff8407bf43fc-220509654__1790302797-51028-Capture-1790303358-primary.PNG?1790303358", "lat": -34.919589, "lng": 150.610696, "inspection_date": "2026-10-08T16:30:00+11:00", "description": "$520 pw 2 bed, 1 bath property at 11 Aspromonte Drive, south nowra NSW 2541. Available 12th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.228212", "last_seen": "2026-10-04T14:28:09.462301", "price_history": []}, {"id": "6442408", "url": "https://www.rent.com.au/property/22-sampson-cres-bomaderry-nsw-2541-6442408", "title": "22 Sampson Crescent, bomaderry NSW 2541", "street": "22 Sampson Crescent", "suburb": "Bomaderry", "postcode": "2541", "price": 540, "beds": 3, "baths": 1, "cars": 2, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267120231/569cbc65ae924e8d390fb9e8-200191980__1778039108-200191980__1778039064-69534-1-1785114738-primary.png?1785114738", "lat": -34.846664, "lng": 150.607518, "inspection_date": null, "description": "$540 pw 3 bed, 1 bath property at 22 Sampson Crescent, bomaderry NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.295730", "last_seen": "2026-10-04T14:28:09.523887", "price_history": []}, {"id": "6494598", "url": "https://www.rent.com.au/property/5-burr-ave-nowra-nsw-2541-6494598", "title": "5 Burr Avenue, nowra NSW 2541", "street": "5 Burr Avenue", "suburb": "Nowra", "postcode": "2541", "price": 540, "beds": 4, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267975932/49caf8330c005fd81a6d622e-179003539438915624-rsd-1790035916-primary.jpg?1790035916", "lat": -34.87695, "lng": 150.598541, "inspection_date": null, "description": "$540 pw 4 bed, 1 bath property at 5 Burr Avenue, nowra NSW 2541. Available 5th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.262807", "last_seen": "2026-10-04T14:28:09.493764", "price_history": []}, {"id": "5785009", "url": "https://www.rent.com.au/property/69-st-anns-st-nowra-nsw-2541-5785009", "title": "69 St Anns Street, nowra NSW 2541", "street": "69 St Anns Street", "suburb": "Nowra", "postcode": "2541", "price": 540, "beds": 3, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/252280121/928302464a5a9e2e892360d1-ee0927a8_2D8b72_2D6341_2D7816_2Dc866e3418f14-1725265361-primary.jpg?1725265361", "lat": -34.884709, "lng": 150.604202, "inspection_date": "2026-10-07T13:30:00+11:00", "description": "$540 pw 3 bed, 1 bath property at 69 St Anns Street, nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.259864", "last_seen": "2026-10-04T14:28:09.491033", "price_history": []}, {"id": "6499926", "url": "https://www.rent.com.au/property/2-8-meroo-rd-bomaderry-nsw-2541-6499926", "title": "2/8 Meroo Road, bomaderry NSW 2541", "street": "2/8 Meroo Road", "suburb": "Bomaderry", "postcode": "2541", "price": 550, "beds": 3, "baths": 2, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/268087040/2fdf5b5be9e04a895aa006e2-179072326355306537-rsd-1790723387-primary.jpg?1790723387", "lat": -34.834936, "lng": 150.60939, "inspection_date": null, "description": "$550 pw 3 bed, 2 bath property at 2/8 Meroo Road, bomaderry NSW 2541. Available 19th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.286990", "last_seen": "2026-10-04T14:28:09.515375", "price_history": []}, {"id": "6505000", "url": "https://www.rent.com.au/property/22-mcmahons-rd-north-nowra-nsw-2541-6505000", "title": "22 Mcmahons Road, north nowra NSW 2541", "street": "22 Mcmahons Road", "suburb": "North Nowra", "postcode": "2541", "price": 550, "beds": 4, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268141836/74aca3dbe0b0caf2e492cb59-178875771351358024-rsd-1790925286-primary.jpg?1790925286", "lat": -34.859462, "lng": 150.58174, "inspection_date": null, "description": "$550 pw 4 bed, 1 bath property at 22 Mcmahons Road, north nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.278334", "last_seen": "2026-10-04T14:28:09.507158", "price_history": []}, {"id": "6499898", "url": "https://www.rent.com.au/property/5-75-albatross-rd-west-nowra-nsw-2541-6499898", "title": "5/75 Albatross Road, west nowra NSW 2541", "street": "5/75 Albatross Road", "suburb": "West Nowra", "postcode": "2541", "price": 550, "beds": 3, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268058274/f0f5fd02e5766cd3dfe0d445-171581918651358024-rsd-1790569141-primary.jpg?1790569141", "lat": -34.8929, "lng": 150.592181, "inspection_date": null, "description": "$550 pw 3 bed, 1 bath property at 5/75 Albatross Road, west nowra NSW 2541. Available 5th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.216829", "last_seen": "2026-10-04T14:28:09.451757", "price_history": []}];
+    const INITIAL_LISTINGS = [{"id": "6481203", "url": "https://www.rent.com.au/property/9b-mattes-way-bomaderry-nsw-2541-6481203", "title": "9B Mattes Way, bomaderry NSW 2541", "street": "9B Mattes Way", "suburb": "Bomaderry", "postcode": "2541", "price": 360, "beds": 1, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267750297/695972de7be195435a101686-uploads_2F1764635789248-v7fpiwggjeg-3f6b98543d827cf02025a90a44fb5004_2Fimage__2810_29-1788747273-primary.jpg?1788747273", "lat": -34.85913, "lng": 150.598707, "inspection_date": "2026-10-06T10:35:00+11:00", "description": "$360 pw 1 bed, 1 bath property at 9B Mattes Way, bomaderry NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.292785", "last_seen": "2026-10-04T14:28:09.521079", "price_history": [], "pets_allowed": 1}, {"id": "6494234", "url": "https://www.rent.com.au/property/14f-yeovil-dr-bomaderry-nsw-2541-6494234", "title": "14F Yeovil Drive, bomaderry NSW 2541", "street": "14F Yeovil Drive", "suburb": "Bomaderry", "postcode": "2541", "price": 390, "beds": 1, "baths": 1, "cars": 1, "prop_type": "Duplex", "image_url": "https://cdn.rent.com.au/photos/images/267965582/773e193271939ac427ca67bb-176784990146525578-rsd-1789966969-primary.jpg?1789966969", "lat": -34.841115, "lng": 150.607954, "inspection_date": null, "description": "$390 pw 1 bed, 1 bath property at 14F Yeovil Drive, bomaderry NSW 2541. Available 15th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.289861", "last_seen": "2026-10-04T14:28:09.518112", "price_history": [], "pets_allowed": 0}, {"id": "6502936", "url": "https://www.rent.com.au/property/3-73-plunkett-st-nowra-nsw-2541-6502936", "title": "3/73 Plunkett Street, nowra NSW 2541", "street": "3/73 Plunkett Street", "suburb": "Nowra", "postcode": "2541", "price": 425, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Unit", "image_url": "https://cdn.rent.com.au/photos/images/268126827/3726bce6713f26af3cae951f-images_2F25974264_2F442730908-image-M-1790898612-primary.jpg?1790898612", "lat": -34.878086, "lng": 150.60022, "inspection_date": "2026-10-08T16:00:00+11:00", "description": "$425 pw 2 bed, 1 bath property at 3/73 Plunkett Street, nowra NSW 2541. Available 5th November 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.244892", "last_seen": "2026-10-04T14:28:09.477987", "price_history": [], "pets_allowed": 0}, {"id": "6490495", "url": "https://www.rent.com.au/property/1-22-hawthorn-ave-nowra-nsw-2541-6490495", "title": "1/22 Hawthorn Avenue, nowra NSW 2541", "street": "1/22 Hawthorn Avenue", "suburb": "Nowra", "postcode": "2541", "price": 430, "beds": 2, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267993673/e4d40a5f7db5de6cb546190c-179011676653074164-rsd-1790116790-primary.jpg?1790116790", "lat": -34.867716, "lng": 150.603186, "inspection_date": null, "description": "$430 pw 2 bed, 1 bath property at 1/22 Hawthorn Avenue, nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.269218", "last_seen": "2026-10-04T14:28:09.498941", "price_history": [], "pets_allowed": 0}, {"id": "6453612", "url": "https://www.rent.com.au/property/1-5-albatross-rd-nowra-nsw-2541-6453612", "title": "1/5 Albatross Road, nowra NSW 2541", "street": "1/5 Albatross Road", "suburb": "Nowra", "postcode": "2541", "price": 460, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Unit", "image_url": "https://cdn.rent.com.au/photos/images/267305390/d9a722cbdc9c22d0c3ca86b4-213092739__1785896588-213092739__1785895490-250664-7-1786070542-primary.png?1786070542", "lat": -34.887349, "lng": 150.599425, "inspection_date": null, "description": "$460 pw 2 bed, 1 bath property at 1/5 Albatross Road, nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.275238", "last_seen": "2026-10-04T14:28:09.504362", "price_history": [], "pets_allowed": 0}, {"id": "6504892", "url": "https://www.rent.com.au/property/10-102-kalandar-st-nowra-nsw-2541-6504892", "title": "10/102 Kalandar Street, nowra NSW 2541", "street": "10/102 Kalandar Street", "suburb": "Nowra", "postcode": "2541", "price": 460, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/268140174/2626cb00bf024287a667b3f8-187512649__1771304948-187512649__1771304910-98930-IMG2504-1790922144-primary.jpg?1790922144", "lat": -34.888617, "lng": 150.606805, "inspection_date": "2026-10-06T12:45:00+11:00", "description": "$460 pw 2 bed, 1 bath property at 10/102 Kalandar Street, nowra NSW 2541. Available 12th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.239257", "last_seen": "2026-10-04T14:28:09.472820", "price_history": [], "pets_allowed": 0}, {"id": "6497826", "url": "https://www.rent.com.au/property/1-2-mcmahons-rd-north-nowra-nsw-2541-6497826", "title": "1/2 Mcmahons Road, north nowra NSW 2541", "street": "1/2 Mcmahons Road", "suburb": "North Nowra", "postcode": "2541", "price": 500, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/268027489/ef901c83c10a6ef0a15e4f18-179023073005287703-rsd-1790230984-primary.jpg?1790230984", "lat": -34.858653, "lng": 150.583709, "inspection_date": null, "description": "$500 pw 2 bed, 1 bath property at 1/2 Mcmahons Road, north nowra NSW 2541. Available 21st October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.281091", "last_seen": "2026-10-04T14:28:09.509975", "price_history": [], "pets_allowed": 1}, {"id": "6494267", "url": "https://www.rent.com.au/property/4-95-albatross-rd-west-nowra-nsw-2541-6494267", "title": "4/95 Albatross Road, west nowra NSW 2541", "street": "4/95 Albatross Road", "suburb": "West Nowra", "postcode": "2541", "price": 500, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/267969354/a2220eed0f8238b43d2f5c6e-178997101005287703-rsd-1789971593-primary.jpg?1789971593", "lat": -34.894336, "lng": 150.590801, "inspection_date": null, "description": "$500 pw 2 bed, 1 bath property at 4/95 Albatross Road, west nowra NSW 2541. Available 18th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.219726", "last_seen": "2026-10-04T14:28:09.454598", "price_history": [], "pets_allowed": 0}, {"id": "6502205", "url": "https://www.rent.com.au/property/16-stuart-st-nowra-nsw-2541-6502205", "title": "16 Stuart Street, nowra NSW 2541", "street": "16 Stuart Street", "suburb": "Nowra", "postcode": "2541", "price": 510, "beds": 3, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268098821/3b30e3303dc1357a57c8091b-179074480516564160-rsd-1790745114-primary.jpg?1790745114", "lat": -34.889852, "lng": 150.61007, "inspection_date": null, "description": "$510 pw 3 bed, 1 bath property at 16 Stuart Street, nowra NSW 2541. Available 16th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.250944", "last_seen": "2026-10-04T14:28:09.483119", "price_history": [], "pets_allowed": 1}, {"id": "6498545", "url": "https://www.rent.com.au/property/11-aspromonte-dr-south-nowra-nsw-2541-6498545", "title": "11 Aspromonte Drive, south nowra NSW 2541", "street": "11 Aspromonte Drive", "suburb": "South Nowra", "postcode": "2541", "price": 520, "beds": 2, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268036583/dd35228966ebff8407bf43fc-220509654__1790302797-51028-Capture-1790303358-primary.PNG?1790303358", "lat": -34.919589, "lng": 150.610696, "inspection_date": "2026-10-08T16:30:00+11:00", "description": "$520 pw 2 bed, 1 bath property at 11 Aspromonte Drive, south nowra NSW 2541. Available 12th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.228212", "last_seen": "2026-10-04T14:28:09.462301", "price_history": [], "pets_allowed": 1}, {"id": "6442408", "url": "https://www.rent.com.au/property/22-sampson-cres-bomaderry-nsw-2541-6442408", "title": "22 Sampson Crescent, bomaderry NSW 2541", "street": "22 Sampson Crescent", "suburb": "Bomaderry", "postcode": "2541", "price": 540, "beds": 3, "baths": 1, "cars": 2, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267120231/569cbc65ae924e8d390fb9e8-200191980__1778039108-200191980__1778039064-69534-1-1785114738-primary.png?1785114738", "lat": -34.846664, "lng": 150.607518, "inspection_date": null, "description": "$540 pw 3 bed, 1 bath property at 22 Sampson Crescent, bomaderry NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.295730", "last_seen": "2026-10-04T14:28:09.523887", "price_history": [], "pets_allowed": 1}, {"id": "6494598", "url": "https://www.rent.com.au/property/5-burr-ave-nowra-nsw-2541-6494598", "title": "5 Burr Avenue, nowra NSW 2541", "street": "5 Burr Avenue", "suburb": "Nowra", "postcode": "2541", "price": 540, "beds": 4, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267975932/49caf8330c005fd81a6d622e-179003539438915624-rsd-1790035916-primary.jpg?1790035916", "lat": -34.87695, "lng": 150.598541, "inspection_date": null, "description": "$540 pw 4 bed, 1 bath property at 5 Burr Avenue, nowra NSW 2541. Available 5th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.262807", "last_seen": "2026-10-04T14:28:09.493764", "price_history": [], "pets_allowed": 1}, {"id": "5785009", "url": "https://www.rent.com.au/property/69-st-anns-st-nowra-nsw-2541-5785009", "title": "69 St Anns Street, nowra NSW 2541", "street": "69 St Anns Street", "suburb": "Nowra", "postcode": "2541", "price": 540, "beds": 3, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/252280121/928302464a5a9e2e892360d1-ee0927a8_2D8b72_2D6341_2D7816_2Dc866e3418f14-1725265361-primary.jpg?1725265361", "lat": -34.884709, "lng": 150.604202, "inspection_date": "2026-10-07T13:30:00+11:00", "description": "$540 pw 3 bed, 1 bath property at 69 St Anns Street, nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.259864", "last_seen": "2026-10-04T14:28:09.491033", "price_history": [], "pets_allowed": 1}, {"id": "6499926", "url": "https://www.rent.com.au/property/2-8-meroo-rd-bomaderry-nsw-2541-6499926", "title": "2/8 Meroo Road, bomaderry NSW 2541", "street": "2/8 Meroo Road", "suburb": "Bomaderry", "postcode": "2541", "price": 550, "beds": 3, "baths": 2, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/268087040/2fdf5b5be9e04a895aa006e2-179072326355306537-rsd-1790723387-primary.jpg?1790723387", "lat": -34.834936, "lng": 150.60939, "inspection_date": null, "description": "$550 pw 3 bed, 2 bath property at 2/8 Meroo Road, bomaderry NSW 2541. Available 19th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.286990", "last_seen": "2026-10-04T14:28:09.515375", "price_history": [], "pets_allowed": 0}, {"id": "6505000", "url": "https://www.rent.com.au/property/22-mcmahons-rd-north-nowra-nsw-2541-6505000", "title": "22 Mcmahons Road, north nowra NSW 2541", "street": "22 Mcmahons Road", "suburb": "North Nowra", "postcode": "2541", "price": 550, "beds": 4, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268141836/74aca3dbe0b0caf2e492cb59-178875771351358024-rsd-1790925286-primary.jpg?1790925286", "lat": -34.859462, "lng": 150.58174, "inspection_date": null, "description": "$550 pw 4 bed, 1 bath property at 22 Mcmahons Road, north nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.278334", "last_seen": "2026-10-04T14:28:09.507158", "price_history": [], "pets_allowed": 1}, {"id": "6499898", "url": "https://www.rent.com.au/property/5-75-albatross-rd-west-nowra-nsw-2541-6499898", "title": "5/75 Albatross Road, west nowra NSW 2541", "street": "5/75 Albatross Road", "suburb": "West Nowra", "postcode": "2541", "price": 550, "beds": 3, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268058274/f0f5fd02e5766cd3dfe0d445-171581918651358024-rsd-1790569141-primary.jpg?1790569141", "lat": -34.8929, "lng": 150.592181, "inspection_date": null, "description": "$550 pw 3 bed, 1 bath property at 5/75 Albatross Road, west nowra NSW 2541. Available 5th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.216829", "last_seen": "2026-10-04T14:28:09.451757", "price_history": [], "pets_allowed": 0}];
 
     // Override fetchListings for offline/iframe embedding if local API is unreachable
     const originalFetchListings = window.fetchListings;
@@ -1504,7 +1571,8 @@ const filters = {
     query: '',
     sort_by: 'price_asc',
     only_inspections: false,
-    only_favorites: false
+    only_favorites: false,
+    only_pets: false
 };
 
 // Initialize App
@@ -1626,6 +1694,12 @@ function initEventListeners() {
         filters.sort_by = e.target.value;
         const deskSort = document.getElementById('filter-sort');
         if (deskSort) deskSort.value = e.target.value;
+        fetchListings();
+    });
+
+    document.getElementById('filter-only-pets')?.addEventListener('change', (e) => {
+        filters.only_pets = e.target.checked;
+        syncFilterControls();
         fetchListings();
     });
 
@@ -1760,6 +1834,9 @@ function initMobileFilters() {
         const propSelect = document.getElementById('mobile-sheet-prop-type');
         if (propSelect) propSelect.value = filters.prop_type;
 
+        const petsCheck = document.getElementById('mobile-sheet-pets');
+        if (petsCheck) petsCheck.checked = filters.only_pets;
+
         const inspCheck = document.getElementById('mobile-sheet-insp');
         if (inspCheck) inspCheck.checked = filters.only_inspections;
 
@@ -1796,6 +1873,9 @@ function initMobileFilters() {
         const propSelect = document.getElementById('mobile-sheet-prop-type');
         if (propSelect) filters.prop_type = propSelect.value;
 
+        const petsCheck = document.getElementById('mobile-sheet-pets');
+        if (petsCheck) filters.only_pets = petsCheck.checked;
+
         const inspCheck = document.getElementById('mobile-sheet-insp');
         if (inspCheck) filters.only_inspections = inspCheck.checked;
 
@@ -1819,7 +1899,9 @@ function initMobileChips() {
     document.querySelectorAll('.mobile-chip').forEach(chip => {
         chip.addEventListener('click', () => {
             const type = chip.getAttribute('data-chip');
-            if (type === 'insp') {
+            if (type === 'pets') {
+                filters.only_pets = !filters.only_pets;
+            } else if (type === 'insp') {
                 filters.only_inspections = !filters.only_inspections;
             } else if (type === 'fav') {
                 filters.only_favorites = !filters.only_favorites;
@@ -1840,7 +1922,8 @@ function updateChipVisualStates() {
     document.querySelectorAll('.mobile-chip').forEach(chip => {
         const type = chip.getAttribute('data-chip');
         let isActive = false;
-        if (type === 'insp') isActive = filters.only_inspections;
+        if (type === 'pets') isActive = filters.only_pets;
+        else if (type === 'insp') isActive = filters.only_inspections;
         else if (type === 'fav') isActive = filters.only_favorites;
         else if (type === 'price-450') isActive = (filters.max_price === 450);
         else if (type === 'beds-2') isActive = (filters.min_beds === 2);
@@ -1863,6 +1946,7 @@ function updateActiveFilterBadge() {
     if (filters.min_beds > 0) count++;
     if (filters.prop_type !== 'all') count++;
     if (filters.query && filters.query.length > 0) count++;
+    if (filters.only_pets) count++;
     if (filters.only_inspections) count++;
     if (filters.only_favorites) count++;
 
@@ -1894,6 +1978,12 @@ function syncDesktopFiltersFromState() {
 
     const prop = document.getElementById('filter-prop-type');
     if (prop) prop.value = filters.prop_type;
+
+    const pets = document.getElementById('filter-only-pets');
+    if (pets) pets.checked = filters.only_pets;
+
+    const mobPets = document.getElementById('mobile-sheet-pets');
+    if (mobPets) mobPets.checked = filters.only_pets;
 
     const insp = document.getElementById('filter-only-inspections');
     if (insp) insp.checked = filters.only_inspections;
@@ -1990,6 +2080,7 @@ async function fetchListings() {
         params.append('sort_by', filters.sort_by);
         if (filters.only_inspections) params.append('only_inspections', 'true');
         if (filters.only_favorites) params.append('only_favorites', 'true');
+        if (filters.only_pets) params.append('only_pets', 'true');
 
         const res = await fetch(`/api/listings?${params.toString()}`);
         const data = await res.json();
@@ -2113,8 +2204,14 @@ function createListingCardHtml(item) {
                     </div>
 
                     <!-- Inspection / Badges -->
-                    <div class="mt-2">
+                    <div class="mt-2 flex flex-wrap gap-1.5 items-center">
                         ${inspBadge}
+                        ${item.pets_allowed ? `
+                            <div class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                <i data-lucide="paw-print" class="w-3 h-3 mr-1 text-emerald-600"></i>
+                                <span>Pets OK</span>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
 
@@ -2397,6 +2494,27 @@ function openListingModal(listingId) {
         inspBox.classList.add('hidden');
     }
 
+    // Pet Policy Box
+    const petBox = document.getElementById('modal-pet-box');
+    const petText = document.getElementById('modal-pet-text');
+    const petBadge = document.getElementById('modal-pet-badge');
+    const petIconWrap = document.getElementById('modal-pet-icon-wrap');
+    if (petBox && petText && petBadge) {
+        if (item.pets_allowed) {
+            petText.textContent = "Pets Allowed / Considered Upon Application";
+            petText.className = "text-xs font-bold text-emerald-700";
+            petBadge.textContent = "Pet Friendly";
+            petBadge.className = "px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800";
+            if (petIconWrap) petIconWrap.className = "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-emerald-100 text-emerald-700";
+        } else {
+            petText.textContent = "No pets specified or subject to landlord discretion";
+            petText.className = "text-xs font-medium text-slate-600";
+            petBadge.textContent = "Check with Agent";
+            petBadge.className = "px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600";
+            if (petIconWrap) petIconWrap.className = "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-slate-100 text-slate-500";
+        }
+    }
+
     // Google Maps Link
     const q = encodeURIComponent(`${item.street}, ${item.suburb} NSW 2541`);
     const mapsLink = document.getElementById('modal-maps-link');
@@ -2534,7 +2652,8 @@ async function handleAddRental(e) {
         prop_type: document.getElementById('add-type').value,
         url: document.getElementById('add-url').value,
         image_url: document.getElementById('add-image').value,
-        notes: document.getElementById('add-notes').value
+        notes: document.getElementById('add-notes').value,
+        pets_allowed: document.getElementById('add-pets-allowed')?.checked ? 1 : 0
     };
 
     try {
@@ -2735,6 +2854,9 @@ async function fetchStats() {
         const statInsp = document.getElementById('stat-inspections');
         if (statInsp) statInsp.textContent = s.inspections_count;
 
+        const statPets = document.getElementById('stat-pets');
+        if (statPets) statPets.textContent = s.pets_count ?? '--';
+
         const statSaved = document.getElementById('stat-saved');
         if (statSaved) statSaved.textContent = s.favorites_count;
 
@@ -2758,6 +2880,7 @@ function resetFilters() {
     filters.prop_type = 'all';
     filters.query = '';
     filters.sort_by = 'price_asc';
+    filters.only_pets = false;
     filters.only_inspections = false;
     filters.only_favorites = false;
 

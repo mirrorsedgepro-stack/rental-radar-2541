@@ -68,9 +68,26 @@ def build_embed():
             console.log("Using embedded 2541 dataset:", args[0]);
             const url = args[0] || '';
             if (url.includes('/api/listings')) {
+                let items = [...INITIAL_LISTINGS];
+                try {
+                    const parsedUrl = new URL(url, 'http://localhost');
+                    const maxP = parseInt(parsedUrl.searchParams.get('max_price') || '550');
+                    items = items.filter(l => (l.price || 0) <= maxP);
+                    const sub = parsedUrl.searchParams.get('suburb');
+                    if (sub && sub !== 'all') items = items.filter(l => (l.suburb || '').toLowerCase() === sub.toLowerCase());
+                    const beds = parseInt(parsedUrl.searchParams.get('min_beds') || '0');
+                    if (beds > 0) items = items.filter(l => (l.beds || 0) >= beds);
+                    const ptype = parsedUrl.searchParams.get('prop_type');
+                    if (ptype && ptype !== 'all') items = items.filter(l => (l.prop_type || '').toLowerCase() === ptype.toLowerCase());
+                    if (parsedUrl.searchParams.get('only_pets') === 'true') items = items.filter(l => l.pets_allowed === 1);
+                    if (parsedUrl.searchParams.get('only_inspections') === 'true') items = items.filter(l => !!l.inspection_date);
+                    if (parsedUrl.searchParams.get('only_favorites') === 'true') items = items.filter(l => !!l.is_favorite);
+                    const q = (parsedUrl.searchParams.get('query') || '').toLowerCase().trim();
+                    if (q) items = items.filter(l => (l.street || '').toLowerCase().includes(q) || (l.suburb || '').toLowerCase().includes(q) || (l.description || '').toLowerCase().includes(q));
+                } catch(err) {}
                 return {
                     ok: true,
-                    json: async () => ({ count: INITIAL_LISTINGS.length, listings: INITIAL_LISTINGS })
+                    json: async () => ({ count: items.length, listings: items })
                 };
             }
             if (url.includes('/api/stats')) {
@@ -84,6 +101,7 @@ def build_embed():
                         min_price: 360,
                         max_price: 550,
                         inspections_count: INITIAL_LISTINGS.filter(l => l.inspection_date).length,
+                        pets_count: INITIAL_LISTINGS.filter(l => l.pets_allowed === 1).length,
                         favorites_count: 0,
                         suburbs: [
                             { suburb: 'Nowra', count: 7 },

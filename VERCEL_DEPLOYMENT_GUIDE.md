@@ -6,18 +6,18 @@ The **Radar Realty Australia** app is now deployed and running live on **Vercel*
 
 ## 🌐 Live Deployment URL
 
-* **Live Web App**: [**https://temporary-rapid-harp-fphga0n.vercel.app**](https://temporary-rapid-harp-fphga0n.vercel.app)
+* **Live Web App**: [**https://temporary-snappy-slate-6w21ecf.vercel.app**](https://temporary-snappy-slate-6w21ecf.vercel.app)
 * **API Endpoints**:
-  * [Listings API](https://temporary-rapid-harp-fphga0n.vercel.app/api/listings?listing_type=rent) (`GET /api/listings?listing_type=rent`)
-  * [Stats API](https://temporary-rapid-harp-fphga0n.vercel.app/api/stats) (`GET /api/stats`)
-  * [Portal Links API](https://temporary-rapid-harp-fphga0n.vercel.app/api/portal-links) (`GET /api/portal-links`)
+  * [Listings API](https://temporary-snappy-slate-6w21ecf.vercel.app/api/listings?listing_type=rent) (`GET /api/listings?listing_type=rent`)
+  * [Stats API](https://temporary-snappy-slate-6w21ecf.vercel.app/api/stats) (`GET /api/stats`)
+  * [Portal Links API](https://temporary-snappy-slate-6w21ecf.vercel.app/api/portal-links) (`GET /api/portal-links`)
 
 ---
 
 ## 🔑 How to Claim & Keep this Deployment Forever
 
 1. Open this link in your browser to permanently attach it to your Vercel account:
-   👉 **[https://vercel.com/claim-deployment?code=c7951a4f-c69c-4805-9692-f2ab2e2e1637](https://vercel.com/claim-deployment?code=c7951a4f-c69c-4805-9692-f2ab2e2e1637)**
+   👉 **[https://vercel.com/claim-deployment?code=535312eb-00c1-4990-8b13-8a6dce241f1f](https://vercel.com/claim-deployment?code=535312eb-00c1-4990-8b13-8a6dce241f1f)**
 2. Sign in or create a free Vercel account (with GitHub, Google, or Email).
 3. The deployment will be permanently attached to your Vercel account with a custom `*.vercel.app` domain and free automatic SSL!
 

@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2541 Rental Radar | Nowra & Bomaderry Housing Rentals under $550</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1d4ed8',
+                        'primary-hover': '#1e40af',
+                        brand: '#0284c7',
+                        shoal: '#0f766e',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+    <!-- Top Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand / Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
+                        <i data-lucide="home" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h1 class="text-xl font-bold tracking-tight text-slate-900">2541 Rental Radar</h1>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                                <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-500 pulsing-beacon"></span>
+                                Live Nowra & Bomaderry
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500">Rentals in Postcode 2541 under $550/wk</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <button id="btn-refresh" class="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm active:scale-95">
+                        <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4 mr-1.5 text-blue-600"></i>
+                        <span>Sync Live</span>
+                    </button>
+                    <button id="btn-add-modal" class="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-sm transition active:scale-95">
+                        <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5"></i>
+                        <span>+ Add Rental</span>
+                    </button>
+                    <button id="btn-print" class="hidden sm:inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm">
+                        <i data-lucide="printer" class="w-4 h-4 mr-1.5 text-slate-600"></i>
+                        <span>Run Sheet</span>
+                    </button>
+                    <button id="btn-export-csv" class="hidden md:inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm">
+                        <i data-lucide="download" class="w-4 h-4 mr-1.5 text-slate-600"></i>
+                        <span>CSV</span>
+                    </button>
+                    <button id="btn-settings-modal" class="p-2 border border-slate-300 rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm" title="Settings & Alerts">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+        <!-- Stat Highlights Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+            <!-- Active Under 550 -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Under $550/wk</p>
+                    <h3 id="stat-count" class="text-2xl font-bold text-slate-900 mt-1">--</h3>
+                    <p class="text-xs text-emerald-600 font-medium mt-0.5 flex items-center">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1"></i> Ready to rent
+                    </p>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <!-- Average Rent -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Average Rent</p>
+                    <h3 id="stat-avg" class="text-2xl font-bold text-slate-900 mt-1">$--</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Across 2541 listings</p>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i data-lucide="badge-dollar-sign" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <!-- Lowest Price -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Lowest Deal</p>
+                    <h3 id="stat-min" class="text-2xl font-bold text-emerald-700 mt-1">$--</h3>
+                    <p class="text-xs text-emerald-600 mt-0.5 font-medium">Bargain entry</p>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <i data-lucide="tag" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <!-- Inspections -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Inspections</p>
+                    <h3 id="stat-inspections" class="text-2xl font-bold text-slate-900 mt-1">--</h3>
+                    <p class="text-xs text-indigo-600 font-medium mt-0.5">Upcoming scheduled</p>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <i data-lucide="calendar" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <!-- Shortlisted / Applied -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between col-span-2 sm:col-span-1">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">My Shortlist</p>
+                    <h3 id="stat-saved" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
+                    <p class="text-xs text-rose-500 font-medium mt-0.5 flex items-center">
+                        <i data-lucide="heart" class="w-3.5 h-3.5 mr-1 fill-current"></i> Saved rentals
+                    </p>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+                    <i data-lucide="bookmark" class="w-5 h-5"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Suburb Quick Filter Bar -->
+        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+            <div class="flex items-center space-x-2 min-w-max text-xs" id="suburb-pills">
+                <span class="text-slate-500 font-medium mr-1 flex items-center">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1 text-slate-400"></i> Suburbs:
+                </span>
+                <button class="suburb-btn active px-3 py-1.5 rounded-lg bg-blue-600 text-white font-medium shadow-sm transition" data-suburb="all">
+                    All 2541 (<span id="sub-all-count">16</span>)
+                </button>
+                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="Nowra">
+                    Nowra (<span id="sub-nowra-count">7</span>)
+                </button>
+                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="Bomaderry">
+                    Bomaderry (<span id="sub-bomaderry-count">4</span>)
+                </button>
+                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="North Nowra">
+                    North Nowra (<span id="sub-north-nowra-count">2</span>)
+                </button>
+                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="West Nowra">
+                    West Nowra (<span id="sub-west-nowra-count">2</span>)
+                </button>
+                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="South Nowra">
+                    South Nowra (<span id="sub-south-nowra-count">1</span>)
+                </button>
+                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="Bangalee">
+                    Bangalee
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Controls Toolbar -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <!-- Search input -->
+                <div class="lg:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Search Street or Keyword</label>
+                    <div class="relative">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+                        <input type="text" id="filter-query" placeholder="e.g. Albatross, Kalandar, backyard..." class="w-full pl-9 pr-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Max Price Slider -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-semibold text-slate-600">Max Rent / wk</label>
+                        <span id="price-slider-val" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">$550</span>
+                    </div>
+                    <input type="range" id="filter-max-price" min="300" max="650" step="10" value="550" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                </div>
+
+                <!-- Bedrooms -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Min Bedrooms</label>
+                    <select id="filter-beds" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="0">Any Bedrooms</option>
+                        <option value="1">1+ Bed</option>
+                        <option value="2">2+ Beds</option>
+                        <option value="3">3+ Beds</option>
+                        <option value="4">4+ Beds</option>
+                    </select>
+                </div>
+
+                <!-- Property Type -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Property Type</label>
+                    <select id="filter-prop-type" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="all">All Types</option>
+                        <option value="House">House</option>
+                        <option value="Villa">Villa</option>
+                        <option value="Unit">Unit / Apartment</option>
+                        <option value="Townhouse">Townhouse</option>
+                        <option value="Duplex">Duplex</option>
+                        <option value="Studio">Studio</option>
+                    </select>
+                </div>
+
+                <!-- Sort By -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Sort By</label>
+                    <select id="filter-sort" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="price_asc">Price: Low to High</option>
+                        <option value="price_desc">Price: High to Low</option>
+                        <option value="newest">Recently Listed</option>
+                        <option value="inspection">Inspection Soonest</option>
+                        <option value="beds_desc">Most Bedrooms</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Checkbox toggles -->
+            <div class="flex flex-wrap items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                <div class="flex items-center space-x-5">
+                    <label class="inline-flex items-center cursor-pointer select-none">
+                        <input type="checkbox" id="filter-only-inspections" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                        <span class="ml-2 font-medium text-slate-700">Has Upcoming Inspection</span>
+                    </label>
+                    <label class="inline-flex items-center cursor-pointer select-none">
+                        <input type="checkbox" id="filter-only-favorites" class="w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                        <span class="ml-2 font-medium text-slate-700 flex items-center">
+                            <i data-lucide="heart" class="w-3.5 h-3.5 mr-1 text-rose-500 fill-current"></i> Saved Only
+                        </span>
+                    </label>
+                </div>
+                <button id="btn-reset-filters" class="text-slate-500 hover:text-slate-800 text-xs font-medium underline">
+                    Reset Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation View Tabs -->
+        <div class="border-b border-slate-200">
+            <nav class="flex space-x-6 text-sm font-semibold" aria-label="Tabs">
+                <button class="view-tab active border-b-2 border-blue-600 py-3 text-blue-600 flex items-center" data-view="grid">
+                    <i data-lucide="layout-grid" class="w-4 h-4 mr-2"></i>
+                    Rentals Grid (<span id="results-count">--</span>)
+                </button>
+                <button class="view-tab border-b-2 border-transparent py-3 text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center" data-view="map">
+                    <i data-lucide="map" class="w-4 h-4 mr-2"></i>
+                    2541 Interactive Map
+                </button>
+                <button class="view-tab border-b-2 border-transparent py-3 text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center" data-view="kanban">
+                    <i data-lucide="kanban" class="w-4 h-4 mr-2"></i>
+                    Application Pipeline
+                </button>
+                <button class="view-tab border-b-2 border-transparent py-3 text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center" data-view="portals">
+                    <i data-lucide="external-link" class="w-4 h-4 mr-2"></i>
+                    Super Search Portals
+                </button>
+                <button class="view-tab border-b-2 border-transparent py-3 text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center" data-view="toolkit">
+                    <i data-lucide="calculator" class="w-4 h-4 mr-2"></i>
+                    Tenant Toolkit & Bond Calc
+                </button>
+            </nav>
+        </div>
+
+        <!-- VIEW 1: Grid View -->
+        <section id="view-grid" class="tab-view block space-y-4">
+            <div id="listings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Listing Cards will be populated here via JS -->
+            </div>
+            <div id="no-results" class="hidden bg-white p-12 rounded-2xl border border-slate-200 text-center space-y-3">
+                <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto">
+                    <i data-lucide="search-x" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-800">No rentals found matching your filters</h3>
+                <p class="text-sm text-slate-500 max-w-sm mx-auto">Try increasing your max rent slider or clearing specific suburb/bedroom filters.</p>
+                <button onclick="resetFilters()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-blue-700 transition">
+                    Reset All Filters
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW 2: Interactive Map View -->
+        <section id="view-map" class="tab-view hidden space-y-3">
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div class="flex items-center space-x-4">
+                    <span class="font-semibold text-slate-700">Map Legend:</span>
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-full bg-emerald-500 mr-1.5"></span> Under $450</span>
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-full bg-blue-600 mr-1.5"></span> $450 - $500</span>
+                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-full bg-amber-500 mr-1.5"></span> $501 - $550</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="font-semibold text-slate-600">Landmarks:</span>
+                    <button id="toggle-train" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">🚆 Bomaderry Station</button>
+                    <button id="toggle-hospital" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">🏥 Hospital</button>
+                    <button id="toggle-shops" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">🛍️ Stockland Nowra</button>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-[620px] relative">
+                <div id="map" class="w-full h-full"></div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: Application Pipeline (Kanban) -->
+        <section id="view-kanban" class="tab-view hidden space-y-4">
+            <div class="flex items-center justify-between bg-blue-50 border border-blue-200 p-3 rounded-xl text-xs text-blue-800">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="info" class="w-4 h-4 text-blue-600 flex-shrink-0"></i>
+                    <span>Track your rental journey: click the status badge on any card to move it through your application pipeline!</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
+                <!-- Column: Discovered -->
+                <div class="bg-slate-100 rounded-xl p-3 flex flex-col space-y-3">
+                    <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-slate-600 px-1">
+                        <span>🔍 Discovered</span>
+                        <span id="kanban-discovered-count" class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div id="kanban-discovered" class="space-y-3 min-h-[300px]"></div>
+                </div>
+
+                <!-- Column: Shortlisted -->
+                <div class="bg-rose-50/70 border border-rose-100 rounded-xl p-3 flex flex-col space-y-3">
+                    <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-rose-700 px-1">
+                        <span>⭐ Shortlisted</span>
+                        <span id="kanban-saved-count" class="bg-rose-200 text-rose-800 px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div id="kanban-saved" class="space-y-3 min-h-[300px]"></div>
+                </div>
+
+                <!-- Column: Inspecting -->
+                <div class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 flex flex-col space-y-3">
+                    <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-indigo-700 px-1">
+                        <span>📅 Inspecting</span>
+                        <span id="kanban-inspecting-count" class="bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div id="kanban-inspecting" class="space-y-3 min-h-[300px]"></div>
+                </div>
+
+                <!-- Column: Applied -->
+                <div class="bg-amber-50/70 border border-amber-100 rounded-xl p-3 flex flex-col space-y-3">
+                    <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-amber-700 px-1">
+                        <span>📝 Applied</span>
+                        <span id="kanban-applied-count" class="bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div id="kanban-applied" class="space-y-3 min-h-[300px]"></div>
+                </div>
+
+                <!-- Column: Offered / Approved -->
+                <div class="bg-emerald-50/70 border border-emerald-100 rounded-xl p-3 flex flex-col space-y-3">
+                    <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-emerald-700 px-1">
+                        <span>🎉 Offered / Leased</span>
+                        <span id="kanban-offered-count" class="bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div id="kanban-offered" class="space-y-3 min-h-[300px]"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: Super Search Portals Launchpad -->
+        <section id="view-portals" class="tab-view hidden space-y-6">
+            <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-2xl p-6 shadow-md">
+                <h3 class="text-xl font-bold">1-Click Launchpad: 2541 Under $550/Week</h3>
+                <p class="text-blue-100 text-sm mt-1 max-w-2xl">
+                    Never miss a hidden rental. Major agencies sometimes list on their own websites hours before aggregators, and private landlords post directly on Gumtree and Flatmates. Click below to launch pre-filtered searches:
+                </p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Major National Portals -->
+                <div>
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center">
+                        <i data-lucide="layers" class="w-4 h-4 mr-2 text-blue-600"></i> Major Australian Portals (Pre-filtered &lt;= $550 in 2541)
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="portal-major-cards"></div>
+                </div>
+
+                <!-- Local Nowra & Shoalhaven Agencies -->
+                <div>
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center">
+                        <i data-lucide="building-2" class="w-4 h-4 mr-2 text-indigo-600"></i> Leading Nowra Real Estate Agencies
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="portal-agency-cards"></div>
+                </div>
+
+                <!-- Private & Alternative -->
+                <div>
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center">
+                        <i data-lucide="users" class="w-4 h-4 mr-2 text-emerald-600"></i> Private Rentals, Studios & Granny Flats
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="portal-private-cards"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 5: Tenant Toolkit & Affordability Calculator -->
+        <section id="view-toolkit" class="tab-view hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Calculator -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                            <i data-lucide="calculator" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900">NSW Rental Cost & Bond Calculator</h3>
+                            <p class="text-xs text-slate-500">Calculate upfront costs and affordability in Nowra/Bomaderry</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Target Weekly Rent ($AUD)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2 font-bold text-slate-400">$</span>
+                            <input type="number" id="calc-rent-input" value="550" min="200" max="1500" step="10" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Breakdown table -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 text-sm">
+                        <div class="flex justify-between items-center text-slate-700">
+                            <span>4-Week NSW Rental Bond (held with NSW Rental Bonds Online):</span>
+                            <span id="calc-bond" class="font-bold text-slate-900">$2,200</span>
+                        </div>
+                        <div class="flex justify-between items-center text-slate-700">
+                            <span>2 Weeks Advance Rent (legal max in NSW):</span>
+                            <span id="calc-advance" class="font-bold text-slate-900">$1,100</span>
+                        </div>
+                        <div class="pt-2 border-t border-slate-200 flex justify-between items-center font-bold text-base text-blue-700">
+                            <span>Total Upfront Move-In Cost:</span>
+                            <span id="calc-upfront">$3,300</span>
+                        </div>
+                        <div class="pt-2 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
+                            <span>Monthly Equivalent:</span>
+                            <span id="calc-monthly" class="font-semibold text-slate-800">$2,390 / mo</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs text-slate-500">
+                            <span>Annual Total:</span>
+                            <span id="calc-annual" class="font-semibold text-slate-800">$28,600 / yr</span>
+                        </div>
+                    </div>
+
+                    <!-- Affordability Check (30% Rule) -->
+                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-xs space-y-1.5 text-emerald-900">
+                        <div class="font-bold flex items-center">
+                            <i data-lucide="shield-alert" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
+                            Housing Affordability Guideline (30% Rule)
+                        </div>
+                        <p>To keep rent within the recommended 30% of gross household income:</p>
+                        <p class="font-semibold">Minimum Gross Income needed: <span id="calc-income-weekly" class="font-bold text-emerald-800">$1,833/wk</span> (<span id="calc-income-annual" class="font-bold text-emerald-800">$95,333/yr</span>)</p>
+                    </div>
+                </div>
+
+                <!-- Renter Cover Letter Generator -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                            <i data-lucide="file-text" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900">Shoalhaven Renter Bio Generator</h3>
+                            <p class="text-xs text-slate-500">Fast-track approval with a polished cover letter for 2Apply/Ignite</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Your Full Name</label>
+                            <input type="text" id="gen-name" value="Alex Smith" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Occupation & Industry</label>
+                            <input type="text" id="gen-job" value="Health Care Professional" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Household Size</label>
+                            <input type="text" id="gen-household" value="Single non-smoker / Couple" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Pets Status</label>
+                            <input type="text" id="gen-pets" value="No pets" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-semibold text-slate-600">Generated Bio & Cover Letter</label>
+                            <button id="btn-copy-bio" class="text-xs text-blue-600 hover:text-blue-800 font-bold flex items-center">
+                                <i data-lucide="copy" class="w-3.5 h-3.5 mr-1"></i> Copy to Clipboard
+                            </button>
+                        </div>
+                        <textarea id="gen-output" rows="6" class="w-full p-3 border border-slate-300 rounded-lg text-xs font-mono text-slate-800 bg-slate-50 focus:bg-white focus:outline-none"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 100 Point ID Checklist -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="text-base font-bold text-slate-900 flex items-center">
+                    <i data-lucide="check-square" class="w-5 h-5 mr-2 text-blue-600"></i>
+                    Rental Application Document Readiness (100 Point ID & Tenant Checklist)
+                </h3>
+                <p class="text-xs text-slate-500">In 2541, properties under $550 lease quickly. Have these documents ready in PDF on your phone/laptop to submit within 10 minutes of inspection:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                        <div class="font-bold text-slate-800">Primary Identification (40-70 pts)</div>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Current Driver's Licence (40)</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Australian Passport (70)</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Birth Certificate (70)</span></label>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                        <div class="font-bold text-slate-800">Proof of Income</div>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Last 3 consecutive payslips</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Last 3 months bank statements</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Employment contract / letter</span></label>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                        <div class="font-bold text-slate-800">Rental History</div>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Rental ledger (past 12 months)</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Previous property manager contact</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Personal references</span></label>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                        <div class="font-bold text-slate-800">NSW Rental Rules</div>
+                        <p class="text-slate-600 leading-relaxed">Bond must be registered with Rental Bonds Online (RBO). No rent bidding is legally permitted in NSW.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Property Details Modal -->
+    <div id="modal-property" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+            <!-- Modal Header -->
+            <div class="relative h-64 bg-slate-900 flex-shrink-0">
+                <img id="modal-img" src="" alt="Property" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-black/40"></div>
+                <button id="modal-close-btn" class="absolute top-4 right-4 w-9 h-9 bg-black/60 hover:bg-black/80 rounded-full text-white flex items-center justify-center transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+                <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end text-white">
+                    <div>
+                        <span id="modal-type-badge" class="px-2.5 py-1 rounded text-xs font-bold uppercase bg-blue-600 text-white tracking-wider">House</span>
+                        <h2 id="modal-price" class="text-3xl font-extrabold mt-1 text-white">$550 <span class="text-base font-normal text-slate-200">/ week</span></h2>
+                        <p id="modal-address" class="text-sm font-medium text-slate-200 mt-0.5">5/75 Albatross Road, West Nowra NSW 2541</p>
+                    </div>
+                    <button id="modal-fav-btn" class="p-2.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur text-white transition">
+                        <i data-lucide="heart" id="modal-fav-icon" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 overflow-y-auto flex-1 space-y-5 text-sm">
+                <!-- Features row -->
+                <div class="grid grid-cols-4 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                    <div>
+                        <span class="text-xs text-slate-500 block">Bedrooms</span>
+                        <span id="modal-beds" class="font-bold text-slate-800 text-base">3</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 block">Bathrooms</span>
+                        <span id="modal-baths" class="font-bold text-slate-800 text-base">1</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 block">Parking</span>
+                        <span id="modal-cars" class="font-bold text-slate-800 text-base">1</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 block">Bond (4wks)</span>
+                        <span id="modal-bond" class="font-bold text-blue-600 text-base">$2,200</span>
+                    </div>
+                </div>
+
+                <!-- Inspection Alert Box if present -->
+                <div id="modal-inspection-box" class="hidden bg-indigo-50 border border-indigo-200 p-3.5 rounded-xl flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
+                            <i data-lucide="calendar" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-indigo-900 block">Upcoming Inspection Time</span>
+                            <span id="modal-inspection-text" class="text-xs font-semibold text-indigo-700">Tue 6 Oct 12:45 pm</span>
+                        </div>
+                    </div>
+                    <a id="modal-ical-btn" href="#" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition flex items-center shadow-sm">
+                        <i data-lucide="calendar-plus" class="w-3.5 h-3.5 mr-1"></i> Add to Calendar
+                    </a>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <h4 class="font-bold text-slate-800 mb-1.5">Property Summary & Availability</h4>
+                    <p id="modal-desc" class="text-slate-600 leading-relaxed text-xs">No description available.</p>
+                </div>
+
+                <!-- Status & Pipeline Dropdown -->
+                <div class="grid grid-cols-2 gap-4 pt-3 border-t border-slate-200">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Application Pipeline Stage</label>
+                        <select id="modal-status-select" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500">
+                            <option value="discovered">🔍 Discovered / Watching</option>
+                            <option value="saved">⭐ Shortlisted</option>
+                            <option value="inspecting">📅 Inspection Booked</option>
+                            <option value="applied">📝 Application Submitted</option>
+                            <option value="offered">🎉 Offered / Approved</option>
+                            <option value="archived">📁 Archived / Passed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Personal Rating</label>
+                        <select id="modal-rating-select" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500">
+                            <option value="0">Unrated</option>
+                            <option value="1">⭐ 1 Star</option>
+                            <option value="2">⭐⭐ 2 Stars</option>
+                            <option value="3">⭐⭐⭐ 3 Stars</option>
+                            <option value="4">⭐⭐⭐⭐ 4 Stars</option>
+                            <option value="5">⭐⭐⭐⭐⭐ 5 Stars (Top Pick!)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Personal Notes -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Personal Notes & Inspection Observations</label>
+                    <textarea id="modal-notes" rows="2" placeholder="e.g. Spoke to agent Sarah, big backyard for BBQ, quiet street, NBN installed..." class="w-full p-2.5 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-50 px-6 py-3.5 border-t border-slate-200 flex items-center justify-between">
+                <a id="modal-maps-link" href="#" target="_blank" class="text-xs font-medium text-slate-600 hover:text-blue-600 flex items-center">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1"></i> View on Google Maps
+                </a>
+                <div class="flex items-center space-x-2">
+                    <button id="modal-save-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                        Save Changes
+                    </button>
+                    <a id="modal-portal-link" href="#" target="_blank" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center">
+                        <span>Open Listing</span>
+                        <i data-lucide="external-link" class="w-3.5 h-3.5 ml-1.5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Custom Rental Modal -->
+    <div id="modal-add" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="font-bold text-base text-slate-900 flex items-center">
+                    <i data-lucide="plus-circle" class="w-5 h-5 mr-2 text-blue-600"></i>
+                    Add Custom Rental to 2541 Tracker
+                </h3>
+                <button id="modal-add-close" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form id="form-add-rental" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Street Address *</label>
+                    <input type="text" id="add-street" required placeholder="e.g. 12 Bridge Road" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Suburb in 2541 *</label>
+                        <select id="add-suburb" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg bg-white">
+                            <option value="Nowra">Nowra</option>
+                            <option value="Bomaderry">Bomaderry</option>
+                            <option value="North Nowra">North Nowra</option>
+                            <option value="South Nowra">South Nowra</option>
+                            <option value="West Nowra">West Nowra</option>
+                            <option value="Worrigee">Worrigee</option>
+                            <option value="Bangalee">Bangalee</option>
+                            <option value="Terara">Terara</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Rent ($/wk) *</label>
+                        <input type="number" id="add-price" required placeholder="e.g. 480" max="650" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg font-bold">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Beds</label>
+                        <input type="number" id="add-beds" value="2" min="1" max="10" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Baths</label>
+                        <input type="number" id="add-baths" value="1" min="1" max="10" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Cars</label>
+                        <input type="number" id="add-cars" value="1" min="0" max="10" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Property Type</label>
+                    <select id="add-type" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg bg-white">
+                        <option value="House">House</option>
+                        <option value="Villa">Villa</option>
+                        <option value="Unit">Unit / Flat</option>
+                        <option value="Townhouse">Townhouse</option>
+                        <option value="Granny Flat">Granny Flat / Studio</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Listing URL / Source Link</label>
+                    <input type="url" id="add-url" placeholder="https://realestate.com.au/... or FB Marketplace" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Image URL (Optional)</label>
+                    <input type="url" id="add-image" placeholder="https://..." class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Personal Notes</label>
+                    <textarea id="add-notes" rows="2" placeholder="Found on Facebook group, landlord contact John 04..." class="w-full p-2 border border-slate-300 rounded-lg"></textarea>
+                </div>
+                <div class="pt-3 border-t border-slate-200 flex justify-end space-x-2">
+                    <button type="button" id="modal-add-cancel" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow">Add Rental</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="modal-settings" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-xs">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="font-bold text-base text-slate-900 flex items-center">
+                    <i data-lucide="settings" class="w-5 h-5 mr-2 text-slate-700"></i>
+                    Settings & Rental Alerts
+                </h3>
+                <button id="modal-settings-close" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Default Price Cap</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2 text-slate-400 font-bold">$</span>
+                        <input type="number" id="setting-max-price" value="550" class="w-full pl-7 pr-3 py-1.5 border border-slate-300 rounded-lg font-bold">
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-1">Alerts trigger when a new rental is found at or below this weekly rent.</p>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Background Refresh Frequency</label>
+                    <select id="setting-refresh-interval" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg bg-white">
+                        <option value="15">Every 15 minutes (Fastest alert)</option>
+                        <option value="30" selected>Every 30 minutes (Recommended)</option>
+                        <option value="60">Every 1 hour</option>
+                        <option value="120">Every 2 hours</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Discord / Telegram Webhook URL</label>
+                    <input type="url" id="setting-webhook-url" placeholder="https://discord.com/api/webhooks/..." class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                    <p class="text-[11px] text-slate-500 mt-1">Get an instant push alert on your mobile Discord/Slack when a new &lt;=$550 property is listed!</p>
+                </div>
+
+                <div class="space-y-2 pt-2 border-t border-slate-100">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="setting-sound" checked class="w-4 h-4 text-blue-600 rounded">
+                        <span class="font-medium text-slate-700">Play Audio Chime when new rental found</span>
+                    </label>
+                    <div class="flex items-center justify-between pt-1">
+                        <span class="text-slate-600">Browser Desktop Notifications:</span>
+                        <button id="btn-request-notify" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-semibold text-[11px]">
+                            Enable in Browser
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-200 flex justify-end space-x-2">
+                    <button id="modal-settings-cancel" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold">Cancel</button>
+                    <button id="modal-settings-save" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow">Save Preferences</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Run Sheet Container (hidden on screen, visible when printed) -->
+    <div id="print-area" class="hidden print-sheet p-6 space-y-4">
+        <div class="border-b-2 border-black pb-3">
+            <h1 class="text-2xl font-bold">2541 Nowra & Bomaderry Open House Run Sheet</h1>
+            <p class="text-xs text-gray-600">Upcoming Rental Inspections under $550/wk | Generated on <span id="print-date"></span></p>
+        </div>
+        <div id="print-inspections-list" class="space-y-3"></div>
+    </div>
+
+    <!-- Toast Notification Banner -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-xs transition-all duration-300">
+        <i data-lucide="bell" class="w-5 h-5 text-emerald-400"></i>
+        <span id="toast-msg">Notification message</span>
+    </div>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>

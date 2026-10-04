@@ -1,0 +1,254 @@
+import requests
+import json
+import re
+import urllib.parse
+import logging
+from typing import List, Dict, Any, Tuple
+from bs4 import BeautifulSoup
+import database
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger(__name__)
+
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-AU,en;q=0.9'
+}
+
+SUBURB_FALLBACK_COORDS = {
+    "nowra": (-34.8727, 150.6019),
+    "bomaderry": (-34.8483, 150.6186),
+    "north nowra": (-34.8582, 150.5891),
+    "south nowra": (-34.9080, 150.6120),
+    "west nowra": (-34.8910, 150.5880),
+    "worrigee": (-34.8930, 150.6380),
+    "bangalee": (-34.8380, 150.5780),
+    "terara": (-34.8780, 150.6550),
+    "mundamia": (-34.8850, 150.5480),
+}
+
+def extract_price(text: str) -> Optional[int]:
+    if not text:
+        return None
+    m = re.search(r'\$\s*([0-9]{1,3}(?:,[0-9]{3})+|[0-9]+)', text)
+    if m:
+        try:
+            val = int(m.group(1).replace(',', ''))
+            return val if val >= 100 else None
+        except ValueError:
+            return None
+    return None
+
+def clean_suburb(suburb_raw: str) -> str:
+    if not suburb_raw:
+        return "Nowra"
+    s = suburb_raw.strip().title()
+    for known in ["North Nowra", "South Nowra", "West Nowra", "Bomaderry", "Bangalee", "Worrigee", "Terara", "Mundamia", "Nowra"]:
+        if known.lower() in s.lower():
+            return known
+    return s
+
+def scrape_2541_rentals(max_price: int = 550) -> List[Dict[str, Any]]:
+    """
+    Scrapes rental listings in postcode 2541 from Rent.com.au.
+    Returns list of parsed listing dictionaries.
+    """
+    listings = []
+    seen_urls = set()
+    
+    # Query up to max_price + 25 to catch edge cases
+    query_price = max(max_price + 25, 550)
+    
+    pages = [
+        f"https://www.rent.com.au/properties/2541?price_max={query_price}",
+        f"https://www.rent.com.au/properties/bangalee-nsw-2541,bomaderry-nsw-2541,north-nowra-nsw-2541,nowra-nsw-2541,south-nowra-nsw-2541,west-nowra-nsw-2541/p2?price_max={query_price}"
+    ]
+    
+    for url in pages:
+        try:
+            logger.info(f"Fetching {url}")
+            resp = requests.get(url, headers=HEADERS, timeout=15)
+            if resp.status_code != 200:
+                logger.warning(f"Failed to fetch {url}, status: {resp.status_code}")
+                continue
+            soup = BeautifulSoup(resp.text, 'html.parser')
+        except Exception as e:
+            logger.error(f"Error requesting {url}: {e}")
+            continue
+            
+        residences = {}
+        events = {}
+        for s in soup.find_all('script', type='application/ld+json'):
+            try:
+                d = json.loads(s.string)
+                items = d if isinstance(d, list) else [d]
+                for it in items:
+                    t = it.get('@type')
+                    u = it.get('url')
+                    if t == 'Residence' and u:
+                        residences[u] = it
+                    elif t == 'Event' and u:
+                        events[u] = it
+            except Exception:
+                pass
+                
+        for art in soup.find_all('article'):
+            link = art.find('a', href=True)
+            if not link:
+                continue
+            href = link['href']
+            full_url = href if href.startswith('http') else 'https://www.rent.com.au' + href
+            if full_url in seen_urls:
+                continue
+            seen_urls.add(full_url)
+            
+            res = residences.get(full_url, {})
+            ev = events.get(full_url, {})
+            text = art.get_text(' ', strip=True)
+            raw_desc = res.get('description', '')
+            
+            # Price extraction with comma support
+            price = extract_price(raw_desc) or extract_price(text)
+                
+            # Bedrooms, bathrooms, car spaces
+            beds = None
+            baths = None
+            cars = None
+            
+            bm = re.search(r'(\d+)\s*bed', text, re.I) or re.search(r'(\d+)\s*bed', raw_desc, re.I)
+            if bm:
+                beds = int(bm.group(1))
+                
+            bam = re.search(r'(\d+)\s*bath', text, re.I) or re.search(r'(\d+)\s*bath', raw_desc, re.I)
+            if bam:
+                baths = int(bam.group(1))
+                
+            cm = re.search(r'(\d+)\s*(?:car spaces|car|parking|garage)', text, re.I)
+            if cm:
+                cars = int(cm.group(1))
+            else:
+                cars = 1 if ('garage' in text.lower() or 'carport' in text.lower() or 'parking' in text.lower()) else 0
+                
+            # Address & Suburb & Postcode
+            addr_obj = res.get('address', [{}])[0] if res.get('address') else {}
+            raw_street = addr_obj.get('streetAddress') or link.get_text(strip=True)
+            raw_suburb = addr_obj.get('addressLocality', '')
+            postcode = addr_obj.get('postalCode')
+            
+            if not postcode:
+                pm = re.search(r'\b(254[01])\b', text) or re.search(r'\b(254[01])\b', full_url)
+                postcode = pm.group(1) if pm else '2541'
+                
+            suburb = clean_suburb(raw_suburb)
+            street = raw_street.strip() if raw_street else f"Property in {suburb}"
+            
+            # High-res Image
+            img = art.find('img')
+            img_url = None
+            if img:
+                src = img.get('src') or img.get('data-src') or ''
+                if '_next/image?url=' in src:
+                    q = urllib.parse.parse_qs(urllib.parse.urlparse(src).query)
+                    img_url = q.get('url', [None])[0]
+                elif src.startswith('http'):
+                    img_url = src
+            if not img_url:
+                img_url = ev.get('image')
+                
+            # Coordinates
+            geo = res.get('geo', [{}])[0] if res.get('geo') else {}
+            lat = geo.get('latitude')
+            lng = geo.get('longitude')
+            
+            if not lat or not lng:
+                fallback = SUBURB_FALLBACK_COORDS.get(suburb.lower(), (-34.8727, 150.6019))
+                # Add slight jitter so multiple properties don't stack exactly on the same pixel
+                import random
+                lat = fallback[0] + random.uniform(-0.005, 0.005)
+                lng = fallback[1] + random.uniform(-0.005, 0.005)
+                
+            # Property type
+            prop_type = 'House'
+            for pt in ['Townhouse', 'Villa', 'Duplex', 'Studio', 'Apartment', 'Unit', 'House']:
+                if pt.lower() in text.lower() or pt.lower() in raw_desc.lower():
+                    prop_type = pt
+                    break
+                    
+            # Inspection time
+            inspection = ev.get('startDate')
+            
+            # Title
+            title = res.get('name') or f"{beds or ''} Bed {prop_type} in {suburb}".strip()
+            
+            # Extract Listing ID
+            lid_match = re.search(r'-(\d+)$', full_url)
+            lid = lid_match.group(1) if lid_match else str(abs(hash(full_url)))
+            
+            listings.append({
+                'id': lid,
+                'url': full_url,
+                'title': title,
+                'street': street,
+                'suburb': suburb,
+                'postcode': '2541',
+                'price': price,
+                'beds': beds or 1,
+                'baths': baths or 1,
+                'cars': cars,
+                'prop_type': prop_type,
+                'image': img_url,
+                'lat': lat,
+                'lng': lng,
+                'inspection': inspection,
+                'desc': raw_desc or text[:250],
+                'source': 'rent.com.au'
+            })
+            
+    return listings
+
+def send_webhook_alert(webhook_url: str, new_listings: List[Dict[str, Any]]):
+    """Sends notification to Discord or custom webhook if new listings are found."""
+    if not webhook_url or not new_listings:
+        return
+    try:
+        content_lines = [f"🚨 **{len(new_listings)} New Rental(s) Found in 2541 Under $550/wk!**\n"]
+        for item in new_listings[:5]:
+            insp_text = f" | 📅 Inspection: {item.get('inspection')[:16]}" if item.get('inspection') else ""
+            content_lines.append(
+                f"• **${item.get('price')}/wk** - {item.get('street')}, {item.get('suburb')} "
+                f"({item.get('beds')} bed, {item.get('baths')} bath, {item.get('prop_type')}){insp_text}\n<{item.get('url')}>"
+            )
+        payload = {"content": "\n".join(content_lines)}
+        requests.post(webhook_url, json=payload, timeout=8)
+        logger.info("Webhook notification sent successfully.")
+    except Exception as e:
+        logger.warning(f"Failed to send webhook notification: {e}")
+
+def run_scraper_and_sync() -> Dict[str, Any]:
+    """Runs the scraper, updates the database, and returns sync summary."""
+    database.init_db()
+    settings = database.get_settings()
+    max_price = int(settings.get("max_price", 550))
+    webhook_url = settings.get("webhook_url", "")
+    
+    items = scrape_2541_rentals(max_price=max_price)
+    new_items = []
+    
+    for it in items:
+        is_new = database.upsert_listing(it)
+        if is_new and it.get("price") and it["price"] <= max_price:
+            new_items.append(it)
+            
+    if new_items and webhook_url:
+        send_webhook_alert(webhook_url, new_items)
+        
+    return {
+        "total_scraped": len(items),
+        "newly_added": len(new_items),
+        "new_listings": new_items
+    }
+
+if __name__ == "__main__":
+    result = run_scraper_and_sync()
+    print("Sync complete:", result["total_scraped"], "total scraped,", result["newly_added"], "new.")

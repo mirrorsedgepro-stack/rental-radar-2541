@@ -1,4 +1,4 @@
-// 2541 Rental Radar Frontend Engine
+// 2541 Rental Radar Frontend Engine - Mobile & Desktop
 
 let allListings = [];
 let activeListing = null;
@@ -22,6 +22,9 @@ const filters = {
 document.addEventListener('DOMContentLoaded', () => {
     initIcons();
     initEventListeners();
+    initMobileNav();
+    initMobileFilters();
+    initMobileChips();
     initCalculator();
     initBioGenerator();
     initTipsModal();
@@ -39,7 +42,7 @@ function initIcons() {
 
 // Event Listeners
 function initEventListeners() {
-    // Navigation Tabs
+    // Desktop Navigation Tabs
     document.querySelectorAll('.view-tab').forEach(tab => {
         tab.addEventListener('click', () => {
             const targetView = tab.getAttribute('data-view');
@@ -58,90 +61,368 @@ function initEventListeners() {
             btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
 
             filters.suburb = btn.getAttribute('data-suburb');
+            updateActiveFilterBadge();
             fetchListings();
         });
     });
 
-    // Filter controls
+    // Desktop Filter controls
     const priceSlider = document.getElementById('filter-max-price');
     const priceVal = document.getElementById('price-slider-val');
-    priceSlider.addEventListener('input', (e) => {
+    priceSlider?.addEventListener('input', (e) => {
         priceVal.textContent = `$${e.target.value}`;
         filters.max_price = parseInt(e.target.value);
+        syncFilterControls();
         fetchListings();
     });
 
-    document.getElementById('filter-beds').addEventListener('change', (e) => {
+    document.getElementById('filter-beds')?.addEventListener('change', (e) => {
         filters.min_beds = parseInt(e.target.value);
+        syncFilterControls();
         fetchListings();
     });
 
-    document.getElementById('filter-prop-type').addEventListener('change', (e) => {
+    document.getElementById('filter-prop-type')?.addEventListener('change', (e) => {
         filters.prop_type = e.target.value;
+        syncFilterControls();
         fetchListings();
     });
 
-    document.getElementById('filter-sort').addEventListener('change', (e) => {
+    document.getElementById('filter-sort')?.addEventListener('change', (e) => {
         filters.sort_by = e.target.value;
+        const mobSort = document.getElementById('filter-sort-mobile');
+        if (mobSort) mobSort.value = e.target.value;
         fetchListings();
     });
 
     let searchTimeout;
-    document.getElementById('filter-query').addEventListener('input', (e) => {
+    const searchInput = document.getElementById('filter-query');
+    searchInput?.addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             filters.query = e.target.value.trim();
+            const mobSearch = document.getElementById('filter-query-mobile');
+            if (mobSearch) mobSearch.value = e.target.value;
+            syncMobileSearchClearBtn();
+            updateActiveFilterBadge();
             fetchListings();
         }, 300);
     });
 
-    document.getElementById('filter-only-inspections').addEventListener('change', (e) => {
+    // Mobile Search Input
+    const mobSearchInput = document.getElementById('filter-query-mobile');
+    const mobClearBtn = document.getElementById('btn-clear-search-mobile');
+    mobSearchInput?.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        syncMobileSearchClearBtn();
+        searchTimeout = setTimeout(() => {
+            filters.query = e.target.value.trim();
+            if (searchInput) searchInput.value = e.target.value;
+            updateActiveFilterBadge();
+            fetchListings();
+        }, 300);
+    });
+
+    mobClearBtn?.addEventListener('click', () => {
+        if (mobSearchInput) mobSearchInput.value = '';
+        if (searchInput) searchInput.value = '';
+        filters.query = '';
+        syncMobileSearchClearBtn();
+        updateActiveFilterBadge();
+        fetchListings();
+    });
+
+    // Mobile Sort Dropdown
+    document.getElementById('filter-sort-mobile')?.addEventListener('change', (e) => {
+        filters.sort_by = e.target.value;
+        const deskSort = document.getElementById('filter-sort');
+        if (deskSort) deskSort.value = e.target.value;
+        fetchListings();
+    });
+
+    document.getElementById('filter-only-inspections')?.addEventListener('change', (e) => {
         filters.only_inspections = e.target.checked;
+        syncFilterControls();
         fetchListings();
     });
 
-    document.getElementById('filter-only-favorites').addEventListener('change', (e) => {
+    document.getElementById('filter-only-favorites')?.addEventListener('change', (e) => {
         filters.only_favorites = e.target.checked;
+        syncFilterControls();
         fetchListings();
     });
 
-    document.getElementById('btn-reset-filters').addEventListener('click', resetFilters);
+    document.getElementById('btn-reset-filters')?.addEventListener('click', resetFilters);
 
     // Header buttons
-    document.getElementById('btn-refresh').addEventListener('click', syncLive);
-    document.getElementById('btn-add-modal').addEventListener('click', () => showModal('modal-add'));
-    document.getElementById('btn-settings-modal').addEventListener('click', () => showModal('modal-settings'));
-    document.getElementById('btn-print').addEventListener('click', printRunSheet);
-    document.getElementById('btn-export-csv').addEventListener('click', () => {
+    document.getElementById('btn-refresh')?.addEventListener('click', syncLive);
+    document.getElementById('btn-add-modal')?.addEventListener('click', () => showModal('modal-add'));
+    document.getElementById('btn-settings-modal')?.addEventListener('click', () => showModal('modal-settings'));
+    document.getElementById('btn-print')?.addEventListener('click', printRunSheet);
+    document.getElementById('btn-export-csv')?.addEventListener('click', () => {
         window.location.href = `/api/export/csv?max_price=${filters.max_price}`;
     });
 
     // Modal close buttons
-    document.getElementById('modal-close-btn').addEventListener('click', () => hideModal('modal-property'));
-    document.getElementById('modal-add-close').addEventListener('click', () => hideModal('modal-add'));
-    document.getElementById('modal-add-cancel').addEventListener('click', () => hideModal('modal-add'));
-    document.getElementById('modal-settings-close').addEventListener('click', () => hideModal('modal-settings'));
-    document.getElementById('modal-settings-cancel').addEventListener('click', () => hideModal('modal-settings'));
+    document.getElementById('modal-close-btn')?.addEventListener('click', () => hideModal('modal-property'));
+    document.getElementById('modal-add-close')?.addEventListener('click', () => hideModal('modal-add'));
+    document.getElementById('modal-add-cancel')?.addEventListener('click', () => hideModal('modal-add'));
+    document.getElementById('modal-settings-close')?.addEventListener('click', () => hideModal('modal-settings'));
+    document.getElementById('modal-settings-cancel')?.addEventListener('click', () => hideModal('modal-settings'));
 
     // Save Listing Meta
-    document.getElementById('modal-save-btn').addEventListener('click', saveActiveListingMeta);
-    document.getElementById('modal-fav-btn').addEventListener('click', toggleActiveFavorite);
+    document.getElementById('modal-save-btn')?.addEventListener('click', saveActiveListingMeta);
+    document.getElementById('modal-fav-btn')?.addEventListener('click', toggleActiveFavorite);
 
     // Add Custom Rental Form
-    document.getElementById('form-add-rental').addEventListener('submit', handleAddRental);
+    document.getElementById('form-add-rental')?.addEventListener('submit', handleAddRental);
 
     // Save Settings
-    document.getElementById('modal-settings-save').addEventListener('click', handleSaveSettings);
-    document.getElementById('btn-request-notify').addEventListener('click', requestBrowserNotification);
+    document.getElementById('modal-settings-save')?.addEventListener('click', handleSaveSettings);
+    document.getElementById('btn-request-notify')?.addEventListener('click', requestBrowserNotification);
 
     // Landmark toggles
     document.getElementById('toggle-train')?.addEventListener('click', () => panToLandmark(-34.8517, 150.6120, "Bomaderry Railway Station (Trains to Sydney)"));
     document.getElementById('toggle-hospital')?.addEventListener('click', () => panToLandmark(-34.8765, 150.5985, "Shoalhaven District Memorial Hospital"));
     document.getElementById('toggle-shops')?.addEventListener('click', () => panToLandmark(-34.8745, 150.6025, "Stockland Nowra Shopping Centre"));
+
+    // GPS Locate Me Button on Map
+    document.getElementById('btn-locate-me')?.addEventListener('click', handleLocateUser);
+
+    // Mobile Map Peek Card Close Button
+    document.getElementById('map-peek-close')?.addEventListener('click', () => {
+        document.getElementById('map-card-peek')?.classList.add('hidden');
+    });
+
+    // Mobile Kanban Stage Switcher Tabs
+    document.querySelectorAll('.kanban-stage-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const stage = tab.getAttribute('data-stage');
+            document.querySelectorAll('.kanban-stage-tab').forEach(t => {
+                t.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+                t.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            tab.classList.remove('bg-slate-100', 'text-slate-700');
+            tab.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+
+            const targetCol = document.querySelector(`.kanban-col-wrapper[data-col="${stage}"]`);
+            if (targetCol) {
+                targetCol.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        });
+    });
+}
+
+function syncMobileSearchClearBtn() {
+    const mobSearchInput = document.getElementById('filter-query-mobile');
+    const mobClearBtn = document.getElementById('btn-clear-search-mobile');
+    if (!mobSearchInput || !mobClearBtn) return;
+    if (mobSearchInput.value.length > 0) {
+        mobClearBtn.classList.remove('hidden');
+    } else {
+        mobClearBtn.classList.add('hidden');
+    }
+}
+
+// Mobile Bottom Nav & Floating View Switcher
+function initMobileNav() {
+    document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetView = btn.getAttribute('data-view');
+            switchView(targetView);
+        });
+    });
+
+    const floatingToggle = document.getElementById('floating-view-toggle');
+    floatingToggle?.addEventListener('click', () => {
+        if (currentTab === 'grid') {
+            switchView('map');
+        } else {
+            switchView('grid');
+        }
+    });
+}
+
+// Mobile Filter Bottom Sheet
+function initMobileFilters() {
+    const btnOpen = document.getElementById('btn-open-mobile-filters');
+    const btnClose = document.getElementById('btn-mobile-filters-close');
+    const btnApply = document.getElementById('btn-mobile-apply-filters');
+    const btnReset = document.getElementById('btn-mobile-reset-filters');
+    const sheetPrice = document.getElementById('mobile-sheet-price');
+    const sheetPriceVal = document.getElementById('mobile-sheet-price-val');
+
+    btnOpen?.addEventListener('click', () => {
+        // Populate current filter values into sheet
+        if (sheetPrice) sheetPrice.value = filters.max_price;
+        if (sheetPriceVal) sheetPriceVal.textContent = `$${filters.max_price}`;
+        
+        document.querySelectorAll('.sheet-bed-btn').forEach(btn => {
+            const val = parseInt(btn.getAttribute('data-val'));
+            if (val === filters.min_beds) {
+                btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+                btn.classList.remove('bg-slate-50', 'text-slate-700');
+            } else {
+                btn.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+                btn.classList.add('bg-slate-50', 'text-slate-700');
+            }
+        });
+
+        const propSelect = document.getElementById('mobile-sheet-prop-type');
+        if (propSelect) propSelect.value = filters.prop_type;
+
+        const inspCheck = document.getElementById('mobile-sheet-insp');
+        if (inspCheck) inspCheck.checked = filters.only_inspections;
+
+        const favCheck = document.getElementById('mobile-sheet-fav');
+        if (favCheck) favCheck.checked = filters.only_favorites;
+
+        showModal('modal-mobile-filters');
+        initIcons();
+    });
+
+    btnClose?.addEventListener('click', () => hideModal('modal-mobile-filters'));
+
+    sheetPrice?.addEventListener('input', (e) => {
+        if (sheetPriceVal) sheetPriceVal.textContent = `$${e.target.value}`;
+    });
+
+    document.querySelectorAll('.sheet-bed-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.sheet-bed-btn').forEach(b => {
+                b.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+                b.classList.add('bg-slate-50', 'text-slate-700');
+            });
+            btn.classList.remove('bg-slate-50', 'text-slate-700');
+            btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+        });
+    });
+
+    btnApply?.addEventListener('click', () => {
+        if (sheetPrice) filters.max_price = parseInt(sheetPrice.value);
+        
+        const activeBedBtn = document.querySelector('.sheet-bed-btn.bg-blue-600');
+        if (activeBedBtn) filters.min_beds = parseInt(activeBedBtn.getAttribute('data-val'));
+
+        const propSelect = document.getElementById('mobile-sheet-prop-type');
+        if (propSelect) filters.prop_type = propSelect.value;
+
+        const inspCheck = document.getElementById('mobile-sheet-insp');
+        if (inspCheck) filters.only_inspections = inspCheck.checked;
+
+        const favCheck = document.getElementById('mobile-sheet-fav');
+        if (favCheck) filters.only_favorites = favCheck.checked;
+
+        syncDesktopFiltersFromState();
+        updateActiveFilterBadge();
+        hideModal('modal-mobile-filters');
+        fetchListings();
+    });
+
+    btnReset?.addEventListener('click', () => {
+        resetFilters();
+        hideModal('modal-mobile-filters');
+    });
+}
+
+// Mobile 1-Tap Filter Chips
+function initMobileChips() {
+    document.querySelectorAll('.mobile-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const type = chip.getAttribute('data-chip');
+            if (type === 'insp') {
+                filters.only_inspections = !filters.only_inspections;
+            } else if (type === 'fav') {
+                filters.only_favorites = !filters.only_favorites;
+            } else if (type === 'price-450') {
+                filters.max_price = (filters.max_price === 450) ? 550 : 450;
+            } else if (type === 'beds-2') {
+                filters.min_beds = (filters.min_beds === 2) ? 0 : 2;
+            } else if (type === 'beds-3') {
+                filters.min_beds = (filters.min_beds === 3) ? 0 : 3;
+            }
+            syncFilterControls();
+            fetchListings();
+        });
+    });
+}
+
+function updateChipVisualStates() {
+    document.querySelectorAll('.mobile-chip').forEach(chip => {
+        const type = chip.getAttribute('data-chip');
+        let isActive = false;
+        if (type === 'insp') isActive = filters.only_inspections;
+        else if (type === 'fav') isActive = filters.only_favorites;
+        else if (type === 'price-450') isActive = (filters.max_price === 450);
+        else if (type === 'beds-2') isActive = (filters.min_beds === 2);
+        else if (type === 'beds-3') isActive = (filters.min_beds === 3);
+
+        if (isActive) {
+            chip.classList.add('bg-blue-600', 'text-white', 'border-blue-600', 'shadow-xs');
+            chip.classList.remove('bg-slate-50', 'text-slate-700', 'border-slate-200');
+        } else {
+            chip.classList.remove('bg-blue-600', 'text-white', 'border-blue-600', 'shadow-xs');
+            chip.classList.add('bg-slate-50', 'text-slate-700', 'border-slate-200');
+        }
+    });
+}
+
+function updateActiveFilterBadge() {
+    let count = 0;
+    if (filters.max_price !== 550) count++;
+    if (filters.suburb !== 'all') count++;
+    if (filters.min_beds > 0) count++;
+    if (filters.prop_type !== 'all') count++;
+    if (filters.query && filters.query.length > 0) count++;
+    if (filters.only_inspections) count++;
+    if (filters.only_favorites) count++;
+
+    const badge = document.getElementById('mobile-filter-badge');
+    if (badge) {
+        if (count > 0) {
+            badge.textContent = count;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
+    updateChipVisualStates();
+}
+
+function syncFilterControls() {
+    syncDesktopFiltersFromState();
+    updateActiveFilterBadge();
+}
+
+function syncDesktopFiltersFromState() {
+    const priceSlider = document.getElementById('filter-max-price');
+    const priceVal = document.getElementById('price-slider-val');
+    if (priceSlider) priceSlider.value = filters.max_price;
+    if (priceVal) priceVal.textContent = `$${filters.max_price}`;
+
+    const beds = document.getElementById('filter-beds');
+    if (beds) beds.value = filters.min_beds;
+
+    const prop = document.getElementById('filter-prop-type');
+    if (prop) prop.value = filters.prop_type;
+
+    const insp = document.getElementById('filter-only-inspections');
+    if (insp) insp.checked = filters.only_inspections;
+
+    const fav = document.getElementById('filter-only-favorites');
+    if (fav) fav.checked = filters.only_favorites;
+
+    const sortDesk = document.getElementById('filter-sort');
+    if (sortDesk) sortDesk.value = filters.sort_by;
+
+    const sortMob = document.getElementById('filter-sort-mobile');
+    if (sortMob) sortMob.value = filters.sort_by;
 }
 
 function switchView(viewName) {
     currentTab = viewName;
+
+    // Desktop top tabs
     document.querySelectorAll('.view-tab').forEach(t => {
         if (t.getAttribute('data-view') === viewName) {
             t.classList.add('border-blue-600', 'text-blue-600');
@@ -152,15 +433,60 @@ function switchView(viewName) {
         }
     });
 
+    // Mobile bottom navigation buttons
+    document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-view') === viewName) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Views container visibility
     document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden'));
     const target = document.getElementById(`view-${viewName}`);
     if (target) target.classList.remove('hidden');
 
+    // Update Mobile Header View Title
+    const mobTitle = document.getElementById('mobile-view-title');
+    if (mobTitle) {
+        const titles = {
+            grid: '<i data-lucide="home" class="w-4 h-4 mr-1.5 text-blue-600"></i><span>Available Rentals in 2541</span>',
+            map: '<i data-lucide="map" class="w-4 h-4 mr-1.5 text-blue-600"></i><span>2541 Interactive Map</span>',
+            kanban: '<i data-lucide="kanban" class="w-4 h-4 mr-1.5 text-blue-600"></i><span>Application Pipeline</span>',
+            portals: '<i data-lucide="external-link" class="w-4 h-4 mr-1.5 text-blue-600"></i><span>Super Search Portals</span>',
+            toolkit: '<i data-lucide="calculator" class="w-4 h-4 mr-1.5 text-blue-600"></i><span>Tenant Toolkit & Calculator</span>'
+        };
+        mobTitle.innerHTML = titles[viewName] || '';
+    }
+
+    // Floating Map / List Toggle Button State
+    const floatingToggle = document.getElementById('floating-view-toggle');
+    const floatingIcon = document.getElementById('floating-toggle-icon');
+    const floatingText = document.getElementById('floating-toggle-text');
+
+    if (floatingToggle && floatingIcon && floatingText) {
+        if (viewName === 'grid') {
+            floatingToggle.classList.remove('hidden');
+            floatingIcon.setAttribute('data-lucide', 'map');
+            floatingText.textContent = 'View Map';
+        } else if (viewName === 'map') {
+            floatingToggle.classList.remove('hidden');
+            floatingIcon.setAttribute('data-lucide', 'layout-grid');
+            floatingText.textContent = 'View List';
+        } else {
+            floatingToggle.classList.add('hidden');
+        }
+    }
+
     if (viewName === 'map') {
-        setTimeout(initOrUpdateMap, 100);
+        setTimeout(initOrUpdateMap, 150);
     } else if (viewName === 'kanban') {
         renderKanban();
     }
+
+    initIcons();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Fetch Listings from API
@@ -180,7 +506,15 @@ async function fetchListings() {
         const data = await res.json();
         allListings = data.listings || [];
 
-        document.getElementById('results-count').textContent = allListings.length;
+        const resultsCountEl = document.getElementById('results-count');
+        if (resultsCountEl) resultsCountEl.textContent = allListings.length;
+
+        const mobileResultsEl = document.getElementById('mobile-results-count');
+        if (mobileResultsEl) mobileResultsEl.textContent = `${allListings.length} listings`;
+
+        const bottomNavResultsEl = document.getElementById('bottom-nav-results');
+        if (bottomNavResultsEl) bottomNavResultsEl.textContent = allListings.length;
+
         renderListingsGrid(allListings);
 
         if (currentTab === 'map') {
@@ -202,17 +536,16 @@ function renderListingsGrid(items) {
     const noResults = document.getElementById('no-results');
 
     if (!items || items.length === 0) {
-        grid.innerHTML = '';
-        noResults.classList.remove('hidden');
+        if (grid) grid.innerHTML = '';
+        if (noResults) noResults.classList.remove('hidden');
         return;
     }
 
-    noResults.classList.add('hidden');
-    grid.innerHTML = items.map(item => createListingCardHtml(item)).join('');
+    if (noResults) noResults.classList.add('hidden');
+    if (grid) grid.innerHTML = items.map(item => createListingCardHtml(item)).join('');
 }
 
 function createListingCardHtml(item) {
-    const isUnder500 = item.price && item.price <= 500;
     const priceColor = item.price <= 450 ? 'text-emerald-700 bg-emerald-50' : (item.price <= 500 ? 'text-blue-700 bg-blue-50' : 'text-amber-800 bg-amber-50');
     const fallbackImg = "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80";
     const imgUrl = item.image_url || fallbackImg;
@@ -230,7 +563,7 @@ function createListingCardHtml(item) {
 
     // New Badge
     const newBadge = item.is_new ? `
-        <span class="absolute top-3 left-3 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-600 text-white shadow-md tracking-wider">
+        <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-600 text-white shadow-md tracking-wider">
             NEW
         </span>
     ` : '';
@@ -238,37 +571,37 @@ function createListingCardHtml(item) {
     const favColor = item.is_favorite ? 'text-rose-500 fill-current' : 'text-slate-400 hover:text-rose-500';
 
     return `
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col group" data-id="${item.id}">
+        <div class="property-card-touch bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col group" data-id="${item.id}">
             <!-- Card Image -->
-            <div class="relative h-48 bg-slate-100 overflow-hidden cursor-pointer" onclick="openListingModal('${item.id}')">
+            <div class="relative h-44 sm:h-48 bg-slate-100 overflow-hidden cursor-pointer" onclick="openListingModal('${item.id}')">
                 <img src="${imgUrl}" alt="${escapeHtml(item.street)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='${fallbackImg}'">
                 ${newBadge}
-                <button onclick="event.stopPropagation(); quickToggleFav('${item.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-md transition">
+                <button onclick="event.stopPropagation(); quickToggleFav('${item.id}')" class="absolute top-2.5 right-2.5 w-9 h-9 rounded-full bg-white/95 hover:bg-white flex items-center justify-center shadow-md transition active:scale-90" title="Shortlist / Save">
                     <i data-lucide="heart" class="w-4 h-4 ${favColor}"></i>
                 </button>
-                <div class="absolute bottom-3 left-3 flex items-center space-x-1.5">
-                    <span class="px-2 py-1 rounded-md text-[11px] font-bold uppercase bg-slate-900/80 text-white backdrop-blur-sm">
+                <div class="absolute bottom-2.5 left-2.5 flex items-center space-x-1.5">
+                    <span class="px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold uppercase bg-slate-900/80 text-white backdrop-blur-sm">
                         ${escapeHtml(item.prop_type || 'Rental')}
                     </span>
-                    <span class="px-2 py-1 rounded-md text-[10px] font-semibold bg-blue-600/90 text-white backdrop-blur-sm">
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-blue-600/90 text-white backdrop-blur-sm">
                         ${escapeHtml(item.source || 'Portal')}
                     </span>
                 </div>
             </div>
 
             <!-- Card Content -->
-            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+            <div class="p-3.5 sm:p-4 flex-1 flex flex-col justify-between space-y-3">
                 <div>
                     <!-- Price and Suburb -->
                     <div class="flex items-baseline justify-between">
-                        <span class="text-2xl font-extrabold text-slate-900">$${item.price || '--'}<span class="text-xs font-normal text-slate-500"> /wk</span></span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded-full ${priceColor}">
+                        <span class="text-xl sm:text-2xl font-extrabold text-slate-900">$${item.price || '--'}<span class="text-xs font-normal text-slate-500"> /wk</span></span>
+                        <span class="text-[11px] sm:text-xs font-bold px-2 py-0.5 rounded-full ${priceColor}">
                             ${item.price <= 450 ? 'Bargain' : (item.price <= 500 ? 'Great Value' : 'Under $550')}
                         </span>
                     </div>
 
                     <!-- Address -->
-                    <h3 class="font-bold text-sm text-slate-900 mt-1 cursor-pointer hover:text-blue-600 transition truncate" onclick="openListingModal('${item.id}')" title="${escapeHtml(item.street)}, ${escapeHtml(item.suburb)}">
+                    <h3 class="font-bold text-xs sm:text-sm text-slate-900 mt-1 cursor-pointer hover:text-blue-600 transition truncate" onclick="openListingModal('${item.id}')" title="${escapeHtml(item.street)}, ${escapeHtml(item.suburb)}">
                         ${escapeHtml(item.street)}
                     </h3>
                     <p class="text-xs text-slate-500 flex items-center mt-0.5">
@@ -277,7 +610,7 @@ function createListingCardHtml(item) {
                     </p>
 
                     <!-- Features -->
-                    <div class="flex items-center space-x-4 mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600">
+                    <div class="flex items-center space-x-3 sm:space-x-4 mt-2.5 pt-2.5 border-t border-slate-100 text-xs text-slate-600">
                         <span class="flex items-center font-medium" title="Bedrooms">
                             <i data-lucide="bed" class="w-3.5 h-3.5 mr-1 text-slate-400"></i> ${item.beds || 1} Bed
                         </span>
@@ -290,13 +623,13 @@ function createListingCardHtml(item) {
                     </div>
 
                     <!-- Inspection / Badges -->
-                    <div class="mt-2.5">
+                    <div class="mt-2">
                         ${inspBadge}
                     </div>
                 </div>
 
                 <!-- Footer Actions -->
-                <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
                     <!-- Status selector -->
                     <select onchange="updateListingStatus('${item.id}', this.value)" class="text-[11px] font-semibold py-1 px-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 hover:bg-slate-100 transition focus:outline-none">
                         <option value="discovered" ${item.status === 'discovered' ? 'selected' : ''}>🔍 Discovered</option>
@@ -306,7 +639,7 @@ function createListingCardHtml(item) {
                         <option value="offered" ${item.status === 'offered' ? 'selected' : ''}>🎉 Offered</option>
                     </select>
 
-                    <button onclick="openListingModal('${item.id}')" class="font-bold text-blue-600 hover:text-blue-800 transition flex items-center">
+                    <button onclick="openListingModal('${item.id}')" class="font-bold text-blue-600 hover:text-blue-800 transition flex items-center p-1 active:scale-95">
                         <span>Details</span>
                         <i data-lucide="chevron-right" class="w-3.5 h-3.5 ml-0.5"></i>
                     </button>
@@ -323,7 +656,9 @@ function initOrUpdateMap() {
 
     if (!leafletMap) {
         // Center on Nowra CBD
-        leafletMap = L.map('map').setView([-34.8727, 150.6019], 13);
+        leafletMap = L.map('map', { zoomControl: false }).setView([-34.8727, 150.6019], 13);
+        L.control.zoom({ position: 'bottomright' }).addTo(leafletMap);
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(leafletMap);
@@ -352,6 +687,13 @@ function initOrUpdateMap() {
 
         const marker = L.marker([item.lat, item.lng], { icon: customIcon });
 
+        // On mobile, clicking marker triggers the bottom preview peek card
+        marker.on('click', () => {
+            if (window.innerWidth < 640) {
+                showMobileMapPeek(item);
+            }
+        });
+
         const popupContent = `
             <div style="width: 220px;" class="p-2 space-y-1 text-xs">
                 ${item.image_url ? `<img src="${item.image_url}" class="w-full h-24 object-cover rounded-lg mb-2">` : ''}
@@ -362,7 +704,7 @@ function initOrUpdateMap() {
                 <p class="font-semibold text-slate-800 truncate">${escapeHtml(item.street)}</p>
                 <p class="text-slate-500">${item.beds || 1}b • ${item.baths || 1}ba • ${item.cars || 0}c (${escapeHtml(item.prop_type || 'House')})</p>
                 ${item.inspection_date ? `<p class="text-indigo-600 font-medium">📅 ${formatInspection(item.inspection_date)}</p>` : ''}
-                <button onclick="openListingModal('${item.id}')" class="w-full mt-2 py-1 bg-blue-600 text-white rounded font-bold text-center block">
+                <button onclick="openListingModal('${item.id}')" class="w-full mt-2 py-1.5 bg-blue-600 text-white rounded font-bold text-center block active:scale-95 transition">
                     View Details
                 </button>
             </div>
@@ -374,8 +716,62 @@ function initOrUpdateMap() {
     });
 
     if (bounds.length > 0) {
-        leafletMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+        leafletMap.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
     }
+}
+
+function showMobileMapPeek(item) {
+    const peekCard = document.getElementById('map-card-peek');
+    const peekImg = document.getElementById('map-peek-img');
+    const peekPrice = document.getElementById('map-peek-price');
+    const peekStreet = document.getElementById('map-peek-street');
+    const peekMeta = document.getElementById('map-peek-meta');
+    const peekBtn = document.getElementById('map-peek-btn');
+
+    if (!peekCard) return;
+
+    const fallbackImg = "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=400&q=80";
+    if (peekImg) peekImg.src = item.image_url || fallbackImg;
+    if (peekPrice) peekPrice.textContent = `$${item.price}/wk`;
+    if (peekStreet) peekStreet.textContent = item.street;
+    if (peekMeta) peekMeta.textContent = `${item.beds || 1}b • ${item.baths || 1}ba • ${item.suburb}`;
+    if (peekBtn) peekBtn.onclick = () => openListingModal(item.id);
+
+    peekCard.classList.remove('hidden');
+    initIcons();
+}
+
+function handleLocateUser() {
+    if (!("geolocation" in navigator)) {
+        showToast("Geolocation is not supported by your browser.");
+        return;
+    }
+
+    showToast("Finding your current location in 2541...");
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+            const { latitude, longitude } = pos.coords;
+            if (leafletMap) {
+                leafletMap.setView([latitude, longitude], 15, { animate: true });
+                if (window.userLocationMarker) {
+                    window.userLocationMarker.setLatLng([latitude, longitude]);
+                } else {
+                    window.userLocationMarker = L.circleMarker([latitude, longitude], {
+                        radius: 8,
+                        color: '#2563eb',
+                        fillColor: '#3b82f6',
+                        fillOpacity: 0.9,
+                        weight: 3
+                    }).addTo(leafletMap).bindPopup("<b>📍 You are here</b>").openPopup();
+                }
+                showToast("Centered on your current location!");
+            }
+        },
+        (err) => {
+            showToast("Could not get location. Check GPS permissions.");
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+    );
 }
 
 function addLandmarks() {
@@ -427,7 +823,7 @@ function renderKanban() {
         if (cols[st]) {
             counts[st]++;
             const card = document.createElement('div');
-            card.className = "bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2 cursor-pointer hover:border-blue-400 transition";
+            card.className = "property-card-touch bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2 cursor-pointer hover:border-blue-400 transition";
             card.onclick = () => openListingModal(item.id);
 
             card.innerHTML = `
@@ -449,6 +845,9 @@ function renderKanban() {
     Object.keys(counts).forEach(k => {
         const el = document.getElementById(`kanban-${k}-count`);
         if (el) el.textContent = counts[k];
+
+        const tabCnt = document.getElementById(`tab-cnt-${k}`);
+        if (tabCnt) tabCnt.textContent = counts[k];
     });
 }
 
@@ -460,37 +859,62 @@ function openListingModal(listingId) {
     activeListing = item;
     const fallbackImg = "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80";
 
-    document.getElementById('modal-img').src = item.image_url || fallbackImg;
-    document.getElementById('modal-price').innerHTML = `$${item.price || '--'} <span class="text-base font-normal text-slate-200">/ week</span>`;
-    document.getElementById('modal-address').textContent = `${item.street}, ${item.suburb} NSW ${item.postcode || '2541'}`;
-    document.getElementById('modal-type-badge').textContent = item.prop_type || 'Property';
+    const modalImg = document.getElementById('modal-img');
+    if (modalImg) modalImg.src = item.image_url || fallbackImg;
 
-    document.getElementById('modal-beds').textContent = item.beds || 1;
-    document.getElementById('modal-baths').textContent = item.baths || 1;
-    document.getElementById('modal-cars').textContent = item.cars || 0;
-    document.getElementById('modal-bond').textContent = `$${(item.price || 0) * 4}`;
+    const modalPrice = document.getElementById('modal-price');
+    if (modalPrice) modalPrice.innerHTML = `$${item.price || '--'} <span class="text-xs sm:text-base font-normal text-slate-200">/ week</span>`;
 
-    document.getElementById('modal-desc').textContent = item.description || "No full description provided.";
-    document.getElementById('modal-notes').value = item.notes || "";
-    document.getElementById('modal-status-select').value = item.status || "discovered";
-    document.getElementById('modal-rating-select').value = item.rating || 0;
+    const modalAddress = document.getElementById('modal-address');
+    if (modalAddress) modalAddress.textContent = `${item.street}, ${item.suburb} NSW ${item.postcode || '2541'}`;
+
+    const modalType = document.getElementById('modal-type-badge');
+    if (modalType) modalType.textContent = item.prop_type || 'Property';
+
+    const modalBeds = document.getElementById('modal-beds');
+    if (modalBeds) modalBeds.textContent = item.beds || 1;
+
+    const modalBaths = document.getElementById('modal-baths');
+    if (modalBaths) modalBaths.textContent = item.baths || 1;
+
+    const modalCars = document.getElementById('modal-cars');
+    if (modalCars) modalCars.textContent = item.cars || 0;
+
+    const modalBond = document.getElementById('modal-bond');
+    if (modalBond) modalBond.textContent = `$${(item.price || 0) * 4}`;
+
+    const modalDesc = document.getElementById('modal-desc');
+    if (modalDesc) modalDesc.textContent = item.description || "No full description provided.";
+
+    const modalNotes = document.getElementById('modal-notes');
+    if (modalNotes) modalNotes.value = item.notes || "";
+
+    const modalStatus = document.getElementById('modal-status-select');
+    if (modalStatus) modalStatus.value = item.status || "discovered";
+
+    const modalRating = document.getElementById('modal-rating-select');
+    if (modalRating) modalRating.value = item.rating || 0;
 
     // Inspection Box
     const inspBox = document.getElementById('modal-inspection-box');
-    if (item.inspection_date) {
+    if (item.inspection_date && inspBox) {
         inspBox.classList.remove('hidden');
-        document.getElementById('modal-inspection-text').textContent = formatInspection(item.inspection_date);
-        document.getElementById('modal-ical-btn').href = `/api/calendar/${item.id}.ics`;
-    } else {
+        const inspText = document.getElementById('modal-inspection-text');
+        if (inspText) inspText.textContent = formatInspection(item.inspection_date);
+        const icalBtn = document.getElementById('modal-ical-btn');
+        if (icalBtn) icalBtn.href = `/api/calendar/${item.id}.ics`;
+    } else if (inspBox) {
         inspBox.classList.add('hidden');
     }
 
     // Google Maps Link
     const q = encodeURIComponent(`${item.street}, ${item.suburb} NSW 2541`);
-    document.getElementById('modal-maps-link').href = `https://www.google.com/maps/search/?api=1&query=${q}`;
+    const mapsLink = document.getElementById('modal-maps-link');
+    if (mapsLink) mapsLink.href = `https://www.google.com/maps/search/?api=1&query=${q}`;
 
     // External Portal Link
-    document.getElementById('modal-portal-link').href = item.url;
+    const portalLink = document.getElementById('modal-portal-link');
+    if (portalLink) portalLink.href = item.url;
 
     // Favorite heart icon
     updateModalFavIcon(item.is_favorite);
@@ -647,10 +1071,18 @@ async function loadSettings() {
     try {
         const res = await fetch('/api/settings');
         const data = await res.json();
-        if (data.max_price) document.getElementById('setting-max-price').value = data.max_price;
-        if (data.auto_refresh_interval) document.getElementById('setting-refresh-interval').value = data.auto_refresh_interval;
-        if (data.webhook_url) document.getElementById('setting-webhook-url').value = data.webhook_url;
-        if (data.sound_enabled) document.getElementById('setting-sound').checked = data.sound_enabled === 'true';
+        if (data.max_price && document.getElementById('setting-max-price')) {
+            document.getElementById('setting-max-price').value = data.max_price;
+        }
+        if (data.auto_refresh_interval && document.getElementById('setting-refresh-interval')) {
+            document.getElementById('setting-refresh-interval').value = data.auto_refresh_interval;
+        }
+        if (data.webhook_url && document.getElementById('setting-webhook-url')) {
+            document.getElementById('setting-webhook-url').value = data.webhook_url;
+        }
+        if (data.sound_enabled && document.getElementById('setting-sound')) {
+            document.getElementById('setting-sound').checked = data.sound_enabled === 'true';
+        }
     } catch (e) {}
 }
 
@@ -686,19 +1118,23 @@ async function loadPortals() {
         const agencyContainer = document.getElementById('portal-agency-cards');
         const privateContainer = document.getElementById('portal-private-cards');
 
+        if (majorContainer) majorContainer.innerHTML = '';
+        if (agencyContainer) agencyContainer.innerHTML = '';
+        if (privateContainer) privateContainer.innerHTML = '';
+
         portals.forEach(p => {
             const card = `
-                <a href="${p.url}" target="_blank" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-400 transition flex flex-col justify-between group">
+                <a href="${p.url}" target="_blank" class="property-card-touch bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-400 transition flex flex-col justify-between group">
                     <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="font-bold text-sm text-slate-900 group-hover:text-blue-600 transition">${escapeHtml(p.name)}</span>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-blue-600 transition">${escapeHtml(p.name)}</span>
                             <i data-lucide="external-link" class="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition"></i>
                         </div>
-                        <p class="text-xs text-slate-500 leading-relaxed">${escapeHtml(p.tagline)}</p>
+                        <p class="text-[11px] sm:text-xs text-slate-500 leading-relaxed">${escapeHtml(p.tagline)}</p>
                     </div>
-                    <div class="mt-3 pt-2 border-t border-slate-100 flex items-center text-[11px] font-semibold text-blue-600">
+                    <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center text-[10px] sm:text-[11px] font-semibold text-blue-600">
                         <span>Search 2541 &lt;=$550</span>
-                        <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
+                        <i data-lucide="arrow-right" class="w-3 h-3 ml-1"></i>
                     </div>
                 </a>
             `;
@@ -797,11 +1233,20 @@ async function fetchStats() {
     try {
         const res = await fetch('/api/stats');
         const s = await res.json();
-        document.getElementById('stat-count').textContent = s.total_under_550;
-        document.getElementById('stat-avg').textContent = `$${Math.round(s.avg_price)}`;
-        document.getElementById('stat-min').textContent = `$${s.min_price}`;
-        document.getElementById('stat-inspections').textContent = s.inspections_count;
-        document.getElementById('stat-saved').textContent = s.favorites_count;
+        const statCount = document.getElementById('stat-count');
+        if (statCount) statCount.textContent = s.total_under_550;
+
+        const statAvg = document.getElementById('stat-avg');
+        if (statAvg) statAvg.textContent = `$${Math.round(s.avg_price)}`;
+
+        const statMin = document.getElementById('stat-min');
+        if (statMin) statMin.textContent = `$${s.min_price}`;
+
+        const statInsp = document.getElementById('stat-inspections');
+        if (statInsp) statInsp.textContent = s.inspections_count;
+
+        const statSaved = document.getElementById('stat-saved');
+        if (statSaved) statSaved.textContent = s.favorites_count;
 
         // Suburb counts in pills
         s.suburbs.forEach(sub => {
@@ -826,14 +1271,13 @@ function resetFilters() {
     filters.only_inspections = false;
     filters.only_favorites = false;
 
-    document.getElementById('filter-max-price').value = 550;
-    document.getElementById('price-slider-val').textContent = '$550';
-    document.getElementById('filter-beds').value = 0;
-    document.getElementById('filter-prop-type').value = 'all';
-    document.getElementById('filter-query').value = '';
-    document.getElementById('filter-sort').value = 'price_asc';
-    document.getElementById('filter-only-inspections').checked = false;
-    document.getElementById('filter-only-favorites').checked = false;
+    syncFilterControls();
+
+    const mobSearch = document.getElementById('filter-query-mobile');
+    if (mobSearch) mobSearch.value = '';
+    const deskSearch = document.getElementById('filter-query');
+    if (deskSearch) deskSearch.value = '';
+    syncMobileSearchClearBtn();
 
     document.querySelectorAll('.suburb-btn').forEach(b => {
         b.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
@@ -845,6 +1289,7 @@ function resetFilters() {
         allBtn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
     }
 
+    updateActiveFilterBadge();
     fetchListings();
 }
 
@@ -922,7 +1367,7 @@ function escapeHtml(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
-// First-Time Tips & Walkthrough Tour
+// First-Time Tips & Walkthrough Tour with Mobile Touch Swipe
 let currentTipStep = 1;
 const totalTipSteps = 6;
 
@@ -933,6 +1378,7 @@ function initTipsModal() {
     const prevBtn = document.getElementById('btn-tip-prev');
     const nextBtn = document.getElementById('btn-tip-next');
     const dontShowCheck = document.getElementById('tips-dont-show');
+    const tipsContainer = document.getElementById('tips-container');
 
     if (!modalTips) return;
 
@@ -967,6 +1413,27 @@ function initTipsModal() {
         localStorage.setItem('2541_tips_dont_show', e.target.checked ? 'true' : 'false');
     });
 
+    // Touch Swipe Detection for Mobile Phones
+    let touchStartX = 0;
+    tipsContainer?.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    tipsContainer?.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].screenX;
+        const diffX = touchStartX - touchEndX;
+
+        if (diffX > 45 && currentTipStep < totalTipSteps) {
+            // Swiped left -> Next
+            currentTipStep++;
+            updateTipStep();
+        } else if (diffX < -45 && currentTipStep > 1) {
+            // Swiped right -> Prev
+            currentTipStep--;
+            updateTipStep();
+        }
+    }, { passive: true });
+
     // Auto-open on first visit if not disabled
     const dontShow = localStorage.getItem('2541_tips_dont_show');
     if (dontShow !== 'true') {
@@ -997,13 +1464,13 @@ function updateTipStep() {
     if (dotsContainer) {
         dotsContainer.innerHTML = Array.from({ length: totalTipSteps }).map((_, i) => {
             const active = (i + 1) === currentTipStep;
-            return `<span class="w-2.5 h-2.5 rounded-full ${active ? 'bg-blue-600' : 'bg-slate-300'} transition-colors"></span>`;
+            return `<span class="w-2 h-2 rounded-full ${active ? 'bg-blue-600' : 'bg-slate-300'} transition-colors"></span>`;
         }).join('');
     }
 
     if (prevBtn) prevBtn.disabled = (currentTipStep === 1);
     if (nextBtn) {
-        nextBtn.textContent = (currentTipStep === totalTipSteps) ? 'Got it, let\'s explore!' : 'Next';
+        nextBtn.textContent = (currentTipStep === totalTipSteps) ? 'Done' : 'Next';
     }
     initIcons();
 }

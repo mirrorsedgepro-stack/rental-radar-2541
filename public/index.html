@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1d4ed8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>2541 Rental Radar | Nowra & Bomaderry Housing Rentals under $550</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,6 +18,9 @@
                         'primary-hover': '#1e40af',
                         brand: '#0284c7',
                         shoal: '#0f766e',
+                    },
+                    screens: {
+                        'xs': '420px',
                     }
                 }
             }
@@ -28,42 +34,44 @@
     <!-- Custom Styles -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
 
     <!-- Top Header -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-14 sm:h-16">
                 <!-- Brand / Logo -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
-                        <i data-lucide="home" class="w-6 h-6"></i>
+                <div class="flex items-center space-x-2.5 sm:space-x-3 cursor-pointer" onclick="switchView('grid')">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md flex-shrink-0">
+                        <i data-lucide="home" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                     </div>
                     <div>
-                        <div class="flex items-center space-x-2">
-                            <h1 class="text-xl font-bold tracking-tight text-slate-900">2541 Rental Radar</h1>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-                                <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-500 pulsing-beacon"></span>
-                                Live Nowra & Bomaderry
+                        <div class="flex items-center space-x-1.5 sm:space-x-2">
+                            <h1 class="text-base sm:text-xl font-bold tracking-tight text-slate-900 leading-tight">2541 Rental Radar</h1>
+                            <span class="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-emerald-100 text-emerald-800">
+                                <span class="w-1.5 h-1.5 mr-1 sm:mr-1.5 rounded-full bg-emerald-500 pulsing-beacon"></span>
+                                <span class="hidden xs:inline">Live 2541</span>
+                                <span class="xs:hidden">Live</span>
                             </span>
                         </div>
-                        <p class="text-xs text-slate-500">Rentals in Postcode 2541 under $550/wk</p>
+                        <p class="text-[11px] sm:text-xs text-slate-500 hidden sm:block">Rentals in Postcode 2541 under $550/wk</p>
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex items-center space-x-2 sm:space-x-3">
-                    <button id="btn-tips" class="inline-flex items-center px-3 py-1.5 border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg text-xs font-semibold shadow-sm transition active:scale-95" title="First-time user guide & search tips">
-                        <i data-lucide="lightbulb" class="w-4 h-4 mr-1.5 text-amber-600"></i>
-                        <span>Tips & Tour</span>
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                    <button id="btn-tips" class="inline-flex items-center p-2 sm:px-3 sm:py-1.5 border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg text-xs font-semibold shadow-sm transition active:scale-95" title="Tips & Tour Guide">
+                        <i data-lucide="lightbulb" class="w-4 h-4 text-amber-600 sm:mr-1.5"></i>
+                        <span class="hidden sm:inline">Tips & Tour</span>
                     </button>
-                    <button id="btn-refresh" class="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm active:scale-95">
-                        <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4 mr-1.5 text-blue-600"></i>
-                        <span>Sync Live</span>
+                    <button id="btn-refresh" class="inline-flex items-center p-2 sm:px-3 sm:py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm active:scale-95" title="Sync Live Rentals">
+                        <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4 text-blue-600 sm:mr-1.5"></i>
+                        <span class="hidden sm:inline">Sync Live</span>
                     </button>
-                    <button id="btn-add-modal" class="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-sm transition active:scale-95">
-                        <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5"></i>
-                        <span>+ Add Rental</span>
+                    <button id="btn-add-modal" class="inline-flex items-center px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-sm transition active:scale-95" title="Add Rental Listing">
+                        <i data-lucide="plus-circle" class="w-4 h-4 sm:mr-1.5"></i>
+                        <span class="hidden sm:inline">+ Add Rental</span>
+                        <span class="sm:hidden text-xs">Add</span>
                     </button>
                     <button id="btn-print" class="hidden sm:inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm">
                         <i data-lucide="printer" class="w-4 h-4 mr-1.5 text-slate-600"></i>
@@ -73,7 +81,7 @@
                         <i data-lucide="download" class="w-4 h-4 mr-1.5 text-slate-600"></i>
                         <span>CSV</span>
                     </button>
-                    <button id="btn-settings-modal" class="p-2 border border-slate-300 rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm" title="Settings & Alerts">
+                    <button id="btn-settings-modal" class="p-2 border border-slate-300 rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm active:scale-95" title="Settings & Alerts">
                         <i data-lucide="settings" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -82,107 +90,152 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6 flex-1 w-full space-y-3 sm:space-y-6 pb-24 md:pb-8">
 
-        <!-- Stat Highlights Cards -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        <!-- Stat Highlights Cards (Swipeable horizontal strip on mobile, 5 cols on desktop) -->
+        <div class="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-2.5 pb-1 lg:grid lg:grid-cols-5 lg:gap-4">
             <!-- Active Under 550 -->
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div class="flex-shrink-0 w-[145px] sm:w-48 lg:w-auto snap-start bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Under $550/wk</p>
-                    <h3 id="stat-count" class="text-2xl font-bold text-slate-900 mt-1">--</h3>
-                    <p class="text-xs text-emerald-600 font-medium mt-0.5 flex items-center">
-                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1"></i> Ready to rent
+                    <p class="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">Under $550/wk</p>
+                    <h3 id="stat-count" class="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5">--</h3>
+                    <p class="text-[10px] sm:text-xs text-emerald-600 font-medium mt-0.5 flex items-center">
+                        <i data-lucide="check-circle-2" class="w-3 h-3 mr-1"></i> Available
                     </p>
                 </div>
-                <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <i data-lucide="home" class="w-5 h-5"></i>
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="home" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </div>
             </div>
 
             <!-- Average Rent -->
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div class="flex-shrink-0 w-[145px] sm:w-48 lg:w-auto snap-start bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Average Rent</p>
-                    <h3 id="stat-avg" class="text-2xl font-bold text-slate-900 mt-1">$--</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Across 2541 listings</p>
+                    <p class="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">Average Rent</p>
+                    <h3 id="stat-avg" class="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5">$--</h3>
+                    <p class="text-[10px] sm:text-xs text-slate-500 mt-0.5">Postcode 2541</p>
                 </div>
-                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <i data-lucide="badge-dollar-sign" class="w-5 h-5"></i>
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="badge-dollar-sign" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </div>
             </div>
 
             <!-- Lowest Price -->
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div class="flex-shrink-0 w-[145px] sm:w-48 lg:w-auto snap-start bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Lowest Deal</p>
-                    <h3 id="stat-min" class="text-2xl font-bold text-emerald-700 mt-1">$--</h3>
-                    <p class="text-xs text-emerald-600 mt-0.5 font-medium">Bargain entry</p>
+                    <p class="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">Lowest Deal</p>
+                    <h3 id="stat-min" class="text-xl sm:text-2xl font-bold text-emerald-700 mt-0.5">$--</h3>
+                    <p class="text-[10px] sm:text-xs text-emerald-600 mt-0.5 font-medium">Bargain entry</p>
                 </div>
-                <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                    <i data-lucide="tag" class="w-5 h-5"></i>
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="tag" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </div>
             </div>
 
             <!-- Inspections -->
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div class="flex-shrink-0 w-[145px] sm:w-48 lg:w-auto snap-start bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Inspections</p>
-                    <h3 id="stat-inspections" class="text-2xl font-bold text-slate-900 mt-1">--</h3>
-                    <p class="text-xs text-indigo-600 font-medium mt-0.5">Upcoming scheduled</p>
+                    <p class="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">Inspections</p>
+                    <h3 id="stat-inspections" class="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5">--</h3>
+                    <p class="text-[10px] sm:text-xs text-indigo-600 font-medium mt-0.5">Upcoming open</p>
                 </div>
-                <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                    <i data-lucide="calendar" class="w-5 h-5"></i>
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="calendar" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </div>
             </div>
 
             <!-- Shortlisted / Applied -->
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between col-span-2 sm:col-span-1">
+            <div class="flex-shrink-0 w-[145px] sm:w-48 lg:w-auto snap-start bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">My Shortlist</p>
-                    <h3 id="stat-saved" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
-                    <p class="text-xs text-rose-500 font-medium mt-0.5 flex items-center">
-                        <i data-lucide="heart" class="w-3.5 h-3.5 mr-1 fill-current"></i> Saved rentals
+                    <p class="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">My Shortlist</p>
+                    <h3 id="stat-saved" class="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5">0</h3>
+                    <p class="text-[10px] sm:text-xs text-rose-500 font-medium mt-0.5 flex items-center">
+                        <i data-lucide="heart" class="w-3 h-3 mr-1 fill-current"></i> Saved items
                     </p>
                 </div>
-                <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
-                    <i data-lucide="bookmark" class="w-5 h-5"></i>
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="bookmark" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Suburb Quick Filter Bar -->
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
-            <div class="flex items-center space-x-2 min-w-max text-xs" id="suburb-pills">
-                <span class="text-slate-500 font-medium mr-1 flex items-center">
+        <!-- Suburb Quick Filter Bar (Touch-optimized horizontal pill scroll) -->
+        <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-sm overflow-x-auto no-scrollbar">
+            <div class="flex items-center space-x-1.5 sm:space-x-2 min-w-max text-xs" id="suburb-pills">
+                <span class="text-slate-500 font-medium mr-1 flex items-center hidden sm:flex">
                     <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1 text-slate-400"></i> Suburbs:
                 </span>
-                <button class="suburb-btn active px-3 py-1.5 rounded-lg bg-blue-600 text-white font-medium shadow-sm transition" data-suburb="all">
+                <button class="suburb-btn active px-3 py-1.5 rounded-lg bg-blue-600 text-white font-medium shadow-sm transition active:scale-95" data-suburb="all">
                     All 2541 (<span id="sub-all-count">16</span>)
                 </button>
-                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="Nowra">
+                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition active:scale-95" data-suburb="Nowra">
                     Nowra (<span id="sub-nowra-count">7</span>)
                 </button>
-                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="Bomaderry">
+                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition active:scale-95" data-suburb="Bomaderry">
                     Bomaderry (<span id="sub-bomaderry-count">4</span>)
                 </button>
-                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="North Nowra">
+                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition active:scale-95" data-suburb="North Nowra">
                     North Nowra (<span id="sub-north-nowra-count">2</span>)
                 </button>
-                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="West Nowra">
+                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition active:scale-95" data-suburb="West Nowra">
                     West Nowra (<span id="sub-west-nowra-count">2</span>)
                 </button>
-                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="South Nowra">
+                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition active:scale-95" data-suburb="South Nowra">
                     South Nowra (<span id="sub-south-nowra-count">1</span>)
                 </button>
-                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="Bangalee">
+                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition active:scale-95" data-suburb="Bangalee">
                     Bangalee
                 </button>
             </div>
         </div>
 
-        <!-- Filter Controls Toolbar -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4">
+        <!-- Mobile Quick Search & Filter Bar (Shown only on small screens) -->
+        <div class="md:hidden bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2.5">
+            <!-- Search + Filter Sheet Button + Sort -->
+            <div class="flex items-center space-x-2">
+                <div class="relative flex-1">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+                    <input type="text" id="filter-query-mobile" placeholder="Search street or keyword..." class="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none">
+                    <button id="btn-clear-search-mobile" class="hidden absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600">
+                        <i data-lucide="x-circle" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <button id="btn-open-mobile-filters" class="inline-flex items-center px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex-shrink-0 active:scale-95">
+                    <i data-lucide="sliders-horizontal" class="w-4 h-4 mr-1.5 text-blue-600"></i>
+                    <span>Filters</span>
+                    <span id="mobile-filter-badge" class="ml-1.5 hidden px-1.5 py-0.2 rounded-full bg-blue-600 text-white text-[10px]">0</span>
+                </button>
+                <select id="filter-sort-mobile" class="px-2.5 py-2 border border-slate-200 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700 focus:ring-2 focus:ring-blue-500 flex-shrink-0">
+                    <option value="price_asc">Price: Low-High</option>
+                    <option value="price_desc">Price: High-Low</option>
+                    <option value="newest">Recently Listed</option>
+                    <option value="inspection">Inspections</option>
+                    <option value="beds_desc">Most Beds</option>
+                </select>
+            </div>
+
+            <!-- Quick Filter Chips Row (1-Tap toggles on mobile) -->
+            <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar text-xs pt-1">
+                <button class="mobile-chip px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-chip="insp">
+                    📅 Inspections
+                </button>
+                <button class="mobile-chip px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-chip="fav">
+                    ⭐ Saved Only
+                </button>
+                <button class="mobile-chip px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-chip="price-450">
+                    &lt; $450/wk
+                </button>
+                <button class="mobile-chip px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-chip="beds-2">
+                    2+ Beds
+                </button>
+                <button class="mobile-chip px-2.5 py-1 rounded-full border border-slate-200 bg-slate-50 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-chip="beds-3">
+                    3+ Beds
+                </button>
+            </div>
+        </div>
+
+        <!-- Desktop Filter Controls Toolbar (Full grid on md+ screens) -->
+        <div class="hidden md:block bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 <!-- Search input -->
                 <div class="lg:col-span-2">
@@ -261,8 +314,8 @@
             </div>
         </div>
 
-        <!-- Navigation View Tabs -->
-        <div class="border-b border-slate-200">
+        <!-- Desktop Navigation View Tabs (Hidden on mobile where bottom nav is active) -->
+        <div class="hidden md:block border-b border-slate-200">
             <nav class="flex space-x-6 text-sm font-semibold" aria-label="Tabs">
                 <button class="view-tab active border-b-2 border-blue-600 py-3 text-blue-600 flex items-center" data-view="grid">
                     <i data-lucide="layout-grid" class="w-4 h-4 mr-2"></i>
@@ -287,18 +340,27 @@
             </nav>
         </div>
 
+        <!-- Mobile View Heading Indicator -->
+        <div class="md:hidden flex items-center justify-between text-xs text-slate-500 font-semibold px-1">
+            <div id="mobile-view-title" class="flex items-center text-slate-800 font-bold">
+                <i data-lucide="home" class="w-4 h-4 mr-1.5 text-blue-600"></i>
+                <span>Available Rentals in 2541</span>
+            </div>
+            <span class="text-blue-600 font-bold" id="mobile-results-count">-- listings</span>
+        </div>
+
         <!-- VIEW 1: Grid View -->
         <section id="view-grid" class="tab-view block space-y-4">
-            <div id="listings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div id="listings-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
                 <!-- Listing Cards will be populated here via JS -->
             </div>
-            <div id="no-results" class="hidden bg-white p-12 rounded-2xl border border-slate-200 text-center space-y-3">
+            <div id="no-results" class="hidden bg-white p-8 sm:p-12 rounded-2xl border border-slate-200 text-center space-y-3">
                 <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto">
                     <i data-lucide="search-x" class="w-6 h-6"></i>
                 </div>
                 <h3 class="text-base font-bold text-slate-800">No rentals found matching your filters</h3>
-                <p class="text-sm text-slate-500 max-w-sm mx-auto">Try increasing your max rent slider or clearing specific suburb/bedroom filters.</p>
-                <button onclick="resetFilters()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-blue-700 transition">
+                <p class="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">Try sliding your max rent up or clearing specific suburb/bedroom filters.</p>
+                <button onclick="resetFilters()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-blue-700 transition active:scale-95">
                     Reset All Filters
                 </button>
             </div>
@@ -306,22 +368,50 @@
 
         <!-- VIEW 2: Interactive Map View -->
         <section id="view-map" class="tab-view hidden space-y-3">
-            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
-                <div class="flex items-center space-x-4">
-                    <span class="font-semibold text-slate-700">Map Legend:</span>
-                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-full bg-emerald-500 mr-1.5"></span> Under $450</span>
-                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-full bg-blue-600 mr-1.5"></span> $450 - $500</span>
-                    <span class="inline-flex items-center"><span class="w-3 h-3 rounded-full bg-amber-500 mr-1.5"></span> $501 - $550</span>
+            <!-- Map Legend and Landmarks -->
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 text-xs">
+                <div class="flex items-center space-x-3 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+                    <span class="font-bold text-slate-700 flex-shrink-0">Pins:</span>
+                    <span class="inline-flex items-center flex-shrink-0"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1"></span> &lt;$450</span>
+                    <span class="inline-flex items-center flex-shrink-0"><span class="w-2.5 h-2.5 rounded-full bg-blue-600 mr-1"></span> $450-$500</span>
+                    <span class="inline-flex items-center flex-shrink-0"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-1"></span> $501-$550</span>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <span class="font-semibold text-slate-600">Landmarks:</span>
-                    <button id="toggle-train" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">🚆 Bomaderry Station</button>
-                    <button id="toggle-hospital" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">🏥 Hospital</button>
-                    <button id="toggle-shops" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">🛍️ Stockland Nowra</button>
+                <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+                    <span class="font-semibold text-slate-500 hidden sm:inline flex-shrink-0">Landmarks:</span>
+                    <button id="toggle-train" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition">🚆 Station</button>
+                    <button id="toggle-hospital" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition">🏥 Hospital</button>
+                    <button id="toggle-shops" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition">🛍️ Stockland</button>
                 </div>
             </div>
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-[620px] relative">
+
+            <!-- Map Container with GPS Button and Mobile Peek Card -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-[calc(100vh-250px)] min-h-[420px] max-h-[640px] relative">
                 <div id="map" class="w-full h-full"></div>
+                
+                <!-- Floating GPS Geolocation Button -->
+                <button id="btn-locate-me" class="absolute top-4 right-4 z-[400] w-10 h-10 bg-white hover:bg-slate-50 text-slate-700 rounded-xl shadow-md border border-slate-200 flex items-center justify-center active:scale-95 transition" title="Center on my location">
+                    <i data-lucide="crosshair" class="w-5 h-5 text-blue-600"></i>
+                </button>
+
+                <!-- Floating Mobile Map Listing Peek Card (Hidden until pin tapped on mobile) -->
+                <div id="map-card-peek" class="hidden absolute bottom-4 left-4 right-4 z-[400] bg-white rounded-xl shadow-xl border border-slate-200 p-3 sm:hidden">
+                    <div class="flex items-start space-x-3">
+                        <img id="map-peek-img" src="" alt="Rental" class="w-20 h-20 rounded-lg object-cover flex-shrink-0 bg-slate-100">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <span id="map-peek-price" class="text-base font-extrabold text-blue-600">$550/wk</span>
+                                <button id="map-peek-close" class="text-slate-400 hover:text-slate-600 p-1">
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <h4 id="map-peek-street" class="font-bold text-xs text-slate-900 truncate mt-0.5">Street Address</h4>
+                            <p id="map-peek-meta" class="text-[11px] text-slate-500 mt-0.5">3b • 1ba • Bomaderry</p>
+                            <button id="map-peek-btn" class="mt-2 w-full py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                                View Full Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -333,9 +423,30 @@
                     <span>Track your rental journey: click the status badge on any card to move it through your application pipeline!</span>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
+
+            <!-- Mobile Stage Navigation Switcher -->
+            <div class="lg:hidden flex items-center space-x-1.5 overflow-x-auto no-scrollbar pb-1 text-xs" id="mobile-kanban-stages">
+                <button class="kanban-stage-tab active px-3 py-1.5 rounded-lg bg-blue-600 text-white font-bold whitespace-nowrap shadow-sm transition" data-stage="discovered">
+                    🔍 Discovered (<span id="tab-cnt-discovered">0</span>)
+                </button>
+                <button class="kanban-stage-tab px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 font-bold whitespace-nowrap transition" data-stage="saved">
+                    ⭐ Shortlist (<span id="tab-cnt-saved">0</span>)
+                </button>
+                <button class="kanban-stage-tab px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 font-bold whitespace-nowrap transition" data-stage="inspecting">
+                    📅 Inspecting (<span id="tab-cnt-inspecting">0</span>)
+                </button>
+                <button class="kanban-stage-tab px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 font-bold whitespace-nowrap transition" data-stage="applied">
+                    📝 Applied (<span id="tab-cnt-applied">0</span>)
+                </button>
+                <button class="kanban-stage-tab px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 font-bold whitespace-nowrap transition" data-stage="offered">
+                    🎉 Leased (<span id="tab-cnt-offered">0</span>)
+                </button>
+            </div>
+
+            <!-- Kanban Columns Container (Swipeable horizontally with snap on mobile) -->
+            <div class="flex overflow-x-auto no-scrollbar snap-x snap-mandatory space-x-3 pb-3 lg:grid lg:grid-cols-5 lg:gap-4 lg:space-x-0" id="kanban-columns-container">
                 <!-- Column: Discovered -->
-                <div class="bg-slate-100 rounded-xl p-3 flex flex-col space-y-3">
+                <div class="kanban-col-wrapper w-[82vw] sm:w-[320px] lg:w-auto flex-shrink-0 snap-center bg-slate-100 rounded-xl p-3 flex flex-col space-y-3" data-col="discovered">
                     <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-slate-600 px-1">
                         <span>🔍 Discovered</span>
                         <span id="kanban-discovered-count" class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">0</span>
@@ -344,7 +455,7 @@
                 </div>
 
                 <!-- Column: Shortlisted -->
-                <div class="bg-rose-50/70 border border-rose-100 rounded-xl p-3 flex flex-col space-y-3">
+                <div class="kanban-col-wrapper w-[82vw] sm:w-[320px] lg:w-auto flex-shrink-0 snap-center bg-rose-50/70 border border-rose-100 rounded-xl p-3 flex flex-col space-y-3" data-col="saved">
                     <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-rose-700 px-1">
                         <span>⭐ Shortlisted</span>
                         <span id="kanban-saved-count" class="bg-rose-200 text-rose-800 px-2 py-0.5 rounded-full">0</span>
@@ -353,7 +464,7 @@
                 </div>
 
                 <!-- Column: Inspecting -->
-                <div class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 flex flex-col space-y-3">
+                <div class="kanban-col-wrapper w-[82vw] sm:w-[320px] lg:w-auto flex-shrink-0 snap-center bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 flex flex-col space-y-3" data-col="inspecting">
                     <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-indigo-700 px-1">
                         <span>📅 Inspecting</span>
                         <span id="kanban-inspecting-count" class="bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full">0</span>
@@ -362,7 +473,7 @@
                 </div>
 
                 <!-- Column: Applied -->
-                <div class="bg-amber-50/70 border border-amber-100 rounded-xl p-3 flex flex-col space-y-3">
+                <div class="kanban-col-wrapper w-[82vw] sm:w-[320px] lg:w-auto flex-shrink-0 snap-center bg-amber-50/70 border border-amber-100 rounded-xl p-3 flex flex-col space-y-3" data-col="applied">
                     <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-amber-700 px-1">
                         <span>📝 Applied</span>
                         <span id="kanban-applied-count" class="bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">0</span>
@@ -371,7 +482,7 @@
                 </div>
 
                 <!-- Column: Offered / Approved -->
-                <div class="bg-emerald-50/70 border border-emerald-100 rounded-xl p-3 flex flex-col space-y-3">
+                <div class="kanban-col-wrapper w-[82vw] sm:w-[320px] lg:w-auto flex-shrink-0 snap-center bg-emerald-50/70 border border-emerald-100 rounded-xl p-3 flex flex-col space-y-3" data-col="offered">
                     <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-emerald-700 px-1">
                         <span>🎉 Offered / Leased</span>
                         <span id="kanban-offered-count" class="bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full">0</span>
@@ -383,9 +494,9 @@
 
         <!-- VIEW 4: Super Search Portals Launchpad -->
         <section id="view-portals" class="tab-view hidden space-y-6">
-            <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-2xl p-6 shadow-md">
-                <h3 class="text-xl font-bold">1-Click Launchpad: 2541 Under $550/Week</h3>
-                <p class="text-blue-100 text-sm mt-1 max-w-2xl">
+            <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-2xl p-5 sm:p-6 shadow-md">
+                <h3 class="text-lg sm:text-xl font-bold">1-Click Launchpad: 2541 Under $550/Week</h3>
+                <p class="text-blue-100 text-xs sm:text-sm mt-1 max-w-2xl">
                     Never miss a hidden rental. Major agencies sometimes list on their own websites hours before aggregators, and private landlords post directly on Gumtree and Flatmates. Click below to launch pre-filtered searches:
                 </p>
             </div>
@@ -393,41 +504,41 @@
             <div class="space-y-6">
                 <!-- Major National Portals -->
                 <div>
-                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center">
-                        <i data-lucide="layers" class="w-4 h-4 mr-2 text-blue-600"></i> Major Australian Portals (Pre-filtered &lt;= $550 in 2541)
+                    <h4 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center">
+                        <i data-lucide="layers" class="w-4 h-4 mr-2 text-blue-600"></i> Major Australian Portals (&lt;= $550 in 2541)
                     </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="portal-major-cards"></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" id="portal-major-cards"></div>
                 </div>
 
                 <!-- Local Nowra & Shoalhaven Agencies -->
                 <div>
-                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center">
+                    <h4 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center">
                         <i data-lucide="building-2" class="w-4 h-4 mr-2 text-indigo-600"></i> Leading Nowra Real Estate Agencies
                     </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="portal-agency-cards"></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" id="portal-agency-cards"></div>
                 </div>
 
                 <!-- Private & Alternative -->
                 <div>
-                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center">
+                    <h4 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center">
                         <i data-lucide="users" class="w-4 h-4 mr-2 text-emerald-600"></i> Private Rentals, Studios & Granny Flats
                     </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="portal-private-cards"></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" id="portal-private-cards"></div>
                 </div>
             </div>
         </section>
 
         <!-- VIEW 5: Tenant Toolkit & Affordability Calculator -->
         <section id="view-toolkit" class="tab-view hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 <!-- Calculator -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 sm:space-y-5">
                     <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0">
                             <i data-lucide="calculator" class="w-6 h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg font-bold text-slate-900">NSW Rental Cost & Bond Calculator</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-900">NSW Rental Cost & Bond Calculator</h3>
                             <p class="text-xs text-slate-500">Calculate upfront costs and affordability in Nowra/Bomaderry</p>
                         </div>
                     </div>
@@ -435,22 +546,22 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Target Weekly Rent ($AUD)</label>
                         <div class="relative">
-                            <span class="absolute left-3 top-2 font-bold text-slate-400">$</span>
+                            <span class="absolute left-3 top-2.5 font-bold text-slate-400">$</span>
                             <input type="number" id="calc-rent-input" value="550" min="200" max="1500" step="10" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-lg font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         </div>
                     </div>
 
                     <!-- Breakdown table -->
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 text-sm">
+                    <div class="bg-slate-50 p-3.5 sm:p-4 rounded-xl border border-slate-200 space-y-2.5 text-xs sm:text-sm">
                         <div class="flex justify-between items-center text-slate-700">
-                            <span>4-Week NSW Rental Bond (held with NSW Rental Bonds Online):</span>
+                            <span>4-Week NSW Rental Bond:</span>
                             <span id="calc-bond" class="font-bold text-slate-900">$2,200</span>
                         </div>
                         <div class="flex justify-between items-center text-slate-700">
-                            <span>2 Weeks Advance Rent (legal max in NSW):</span>
+                            <span>2 Weeks Advance Rent:</span>
                             <span id="calc-advance" class="font-bold text-slate-900">$1,100</span>
                         </div>
-                        <div class="pt-2 border-t border-slate-200 flex justify-between items-center font-bold text-base text-blue-700">
+                        <div class="pt-2 border-t border-slate-200 flex justify-between items-center font-bold text-sm sm:text-base text-blue-700">
                             <span>Total Upfront Move-In Cost:</span>
                             <span id="calc-upfront">$3,300</span>
                         </div>
@@ -465,9 +576,9 @@
                     </div>
 
                     <!-- Affordability Check (30% Rule) -->
-                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-xs space-y-1.5 text-emerald-900">
+                    <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl text-xs space-y-1.5 text-emerald-900">
                         <div class="font-bold flex items-center">
-                            <i data-lucide="shield-alert" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
+                            <i data-lucide="shield-alert" class="w-4 h-4 mr-1.5 text-emerald-600 flex-shrink-0"></i>
                             Housing Affordability Guideline (30% Rule)
                         </div>
                         <p>To keep rent within the recommended 30% of gross household income:</p>
@@ -476,18 +587,18 @@
                 </div>
 
                 <!-- Renter Cover Letter Generator -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center flex-shrink-0">
                             <i data-lucide="file-text" class="w-6 h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg font-bold text-slate-900">Shoalhaven Renter Bio Generator</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-900">Shoalhaven Renter Bio Generator</h3>
                             <p class="text-xs text-slate-500">Fast-track approval with a polished cover letter for 2Apply/Ignite</p>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                         <div>
                             <label class="block font-semibold text-slate-600 mb-1">Your Full Name</label>
                             <input type="text" id="gen-name" value="Alex Smith" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
@@ -509,7 +620,7 @@
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label class="text-xs font-semibold text-slate-600">Generated Bio & Cover Letter</label>
-                            <button id="btn-copy-bio" class="text-xs text-blue-600 hover:text-blue-800 font-bold flex items-center">
+                            <button id="btn-copy-bio" class="text-xs text-blue-600 hover:text-blue-800 font-bold flex items-center active:scale-95 transition">
                                 <i data-lucide="copy" class="w-3.5 h-3.5 mr-1"></i> Copy to Clipboard
                             </button>
                         </div>
@@ -519,13 +630,13 @@
             </div>
 
             <!-- 100 Point ID Checklist -->
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                <h3 class="text-base font-bold text-slate-900 flex items-center">
-                    <i data-lucide="check-square" class="w-5 h-5 mr-2 text-blue-600"></i>
+            <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="text-sm sm:text-base font-bold text-slate-900 flex items-center">
+                    <i data-lucide="check-square" class="w-5 h-5 mr-2 text-blue-600 flex-shrink-0"></i>
                     Rental Application Document Readiness (100 Point ID & Tenant Checklist)
                 </h3>
                 <p class="text-xs text-slate-500">In 2541, properties under $550 lease quickly. Have these documents ready in PDF on your phone/laptop to submit within 10 minutes of inspection:</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                     <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
                         <div class="font-bold text-slate-800">Primary Identification (40-70 pts)</div>
                         <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Current Driver's Licence (40)</span></label>
@@ -554,77 +665,199 @@
 
     </main>
 
-    <!-- Property Details Modal -->
-    <div id="modal-property" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+    <!-- Floating Map / List Toggle Button (Mobile Only) -->
+    <button id="floating-view-toggle" class="md:hidden floating-toggle-btn px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-full text-xs font-bold flex items-center shadow-xl active:scale-95 transition">
+        <i data-lucide="map" id="floating-toggle-icon" class="w-4 h-4 mr-2 text-blue-400"></i>
+        <span id="floating-toggle-text">View Map</span>
+    </button>
+
+    <!-- Mobile Bottom Navigation Bar (Gold standard native app navigation) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 mobile-bottom-nav flex items-center justify-around px-2 py-1">
+        <button class="mobile-nav-btn active flex-1" data-view="grid" title="Browse Rentals">
+            <i data-lucide="layout-grid" class="w-5 h-5 mb-0.5"></i>
+            <span>Rentals</span>
+            <span id="bottom-nav-results" class="absolute top-1 right-3 text-[9px] font-bold bg-blue-600 text-white px-1.5 py-0.2 rounded-full">16</span>
+        </button>
+        <button class="mobile-nav-btn flex-1" data-view="map" title="Interactive Map">
+            <i data-lucide="map" class="w-5 h-5 mb-0.5"></i>
+            <span>Map</span>
+        </button>
+        <button class="mobile-nav-btn flex-1" data-view="kanban" title="Application Pipeline">
+            <i data-lucide="kanban" class="w-5 h-5 mb-0.5"></i>
+            <span>Pipeline</span>
+        </button>
+        <button class="mobile-nav-btn flex-1" data-view="portals" title="Search Portals">
+            <i data-lucide="external-link" class="w-5 h-5 mb-0.5"></i>
+            <span>Portals</span>
+        </button>
+        <button class="mobile-nav-btn flex-1" data-view="toolkit" title="Toolkit & Bond Calculator">
+            <i data-lucide="calculator" class="w-5 h-5 mb-0.5"></i>
+            <span>Toolkit</span>
+        </button>
+    </nav>
+
+    <!-- Mobile Filters Slide-Up Bottom Sheet -->
+    <div id="modal-mobile-filters" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bottom-sheet-content bg-white w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <!-- Sheet Handle (Mobile visual cue) -->
+            <div class="pt-2 pb-1 sm:hidden">
+                <div class="sheet-handle-bar"></div>
+            </div>
+
+            <!-- Sheet Header -->
+            <div class="px-5 py-3 border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="sliders-horizontal" class="w-4 h-4 text-blue-600"></i>
+                    <h3 class="font-bold text-sm text-slate-900">Filter Rentals</h3>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button id="btn-mobile-reset-filters" class="text-xs text-slate-500 hover:text-slate-800 font-semibold underline">
+                        Reset
+                    </button>
+                    <button id="btn-mobile-filters-close" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sheet Body -->
+            <div class="p-5 overflow-y-auto space-y-4 text-xs">
+                <!-- Max Rent -->
+                <div>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label class="font-bold text-slate-700">Max Rent / Week</label>
+                        <span id="mobile-sheet-price-val" class="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-xs">$550</span>
+                    </div>
+                    <input type="range" id="mobile-sheet-price" min="300" max="650" step="10" value="550" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                        <span>$300</span>
+                        <span>$450</span>
+                        <span>$550 (Cap)</span>
+                        <span>$650</span>
+                    </div>
+                </div>
+
+                <!-- Bedrooms Selector -->
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1.5">Bedrooms</label>
+                    <div class="grid grid-cols-5 gap-1.5 text-xs font-semibold" id="mobile-sheet-beds-group">
+                        <button class="sheet-bed-btn py-2 rounded-lg border border-slate-200 bg-blue-600 text-white shadow-sm" data-val="0">Any</button>
+                        <button class="sheet-bed-btn py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-700" data-val="1">1+</button>
+                        <button class="sheet-bed-btn py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-700" data-val="2">2+</button>
+                        <button class="sheet-bed-btn py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-700" data-val="3">3+</button>
+                        <button class="sheet-bed-btn py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-700" data-val="4">4+</button>
+                    </div>
+                </div>
+
+                <!-- Property Type -->
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1.5">Property Type</label>
+                    <select id="mobile-sheet-prop-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500">
+                        <option value="all">All Property Types</option>
+                        <option value="House">House</option>
+                        <option value="Villa">Villa</option>
+                        <option value="Unit">Unit / Apartment</option>
+                        <option value="Townhouse">Townhouse</option>
+                        <option value="Duplex">Duplex</option>
+                        <option value="Studio">Studio</option>
+                    </select>
+                </div>
+
+                <!-- Toggles -->
+                <div class="space-y-3 pt-2 border-t border-slate-100">
+                    <label class="flex items-center justify-between cursor-pointer select-none py-1">
+                        <span class="font-semibold text-slate-700">Has Upcoming Inspection</span>
+                        <input type="checkbox" id="mobile-sheet-insp" class="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                    </label>
+                    <label class="flex items-center justify-between cursor-pointer select-none py-1">
+                        <span class="font-semibold text-slate-700 flex items-center">
+                            <i data-lucide="heart" class="w-3.5 h-3.5 mr-1.5 text-rose-500 fill-current"></i> Saved Only
+                        </span>
+                        <input type="checkbox" id="mobile-sheet-fav" class="w-5 h-5 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Sheet Footer -->
+            <div class="p-4 border-t border-slate-200 bg-slate-50">
+                <button id="btn-mobile-apply-filters" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-md transition active:scale-98">
+                    Apply Filters
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Property Details Modal (Bottom sheet on mobile, dialog on desktop) -->
+    <div id="modal-property" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
+        <div class="bottom-sheet-content bg-white w-full sm:max-w-2xl rounded-t-2xl sm:rounded-2xl max-h-[92vh] sm:max-h-[90vh] flex flex-col shadow-2xl overflow-hidden my-0 sm:my-auto">
             <!-- Modal Header -->
-            <div class="relative h-64 bg-slate-900 flex-shrink-0">
+            <div class="relative h-52 sm:h-64 bg-slate-900 flex-shrink-0">
                 <img id="modal-img" src="" alt="Property" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-black/40"></div>
-                <button id="modal-close-btn" class="absolute top-4 right-4 w-9 h-9 bg-black/60 hover:bg-black/80 rounded-full text-white flex items-center justify-center transition">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-black/40"></div>
+                <button id="modal-close-btn" class="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 sm:w-9 sm:h-9 bg-black/60 hover:bg-black/80 rounded-full text-white flex items-center justify-center transition active:scale-95">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
-                <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end text-white">
-                    <div>
-                        <span id="modal-type-badge" class="px-2.5 py-1 rounded text-xs font-bold uppercase bg-blue-600 text-white tracking-wider">House</span>
-                        <h2 id="modal-price" class="text-3xl font-extrabold mt-1 text-white">$550 <span class="text-base font-normal text-slate-200">/ week</span></h2>
-                        <p id="modal-address" class="text-sm font-medium text-slate-200 mt-0.5">5/75 Albatross Road, West Nowra NSW 2541</p>
+                <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 flex justify-between items-end text-white">
+                    <div class="pr-2">
+                        <span id="modal-type-badge" class="px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold uppercase bg-blue-600 text-white tracking-wider">House</span>
+                        <h2 id="modal-price" class="text-2xl sm:text-3xl font-extrabold mt-0.5 text-white">$550 <span class="text-xs sm:text-base font-normal text-slate-200">/ week</span></h2>
+                        <p id="modal-address" class="text-xs sm:text-sm font-medium text-slate-200 mt-0.5 line-clamp-1">5/75 Albatross Road, West Nowra NSW 2541</p>
                     </div>
-                    <button id="modal-fav-btn" class="p-2.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur text-white transition">
-                        <i data-lucide="heart" id="modal-fav-icon" class="w-6 h-6"></i>
+                    <button id="modal-fav-btn" class="p-2 sm:p-2.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur text-white transition active:scale-95 flex-shrink-0">
+                        <i data-lucide="heart" id="modal-fav-icon" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Modal Body (Scrollable) -->
-            <div class="p-6 overflow-y-auto flex-1 space-y-5 text-sm">
+            <div class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4 text-xs sm:text-sm">
                 <!-- Features row -->
-                <div class="grid grid-cols-4 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+                <div class="grid grid-cols-4 gap-2 bg-slate-50 p-2.5 sm:p-3 rounded-xl border border-slate-200 text-center">
                     <div>
-                        <span class="text-xs text-slate-500 block">Bedrooms</span>
-                        <span id="modal-beds" class="font-bold text-slate-800 text-base">3</span>
+                        <span class="text-[10px] sm:text-xs text-slate-500 block">Bedrooms</span>
+                        <span id="modal-beds" class="font-bold text-slate-800 text-sm sm:text-base">3</span>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-500 block">Bathrooms</span>
-                        <span id="modal-baths" class="font-bold text-slate-800 text-base">1</span>
+                        <span class="text-[10px] sm:text-xs text-slate-500 block">Bathrooms</span>
+                        <span id="modal-baths" class="font-bold text-slate-800 text-sm sm:text-base">1</span>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-500 block">Parking</span>
-                        <span id="modal-cars" class="font-bold text-slate-800 text-base">1</span>
+                        <span class="text-[10px] sm:text-xs text-slate-500 block">Parking</span>
+                        <span id="modal-cars" class="font-bold text-slate-800 text-sm sm:text-base">1</span>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-500 block">Bond (4wks)</span>
-                        <span id="modal-bond" class="font-bold text-blue-600 text-base">$2,200</span>
+                        <span class="text-[10px] sm:text-xs text-slate-500 block">Bond (4wks)</span>
+                        <span id="modal-bond" class="font-bold text-blue-600 text-sm sm:text-base">$2,200</span>
                     </div>
                 </div>
 
                 <!-- Inspection Alert Box if present -->
-                <div id="modal-inspection-box" class="hidden bg-indigo-50 border border-indigo-200 p-3.5 rounded-xl flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
+                <div id="modal-inspection-box" class="hidden bg-indigo-50 border border-indigo-200 p-3 sm:p-3.5 rounded-xl flex items-center justify-between">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center flex-shrink-0">
                             <i data-lucide="calendar" class="w-4 h-4"></i>
                         </div>
                         <div>
-                            <span class="text-xs font-bold text-indigo-900 block">Upcoming Inspection Time</span>
+                            <span class="text-[11px] font-bold text-indigo-900 block">Upcoming Inspection Time</span>
                             <span id="modal-inspection-text" class="text-xs font-semibold text-indigo-700">Tue 6 Oct 12:45 pm</span>
                         </div>
                     </div>
-                    <a id="modal-ical-btn" href="#" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition flex items-center shadow-sm">
-                        <i data-lucide="calendar-plus" class="w-3.5 h-3.5 mr-1"></i> Add to Calendar
+                    <a id="modal-ical-btn" href="#" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition flex items-center shadow-sm whitespace-nowrap active:scale-95">
+                        <i data-lucide="calendar-plus" class="w-3.5 h-3.5 mr-1"></i> Add .ics
                     </a>
                 </div>
 
                 <!-- Description -->
                 <div>
-                    <h4 class="font-bold text-slate-800 mb-1.5">Property Summary & Availability</h4>
+                    <h4 class="font-bold text-slate-800 mb-1">Property Summary & Availability</h4>
                     <p id="modal-desc" class="text-slate-600 leading-relaxed text-xs">No description available.</p>
                 </div>
 
                 <!-- Status & Pipeline Dropdown -->
-                <div class="grid grid-cols-2 gap-4 pt-3 border-t border-slate-200">
+                <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-200">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Application Pipeline Stage</label>
-                        <select id="modal-status-select" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Pipeline Stage</label>
+                        <select id="modal-status-select" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500">
                             <option value="discovered">🔍 Discovered / Watching</option>
                             <option value="saved">⭐ Shortlisted</option>
                             <option value="inspecting">📅 Inspection Booked</option>
@@ -635,13 +868,13 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Personal Rating</label>
-                        <select id="modal-rating-select" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500">
+                        <select id="modal-rating-select" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500">
                             <option value="0">Unrated</option>
                             <option value="1">⭐ 1 Star</option>
                             <option value="2">⭐⭐ 2 Stars</option>
                             <option value="3">⭐⭐⭐ 3 Stars</option>
                             <option value="4">⭐⭐⭐⭐ 4 Stars</option>
-                            <option value="5">⭐⭐⭐⭐⭐ 5 Stars (Top Pick!)</option>
+                            <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
                         </select>
                     </div>
                 </div>
@@ -653,16 +886,16 @@
                 </div>
             </div>
 
-            <!-- Modal Footer -->
-            <div class="bg-slate-50 px-6 py-3.5 border-t border-slate-200 flex items-center justify-between">
+            <!-- Sticky Modal Footer -->
+            <div class="bg-slate-50 px-4 sm:px-6 py-3 border-t border-slate-200 flex items-center justify-between">
                 <a id="modal-maps-link" href="#" target="_blank" class="text-xs font-medium text-slate-600 hover:text-blue-600 flex items-center">
-                    <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1"></i> View on Google Maps
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1"></i> <span class="hidden xs:inline">Google Maps</span><span class="xs:hidden">Maps</span>
                 </a>
                 <div class="flex items-center space-x-2">
-                    <button id="modal-save-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
-                        Save Changes
+                    <button id="modal-save-btn" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition active:scale-95">
+                        Save
                     </button>
-                    <a id="modal-portal-link" href="#" target="_blank" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center">
+                    <a id="modal-portal-link" href="#" target="_blank" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center active:scale-95">
                         <span>Open Listing</span>
                         <i data-lucide="external-link" class="w-3.5 h-3.5 ml-1.5"></i>
                     </a>
@@ -672,26 +905,26 @@
     </div>
 
     <!-- Add Custom Rental Modal -->
-    <div id="modal-add" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+    <div id="modal-add" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
+        <div class="bottom-sheet-content bg-white rounded-t-2xl sm:rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-                <h3 class="font-bold text-base text-slate-900 flex items-center">
+                <h3 class="font-bold text-sm sm:text-base text-slate-900 flex items-center">
                     <i data-lucide="plus-circle" class="w-5 h-5 mr-2 text-blue-600"></i>
                     Add Custom Rental to 2541 Tracker
                 </h3>
-                <button id="modal-add-close" class="text-slate-400 hover:text-slate-600">
+                <button id="modal-add-close" class="text-slate-400 hover:text-slate-600 p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
             <form id="form-add-rental" class="space-y-3 text-xs">
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Street Address *</label>
-                    <input type="text" id="add-street" required placeholder="e.g. 12 Bridge Road" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                    <input type="text" id="add-street" required placeholder="e.g. 12 Bridge Road" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Suburb in 2541 *</label>
-                        <select id="add-suburb" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg bg-white">
+                        <select id="add-suburb" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
                             <option value="Nowra">Nowra</option>
                             <option value="Bomaderry">Bomaderry</option>
                             <option value="North Nowra">North Nowra</option>
@@ -704,7 +937,7 @@
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Rent ($/wk) *</label>
-                        <input type="number" id="add-price" required placeholder="e.g. 480" max="650" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg font-bold">
+                        <input type="number" id="add-price" required placeholder="e.g. 480" max="650" class="w-full px-3 py-2 border border-slate-300 rounded-lg font-bold">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-3">
@@ -723,7 +956,7 @@
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Property Type</label>
-                    <select id="add-type" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg bg-white">
+                    <select id="add-type" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
                         <option value="House">House</option>
                         <option value="Villa">Villa</option>
                         <option value="Unit">Unit / Flat</option>
@@ -744,22 +977,22 @@
                     <textarea id="add-notes" rows="2" placeholder="Found on Facebook group, landlord contact John 04..." class="w-full p-2 border border-slate-300 rounded-lg"></textarea>
                 </div>
                 <div class="pt-3 border-t border-slate-200 flex justify-end space-x-2">
-                    <button type="button" id="modal-add-cancel" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow">Add Rental</button>
+                    <button type="button" id="modal-add-cancel" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold active:scale-95 transition">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow active:scale-95 transition">Add Rental</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Settings Modal -->
-    <div id="modal-settings" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-xs">
+    <div id="modal-settings" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
+        <div class="bottom-sheet-content bg-white rounded-t-2xl sm:rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 text-xs max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-                <h3 class="font-bold text-base text-slate-900 flex items-center">
+                <h3 class="font-bold text-sm sm:text-base text-slate-900 flex items-center">
                     <i data-lucide="settings" class="w-5 h-5 mr-2 text-slate-700"></i>
                     Settings & Rental Alerts
                 </h3>
-                <button id="modal-settings-close" class="text-slate-400 hover:text-slate-600">
+                <button id="modal-settings-close" class="text-slate-400 hover:text-slate-600 p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -767,15 +1000,15 @@
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Default Price Cap</label>
                     <div class="relative">
-                        <span class="absolute left-3 top-2 text-slate-400 font-bold">$</span>
-                        <input type="number" id="setting-max-price" value="550" class="w-full pl-7 pr-3 py-1.5 border border-slate-300 rounded-lg font-bold">
+                        <span class="absolute left-3 top-2.5 text-slate-400 font-bold">$</span>
+                        <input type="number" id="setting-max-price" value="550" class="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg font-bold">
                     </div>
                     <p class="text-[11px] text-slate-500 mt-1">Alerts trigger when a new rental is found at or below this weekly rent.</p>
                 </div>
 
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Background Refresh Frequency</label>
-                    <select id="setting-refresh-interval" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg bg-white">
+                    <select id="setting-refresh-interval" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white">
                         <option value="15">Every 15 minutes (Fastest alert)</option>
                         <option value="30" selected>Every 30 minutes (Recommended)</option>
                         <option value="60">Every 1 hour</option>
@@ -785,7 +1018,7 @@
 
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Discord / Telegram Webhook URL</label>
-                    <input type="url" id="setting-webhook-url" placeholder="https://discord.com/api/webhooks/..." class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                    <input type="url" id="setting-webhook-url" placeholder="https://discord.com/api/webhooks/..." class="w-full px-3 py-2 border border-slate-300 rounded-lg">
                     <p class="text-[11px] text-slate-500 mt-1">Get an instant push alert on your mobile Discord/Slack when a new &lt;=$550 property is listed!</p>
                 </div>
 
@@ -796,15 +1029,15 @@
                     </label>
                     <div class="flex items-center justify-between pt-1">
                         <span class="text-slate-600">Browser Desktop Notifications:</span>
-                        <button id="btn-request-notify" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-semibold text-[11px]">
+                        <button id="btn-request-notify" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-semibold text-[11px] active:scale-95 transition">
                             Enable in Browser
                         </button>
                     </div>
                 </div>
 
                 <div class="pt-3 border-t border-slate-200 flex justify-end space-x-2">
-                    <button id="modal-settings-cancel" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold">Cancel</button>
-                    <button id="modal-settings-save" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow">Save Preferences</button>
+                    <button id="modal-settings-cancel" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold active:scale-95 transition">Cancel</button>
+                    <button id="modal-settings-save" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow active:scale-95 transition">Save Preferences</button>
                 </div>
             </div>
         </div>
@@ -820,33 +1053,33 @@
     </div>
 
     <!-- First-Time Tips & Walkthrough Modal -->
-    <div id="modal-tips" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl max-w-2xl w-full flex flex-col shadow-2xl overflow-hidden my-auto border border-slate-200">
+    <div id="modal-tips" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
+        <div class="bottom-sheet-content bg-white rounded-t-2xl sm:rounded-2xl max-w-2xl w-full flex flex-col shadow-2xl overflow-hidden my-0 sm:my-auto border border-slate-200 max-h-[92vh]">
             <!-- Modal Header -->
-            <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white p-5 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-amber-300">
-                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+            <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white p-4 sm:p-5 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center space-x-2.5 sm:space-x-3">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-amber-300 flex-shrink-0">
+                        <i data-lucide="sparkles" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-lg text-white">How to Use 2541 Rental Radar</h3>
-                        <p class="text-xs text-blue-100">6 essential tips for securing a rental under $550/wk in Nowra & Bomaderry</p>
+                        <h3 class="font-bold text-base sm:text-lg text-white">How to Use 2541 Rental Radar</h3>
+                        <p class="text-[11px] sm:text-xs text-blue-100">6 essential tips for securing a rental under $550/wk in Nowra & Bomaderry</p>
                     </div>
                 </div>
-                <button id="modal-tips-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+                <button id="modal-tips-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition active:scale-95">
+                    <i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </button>
             </div>
 
             <!-- Modal Content Slides (Interactive) -->
-            <div class="p-6 text-slate-800 space-y-4">
+            <div class="p-4 sm:p-6 text-slate-800 space-y-4 overflow-y-auto flex-1" id="tips-container">
                 <!-- Slide 1 -->
                 <div class="tip-slide space-y-3" data-step="1">
                     <div class="flex items-center space-x-2 text-blue-600 font-bold text-sm">
                         <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">1</span>
                         <span>Setting Your Budget & Suburb Filters</span>
                     </div>
-                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                    <div class="p-3.5 sm:p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
                         <p><strong>• Max Rent Slider:</strong> Pre-set to <strong>$550/week</strong>. You can slide down to $400 or up to $650. Every listing above your chosen limit is filtered out immediately.</p>
                         <p><strong>• Suburb Quick Pills:</strong> Click any suburb button (<em>Nowra, Bomaderry, North Nowra, South Nowra, West Nowra</em>) to view rentals in that specific neighborhood.</p>
                         <p><strong>• Inspection Toggle:</strong> Check <em>"Has Upcoming Inspection"</em> to exclusively see properties with scheduled open homes.</p>
@@ -859,9 +1092,9 @@
                         <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">2</span>
                         <span>Interactive 2541 Map & Local Landmarks</span>
                     </div>
-                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                    <div class="p-3.5 sm:p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
                         <p><strong>• Color-Coded Price Pins:</strong></p>
-                        <div class="flex items-center space-x-3 text-[11px] my-1 font-semibold">
+                        <div class="flex flex-wrap items-center gap-1.5 text-[11px] my-1 font-semibold">
                             <span class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">🟢 Under $450 (Bargain)</span>
                             <span class="text-blue-700 bg-blue-100 px-2 py-0.5 rounded">🔵 $450 - $500 (Great Value)</span>
                             <span class="text-amber-800 bg-amber-100 px-2 py-0.5 rounded">🟠 $501 - $550 (Upper Cap)</span>
@@ -876,7 +1109,7 @@
                         <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">3</span>
                         <span>Inspections, 1-Click Calendar & Open House Run Sheet</span>
                     </div>
-                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                    <div class="p-3.5 sm:p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
                         <p><strong>• 1-Click Calendar (.ics):</strong> Click into any property with an inspection and hit <em>"Add to Calendar"</em> to automatically save it to your phone's Google Calendar, Apple Calendar, or Outlook.</p>
                         <p><strong>• Saturday Run Sheet:</strong> Click <em>"Run Sheet"</em> in the header before Saturday morning viewings to generate a clean, print-friendly schedule of open homes so you don't miss inspection windows.</p>
                     </div>
@@ -888,7 +1121,7 @@
                         <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">4</span>
                         <span>Application Pipeline Tracker (Kanban)</span>
                     </div>
-                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                    <div class="p-3.5 sm:p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
                         <p><strong>• Manage Your Rental Pipeline:</strong> Move properties between <em>Discovered</em>, <em>Shortlisted</em>, <em>Inspecting</em>, <em>Applied</em>, and <em>Offered</em> using the card dropdown.</p>
                         <p><strong>• Private Notes & Star Ratings:</strong> Click into any property card to rate it (1-5 stars) and record personal inspection notes (e.g., "Agent said NBN is connected, big backyard, application submitted via 2Apply").</p>
                     </div>
@@ -900,7 +1133,7 @@
                         <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">5</span>
                         <span>Super Search Portals & Adding Custom Rentals</span>
                     </div>
-                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                    <div class="p-3.5 sm:p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
                         <p><strong>• 1-Click Multi-App Portals:</strong> Check the <em>"Super Search Portals"</em> tab for direct pre-filtered searches on Realestate.com.au, Domain, Allhomes, Gumtree (for private rentals), and Flatmates.</p>
                         <p><strong>• + Add Rental:</strong> Found a private rental on Facebook Marketplace or saw a "For Lease" board on Kinghorne Street? Click <em>"+ Add Rental"</em> to track it alongside all other listings on your map and pipeline.</p>
                     </div>
@@ -912,7 +1145,7 @@
                         <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">6</span>
                         <span>NSW Bond Calculator & Auto Renter Bio Generator</span>
                     </div>
-                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                    <div class="p-3.5 sm:p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
                         <p><strong>• Bond & Cost Calculator:</strong> Computes the exact 4-week NSW rental bond ($2,200 for $550/wk), 2 weeks advance rent ($1,100), and total move-in capital ($3,300), plus the 30% affordability income guideline.</p>
                         <p><strong>• Renter Bio Generator:</strong> Generate a customized, professional tenant cover letter tailored for Shoalhaven agents, ready to copy and paste directly into 2Apply or Ignite.</p>
                     </div>
@@ -920,25 +1153,26 @@
             </div>
 
             <!-- Modal Footer with Step Dots and Navigation -->
-            <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-                <label class="flex items-center space-x-2 cursor-pointer text-xs text-slate-500">
+            <div class="bg-slate-50 px-4 sm:px-6 py-3.5 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
+                <label class="flex items-center space-x-1.5 cursor-pointer text-[11px] sm:text-xs text-slate-500">
                     <input type="checkbox" id="tips-dont-show" class="rounded text-blue-600 focus:ring-blue-500">
-                    <span>Don't show automatically on start</span>
+                    <span class="hidden sm:inline">Don't show on start</span>
+                    <span class="sm:hidden">Don't show</span>
                 </label>
                 <div class="flex items-center space-x-2">
                     <!-- Dots -->
-                    <div class="flex space-x-1 mr-3" id="tips-dots">
-                        <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                    <div class="flex space-x-1 mr-2" id="tips-dots">
+                        <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                        <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+                        <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+                        <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+                        <span class="w-2 h-2 rounded-full bg-slate-300"></span>
+                        <span class="w-2 h-2 rounded-full bg-slate-300"></span>
                     </div>
-                    <button id="btn-tip-prev" class="px-3 py-1.5 border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold disabled:opacity-40" disabled>
-                        Previous
+                    <button id="btn-tip-prev" class="px-2.5 py-1.5 border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold disabled:opacity-40 active:scale-95" disabled>
+                        Prev
                     </button>
-                    <button id="btn-tip-next" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                    <button id="btn-tip-next" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition active:scale-95">
                         Next
                     </button>
                 </div>
@@ -947,8 +1181,8 @@
     </div>
 
     <!-- Toast Notification Banner -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-xs transition-all duration-300">
-        <i data-lucide="bell" class="w-5 h-5 text-emerald-400"></i>
+    <div id="toast" class="fixed bottom-20 md:bottom-5 right-4 left-4 sm:left-auto sm:right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-xs transition-all duration-300">
+        <i data-lucide="bell" class="w-5 h-5 text-emerald-400 flex-shrink-0"></i>
         <span id="toast-msg">Notification message</span>
     </div>
 

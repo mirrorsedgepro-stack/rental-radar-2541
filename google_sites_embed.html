@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2541 Rental Radar | Google Sites Edition</title>
+    <title>2541 Rental Radar | Nowra & Bomaderry Housing Rentals under $550</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -25,6 +25,7 @@
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Custom Styles -->
     <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
@@ -144,6 +145,7 @@ body {
     }
 }
 
+
         /* Google Sites Embed Optimization */
         html, body {
             height: 100%;
@@ -151,13 +153,10 @@ body {
             padding: 0;
             background-color: #f8fafc;
         }
-        #app-wrapper {
-            min-height: 100vh;
-        }
-    </style>
+    
+</style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
-<div id="app-wrapper" class="flex flex-col flex-1">
 
     <!-- Top Header -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
@@ -173,7 +172,7 @@ body {
                             <h1 class="text-xl font-bold tracking-tight text-slate-900">2541 Rental Radar</h1>
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
                                 <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-500 pulsing-beacon"></span>
-                                Nowra & Bomaderry
+                                Live Nowra & Bomaderry
                             </span>
                         </div>
                         <p class="text-xs text-slate-500">Rentals in Postcode 2541 under $550/wk</p>
@@ -182,6 +181,14 @@ body {
 
                 <!-- Action Buttons -->
                 <div class="flex items-center space-x-2 sm:space-x-3">
+                    <button id="btn-tips" class="inline-flex items-center px-3 py-1.5 border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg text-xs font-semibold shadow-sm transition active:scale-95" title="First-time user guide & search tips">
+                        <i data-lucide="lightbulb" class="w-4 h-4 mr-1.5 text-amber-600"></i>
+                        <span>Tips & Tour</span>
+                    </button>
+                    <button id="btn-refresh" class="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm active:scale-95">
+                        <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4 mr-1.5 text-blue-600"></i>
+                        <span>Sync Live</span>
+                    </button>
                     <button id="btn-add-modal" class="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-sm transition active:scale-95">
                         <i data-lucide="plus-circle" class="w-4 h-4 mr-1.5"></i>
                         <span>+ Add Rental</span>
@@ -192,9 +199,9 @@ body {
                     </button>
                     <button id="btn-export-csv" class="hidden md:inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm">
                         <i data-lucide="download" class="w-4 h-4 mr-1.5 text-slate-600"></i>
-                        <span>Export CSV</span>
+                        <span>CSV</span>
                     </button>
-                    <button id="btn-settings-modal" class="p-2 border border-slate-300 rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm" title="Settings & Backup">
+                    <button id="btn-settings-modal" class="p-2 border border-slate-300 rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm" title="Settings & Alerts">
                         <i data-lucide="settings" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -211,7 +218,7 @@ body {
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Under $550/wk</p>
-                    <h3 id="stat-count" class="text-2xl font-bold text-slate-900 mt-1">16</h3>
+                    <h3 id="stat-count" class="text-2xl font-bold text-slate-900 mt-1">--</h3>
                     <p class="text-xs text-emerald-600 font-medium mt-0.5 flex items-center">
                         <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1"></i> Ready to rent
                     </p>
@@ -225,7 +232,7 @@ body {
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Average Rent</p>
-                    <h3 id="stat-avg" class="text-2xl font-bold text-slate-900 mt-1">$489</h3>
+                    <h3 id="stat-avg" class="text-2xl font-bold text-slate-900 mt-1">$--</h3>
                     <p class="text-xs text-slate-500 mt-0.5">Across 2541 listings</p>
                 </div>
                 <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -237,8 +244,8 @@ body {
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Lowest Deal</p>
-                    <h3 id="stat-min" class="text-2xl font-bold text-emerald-700 mt-1">$360</h3>
-                    <p class="text-xs text-emerald-600 mt-0.5 font-medium">Bomaderry entry</p>
+                    <h3 id="stat-min" class="text-2xl font-bold text-emerald-700 mt-1">$--</h3>
+                    <p class="text-xs text-emerald-600 mt-0.5 font-medium">Bargain entry</p>
                 </div>
                 <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
                     <i data-lucide="tag" class="w-5 h-5"></i>
@@ -249,7 +256,7 @@ body {
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
                 <div>
                     <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Inspections</p>
-                    <h3 id="stat-inspections" class="text-2xl font-bold text-slate-900 mt-1">5</h3>
+                    <h3 id="stat-inspections" class="text-2xl font-bold text-slate-900 mt-1">--</h3>
                     <p class="text-xs text-indigo-600 font-medium mt-0.5">Upcoming scheduled</p>
                 </div>
                 <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
@@ -295,6 +302,9 @@ body {
                 </button>
                 <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="South Nowra">
                     South Nowra (<span id="sub-south-nowra-count">1</span>)
+                </button>
+                <button class="suburb-btn px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition" data-suburb="Bangalee">
+                    Bangalee
                 </button>
             </div>
         </div>
@@ -342,6 +352,7 @@ body {
                         <option value="Unit">Unit / Apartment</option>
                         <option value="Townhouse">Townhouse</option>
                         <option value="Duplex">Duplex</option>
+                        <option value="Studio">Studio</option>
                     </select>
                 </div>
 
@@ -351,6 +362,7 @@ body {
                     <select id="filter-sort" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         <option value="price_asc">Price: Low to High</option>
                         <option value="price_desc">Price: High to Low</option>
+                        <option value="newest">Recently Listed</option>
                         <option value="inspection">Inspection Soonest</option>
                         <option value="beds_desc">Most Bedrooms</option>
                     </select>
@@ -382,7 +394,7 @@ body {
             <nav class="flex space-x-6 text-sm font-semibold" aria-label="Tabs">
                 <button class="view-tab active border-b-2 border-blue-600 py-3 text-blue-600 flex items-center" data-view="grid">
                     <i data-lucide="layout-grid" class="w-4 h-4 mr-2"></i>
-                    Rentals Grid (<span id="results-count">16</span>)
+                    Rentals Grid (<span id="results-count">--</span>)
                 </button>
                 <button class="view-tab border-b-2 border-transparent py-3 text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center" data-view="map">
                     <i data-lucide="map" class="w-4 h-4 mr-2"></i>
@@ -405,13 +417,18 @@ body {
 
         <!-- VIEW 1: Grid View -->
         <section id="view-grid" class="tab-view block space-y-4">
-            <div id="listings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+            <div id="listings-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Listing Cards will be populated here via JS -->
+            </div>
             <div id="no-results" class="hidden bg-white p-12 rounded-2xl border border-slate-200 text-center space-y-3">
                 <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto">
                     <i data-lucide="search-x" class="w-6 h-6"></i>
                 </div>
                 <h3 class="text-base font-bold text-slate-800">No rentals found matching your filters</h3>
-                <p class="text-sm text-slate-500 max-w-sm mx-auto">Try adjusting the price slider or clearing bedroom filters.</p>
+                <p class="text-sm text-slate-500 max-w-sm mx-auto">Try increasing your max rent slider or clearing specific suburb/bedroom filters.</p>
+                <button onclick="resetFilters()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-blue-700 transition">
+                    Reset All Filters
+                </button>
             </div>
         </section>
 
@@ -431,52 +448,63 @@ body {
                     <button id="toggle-shops" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">🛍️ Stockland Nowra</button>
                 </div>
             </div>
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-[600px] relative">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-[620px] relative">
                 <div id="map" class="w-full h-full"></div>
             </div>
         </section>
 
         <!-- VIEW 3: Application Pipeline (Kanban) -->
         <section id="view-kanban" class="tab-view hidden space-y-4">
+            <div class="flex items-center justify-between bg-blue-50 border border-blue-200 p-3 rounded-xl text-xs text-blue-800">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="info" class="w-4 h-4 text-blue-600 flex-shrink-0"></i>
+                    <span>Track your rental journey: click the status badge on any card to move it through your application pipeline!</span>
+                </div>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
+                <!-- Column: Discovered -->
                 <div class="bg-slate-100 rounded-xl p-3 flex flex-col space-y-3">
                     <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-slate-600 px-1">
                         <span>🔍 Discovered</span>
                         <span id="kanban-discovered-count" class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">0</span>
                     </div>
-                    <div id="kanban-discovered" class="space-y-3 min-h-[250px]"></div>
+                    <div id="kanban-discovered" class="space-y-3 min-h-[300px]"></div>
                 </div>
 
+                <!-- Column: Shortlisted -->
                 <div class="bg-rose-50/70 border border-rose-100 rounded-xl p-3 flex flex-col space-y-3">
                     <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-rose-700 px-1">
                         <span>⭐ Shortlisted</span>
                         <span id="kanban-saved-count" class="bg-rose-200 text-rose-800 px-2 py-0.5 rounded-full">0</span>
                     </div>
-                    <div id="kanban-saved" class="space-y-3 min-h-[250px]"></div>
+                    <div id="kanban-saved" class="space-y-3 min-h-[300px]"></div>
                 </div>
 
+                <!-- Column: Inspecting -->
                 <div class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 flex flex-col space-y-3">
                     <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-indigo-700 px-1">
                         <span>📅 Inspecting</span>
                         <span id="kanban-inspecting-count" class="bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full">0</span>
                     </div>
-                    <div id="kanban-inspecting" class="space-y-3 min-h-[250px]"></div>
+                    <div id="kanban-inspecting" class="space-y-3 min-h-[300px]"></div>
                 </div>
 
+                <!-- Column: Applied -->
                 <div class="bg-amber-50/70 border border-amber-100 rounded-xl p-3 flex flex-col space-y-3">
                     <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-amber-700 px-1">
                         <span>📝 Applied</span>
                         <span id="kanban-applied-count" class="bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">0</span>
                     </div>
-                    <div id="kanban-applied" class="space-y-3 min-h-[250px]"></div>
+                    <div id="kanban-applied" class="space-y-3 min-h-[300px]"></div>
                 </div>
 
+                <!-- Column: Offered / Approved -->
                 <div class="bg-emerald-50/70 border border-emerald-100 rounded-xl p-3 flex flex-col space-y-3">
                     <div class="flex items-center justify-between font-bold text-xs uppercase tracking-wider text-emerald-700 px-1">
-                        <span>🎉 Offered</span>
+                        <span>🎉 Offered / Leased</span>
                         <span id="kanban-offered-count" class="bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full">0</span>
                     </div>
-                    <div id="kanban-offered" class="space-y-3 min-h-[250px]"></div>
+                    <div id="kanban-offered" class="space-y-3 min-h-[300px]"></div>
                 </div>
             </div>
         </section>
@@ -486,10 +514,35 @@ body {
             <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-2xl p-6 shadow-md">
                 <h3 class="text-xl font-bold">1-Click Launchpad: 2541 Under $550/Week</h3>
                 <p class="text-blue-100 text-sm mt-1 max-w-2xl">
-                    Launch pre-filtered searches directly on Australia's leading property portals and local Nowra agencies:
+                    Never miss a hidden rental. Major agencies sometimes list on their own websites hours before aggregators, and private landlords post directly on Gumtree and Flatmates. Click below to launch pre-filtered searches:
                 </p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="portal-cards"></div>
+
+            <div class="space-y-6">
+                <!-- Major National Portals -->
+                <div>
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center">
+                        <i data-lucide="layers" class="w-4 h-4 mr-2 text-blue-600"></i> Major Australian Portals (Pre-filtered &lt;= $550 in 2541)
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="portal-major-cards"></div>
+                </div>
+
+                <!-- Local Nowra & Shoalhaven Agencies -->
+                <div>
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center">
+                        <i data-lucide="building-2" class="w-4 h-4 mr-2 text-indigo-600"></i> Leading Nowra Real Estate Agencies
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="portal-agency-cards"></div>
+                </div>
+
+                <!-- Private & Alternative -->
+                <div>
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3 flex items-center">
+                        <i data-lucide="users" class="w-4 h-4 mr-2 text-emerald-600"></i> Private Rentals, Studios & Granny Flats
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="portal-private-cards"></div>
+                </div>
+            </div>
         </section>
 
         <!-- VIEW 5: Tenant Toolkit & Affordability Calculator -->
@@ -515,13 +568,14 @@ body {
                         </div>
                     </div>
 
+                    <!-- Breakdown table -->
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 text-sm">
                         <div class="flex justify-between items-center text-slate-700">
-                            <span>4-Week NSW Rental Bond:</span>
+                            <span>4-Week NSW Rental Bond (held with NSW Rental Bonds Online):</span>
                             <span id="calc-bond" class="font-bold text-slate-900">$2,200</span>
                         </div>
                         <div class="flex justify-between items-center text-slate-700">
-                            <span>2 Weeks Advance Rent:</span>
+                            <span>2 Weeks Advance Rent (legal max in NSW):</span>
                             <span id="calc-advance" class="font-bold text-slate-900">$1,100</span>
                         </div>
                         <div class="pt-2 border-t border-slate-200 flex justify-between items-center font-bold text-base text-blue-700">
@@ -538,13 +592,14 @@ body {
                         </div>
                     </div>
 
+                    <!-- Affordability Check (30% Rule) -->
                     <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-xs space-y-1.5 text-emerald-900">
                         <div class="font-bold flex items-center">
                             <i data-lucide="shield-alert" class="w-4 h-4 mr-1.5 text-emerald-600"></i>
                             Housing Affordability Guideline (30% Rule)
                         </div>
-                        <p>To keep rent within 30% of gross household income:</p>
-                        <p class="font-semibold">Gross Income needed: <span id="calc-income-weekly" class="font-bold text-emerald-800">$1,833/wk</span> (<span id="calc-income-annual" class="font-bold text-emerald-800">$95,333/yr</span>)</p>
+                        <p>To keep rent within the recommended 30% of gross household income:</p>
+                        <p class="font-semibold">Minimum Gross Income needed: <span id="calc-income-weekly" class="font-bold text-emerald-800">$1,833/wk</span> (<span id="calc-income-annual" class="font-bold text-emerald-800">$95,333/yr</span>)</p>
                     </div>
                 </div>
 
@@ -570,7 +625,7 @@ body {
                             <input type="text" id="gen-job" value="Health Care Professional" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Household Profile</label>
+                            <label class="block font-semibold text-slate-600 mb-1">Household Size</label>
                             <input type="text" id="gen-household" value="Single non-smoker / Couple" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
                         </div>
                         <div>
@@ -581,12 +636,45 @@ body {
 
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label class="text-xs font-semibold text-slate-600">Generated Cover Letter</label>
+                            <label class="text-xs font-semibold text-slate-600">Generated Bio & Cover Letter</label>
                             <button id="btn-copy-bio" class="text-xs text-blue-600 hover:text-blue-800 font-bold flex items-center">
                                 <i data-lucide="copy" class="w-3.5 h-3.5 mr-1"></i> Copy to Clipboard
                             </button>
                         </div>
                         <textarea id="gen-output" rows="6" class="w-full p-3 border border-slate-300 rounded-lg text-xs font-mono text-slate-800 bg-slate-50 focus:bg-white focus:outline-none"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 100 Point ID Checklist -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h3 class="text-base font-bold text-slate-900 flex items-center">
+                    <i data-lucide="check-square" class="w-5 h-5 mr-2 text-blue-600"></i>
+                    Rental Application Document Readiness (100 Point ID & Tenant Checklist)
+                </h3>
+                <p class="text-xs text-slate-500">In 2541, properties under $550 lease quickly. Have these documents ready in PDF on your phone/laptop to submit within 10 minutes of inspection:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                        <div class="font-bold text-slate-800">Primary Identification (40-70 pts)</div>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Current Driver's Licence (40)</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Australian Passport (70)</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Birth Certificate (70)</span></label>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                        <div class="font-bold text-slate-800">Proof of Income</div>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Last 3 consecutive payslips</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Last 3 months bank statements</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Employment contract / letter</span></label>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                        <div class="font-bold text-slate-800">Rental History</div>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Rental ledger (past 12 months)</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Previous property manager contact</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-600"> <span>Personal references</span></label>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                        <div class="font-bold text-slate-800">NSW Rental Rules</div>
+                        <p class="text-slate-600 leading-relaxed">Bond must be registered with Rental Bonds Online (RBO). No rent bidding is legally permitted in NSW.</p>
                     </div>
                 </div>
             </div>
@@ -597,7 +685,8 @@ body {
     <!-- Property Details Modal -->
     <div id="modal-property" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden my-auto">
-            <div class="relative h-60 bg-slate-900 flex-shrink-0">
+            <!-- Modal Header -->
+            <div class="relative h-64 bg-slate-900 flex-shrink-0">
                 <img id="modal-img" src="" alt="Property" class="w-full h-full object-cover">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-black/40"></div>
                 <button id="modal-close-btn" class="absolute top-4 right-4 w-9 h-9 bg-black/60 hover:bg-black/80 rounded-full text-white flex items-center justify-center transition">
@@ -607,7 +696,7 @@ body {
                     <div>
                         <span id="modal-type-badge" class="px-2.5 py-1 rounded text-xs font-bold uppercase bg-blue-600 text-white tracking-wider">House</span>
                         <h2 id="modal-price" class="text-3xl font-extrabold mt-1 text-white">$550 <span class="text-base font-normal text-slate-200">/ week</span></h2>
-                        <p id="modal-address" class="text-sm font-medium text-slate-200 mt-0.5">Nowra NSW 2541</p>
+                        <p id="modal-address" class="text-sm font-medium text-slate-200 mt-0.5">5/75 Albatross Road, West Nowra NSW 2541</p>
                     </div>
                     <button id="modal-fav-btn" class="p-2.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur text-white transition">
                         <i data-lucide="heart" id="modal-fav-icon" class="w-6 h-6"></i>
@@ -615,7 +704,9 @@ body {
                 </div>
             </div>
 
-            <div class="p-6 overflow-y-auto flex-1 space-y-4 text-sm">
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 overflow-y-auto flex-1 space-y-5 text-sm">
+                <!-- Features row -->
                 <div class="grid grid-cols-4 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
                     <div>
                         <span class="text-xs text-slate-500 block">Bedrooms</span>
@@ -635,6 +726,7 @@ body {
                     </div>
                 </div>
 
+                <!-- Inspection Alert Box if present -->
                 <div id="modal-inspection-box" class="hidden bg-indigo-50 border border-indigo-200 p-3.5 rounded-xl flex items-center justify-between">
                     <div class="flex items-center space-x-3">
                         <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
@@ -642,53 +734,61 @@ body {
                         </div>
                         <div>
                             <span class="text-xs font-bold text-indigo-900 block">Upcoming Inspection Time</span>
-                            <span id="modal-inspection-text" class="text-xs font-semibold text-indigo-700">Open Home</span>
+                            <span id="modal-inspection-text" class="text-xs font-semibold text-indigo-700">Tue 6 Oct 12:45 pm</span>
                         </div>
                     </div>
+                    <a id="modal-ical-btn" href="#" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition flex items-center shadow-sm">
+                        <i data-lucide="calendar-plus" class="w-3.5 h-3.5 mr-1"></i> Add to Calendar
+                    </a>
                 </div>
 
+                <!-- Description -->
                 <div>
-                    <h4 class="font-bold text-slate-800 mb-1">Property Summary</h4>
+                    <h4 class="font-bold text-slate-800 mb-1.5">Property Summary & Availability</h4>
                     <p id="modal-desc" class="text-slate-600 leading-relaxed text-xs">No description available.</p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200">
+                <!-- Status & Pipeline Dropdown -->
+                <div class="grid grid-cols-2 gap-4 pt-3 border-t border-slate-200">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Pipeline Stage</label>
-                        <select id="modal-status-select" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white">
-                            <option value="discovered">🔍 Discovered</option>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Application Pipeline Stage</label>
+                        <select id="modal-status-select" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500">
+                            <option value="discovered">🔍 Discovered / Watching</option>
                             <option value="saved">⭐ Shortlisted</option>
                             <option value="inspecting">📅 Inspection Booked</option>
                             <option value="applied">📝 Application Submitted</option>
-                            <option value="offered">🎉 Offered</option>
+                            <option value="offered">🎉 Offered / Approved</option>
+                            <option value="archived">📁 Archived / Passed</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Rating</label>
-                        <select id="modal-rating-select" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Personal Rating</label>
+                        <select id="modal-rating-select" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500">
                             <option value="0">Unrated</option>
                             <option value="1">⭐ 1 Star</option>
                             <option value="2">⭐⭐ 2 Stars</option>
                             <option value="3">⭐⭐⭐ 3 Stars</option>
                             <option value="4">⭐⭐⭐⭐ 4 Stars</option>
-                            <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+                            <option value="5">⭐⭐⭐⭐⭐ 5 Stars (Top Pick!)</option>
                         </select>
                     </div>
                 </div>
 
+                <!-- Personal Notes -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Personal Notes</label>
-                    <textarea id="modal-notes" rows="2" placeholder="Inspection notes, agent contact..." class="w-full p-2.5 border border-slate-300 rounded-lg text-xs"></textarea>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Personal Notes & Inspection Observations</label>
+                    <textarea id="modal-notes" rows="2" placeholder="e.g. Spoke to agent Sarah, big backyard for BBQ, quiet street, NBN installed..." class="w-full p-2.5 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
                 </div>
             </div>
 
+            <!-- Modal Footer -->
             <div class="bg-slate-50 px-6 py-3.5 border-t border-slate-200 flex items-center justify-between">
                 <a id="modal-maps-link" href="#" target="_blank" class="text-xs font-medium text-slate-600 hover:text-blue-600 flex items-center">
-                    <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1"></i> Google Maps
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1"></i> View on Google Maps
                 </a>
                 <div class="flex items-center space-x-2">
                     <button id="modal-save-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
-                        Save
+                        Save Changes
                     </button>
                     <a id="modal-portal-link" href="#" target="_blank" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center">
                         <span>Open Listing</span>
@@ -701,11 +801,11 @@ body {
 
     <!-- Add Custom Rental Modal -->
     <div id="modal-add" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-200 pb-3">
                 <h3 class="font-bold text-base text-slate-900 flex items-center">
                     <i data-lucide="plus-circle" class="w-5 h-5 mr-2 text-blue-600"></i>
-                    Add Custom Rental
+                    Add Custom Rental to 2541 Tracker
                 </h3>
                 <button id="modal-add-close" class="text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -714,7 +814,7 @@ body {
             <form id="form-add-rental" class="space-y-3 text-xs">
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Street Address *</label>
-                    <input type="text" id="add-street" required placeholder="e.g. 10 River Street" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                    <input type="text" id="add-street" required placeholder="e.g. 12 Bridge Road" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -725,6 +825,9 @@ body {
                             <option value="North Nowra">North Nowra</option>
                             <option value="South Nowra">South Nowra</option>
                             <option value="West Nowra">West Nowra</option>
+                            <option value="Worrigee">Worrigee</option>
+                            <option value="Bangalee">Bangalee</option>
+                            <option value="Terara">Terara</option>
                         </select>
                     </div>
                     <div>
@@ -747,8 +850,26 @@ body {
                     </div>
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Listing URL / Facebook Link</label>
-                    <input type="url" id="add-url" placeholder="https://..." class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                    <label class="block font-semibold text-slate-700 mb-1">Property Type</label>
+                    <select id="add-type" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg bg-white">
+                        <option value="House">House</option>
+                        <option value="Villa">Villa</option>
+                        <option value="Unit">Unit / Flat</option>
+                        <option value="Townhouse">Townhouse</option>
+                        <option value="Granny Flat">Granny Flat / Studio</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Listing URL / Source Link</label>
+                    <input type="url" id="add-url" placeholder="https://realestate.com.au/... or FB Marketplace" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Image URL (Optional)</label>
+                    <input type="url" id="add-image" placeholder="https://..." class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Personal Notes</label>
+                    <textarea id="add-notes" rows="2" placeholder="Found on Facebook group, landlord contact John 04..." class="w-full p-2 border border-slate-300 rounded-lg"></textarea>
                 </div>
                 <div class="pt-3 border-t border-slate-200 flex justify-end space-x-2">
                     <button type="button" id="modal-add-cancel" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold">Cancel</button>
@@ -758,642 +879,1284 @@ body {
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div id="modal-settings" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-xs">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <h3 class="font-bold text-base text-slate-900 flex items-center">
+                    <i data-lucide="settings" class="w-5 h-5 mr-2 text-slate-700"></i>
+                    Settings & Rental Alerts
+                </h3>
+                <button id="modal-settings-close" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Default Price Cap</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2 text-slate-400 font-bold">$</span>
+                        <input type="number" id="setting-max-price" value="550" class="w-full pl-7 pr-3 py-1.5 border border-slate-300 rounded-lg font-bold">
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-1">Alerts trigger when a new rental is found at or below this weekly rent.</p>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Background Refresh Frequency</label>
+                    <select id="setting-refresh-interval" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg bg-white">
+                        <option value="15">Every 15 minutes (Fastest alert)</option>
+                        <option value="30" selected>Every 30 minutes (Recommended)</option>
+                        <option value="60">Every 1 hour</option>
+                        <option value="120">Every 2 hours</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Discord / Telegram Webhook URL</label>
+                    <input type="url" id="setting-webhook-url" placeholder="https://discord.com/api/webhooks/..." class="w-full px-3 py-1.5 border border-slate-300 rounded-lg">
+                    <p class="text-[11px] text-slate-500 mt-1">Get an instant push alert on your mobile Discord/Slack when a new &lt;=$550 property is listed!</p>
+                </div>
+
+                <div class="space-y-2 pt-2 border-t border-slate-100">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="setting-sound" checked class="w-4 h-4 text-blue-600 rounded">
+                        <span class="font-medium text-slate-700">Play Audio Chime when new rental found</span>
+                    </label>
+                    <div class="flex items-center justify-between pt-1">
+                        <span class="text-slate-600">Browser Desktop Notifications:</span>
+                        <button id="btn-request-notify" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-semibold text-[11px]">
+                            Enable in Browser
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-200 flex justify-end space-x-2">
+                    <button id="modal-settings-cancel" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold">Cancel</button>
+                    <button id="modal-settings-save" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow">Save Preferences</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Run Sheet Container (hidden on screen, visible when printed) -->
+    <div id="print-area" class="hidden print-sheet p-6 space-y-4">
+        <div class="border-b-2 border-black pb-3">
+            <h1 class="text-2xl font-bold">2541 Nowra & Bomaderry Open House Run Sheet</h1>
+            <p class="text-xs text-gray-600">Upcoming Rental Inspections under $550/wk | Generated on <span id="print-date"></span></p>
+        </div>
+        <div id="print-inspections-list" class="space-y-3"></div>
+    </div>
+
+    <!-- First-Time Tips & Walkthrough Modal -->
+    <div id="modal-tips" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-2xl w-full flex flex-col shadow-2xl overflow-hidden my-auto border border-slate-200">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-amber-300">
+                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-white">How to Use 2541 Rental Radar</h3>
+                        <p class="text-xs text-blue-100">6 essential tips for securing a rental under $550/wk in Nowra & Bomaderry</p>
+                    </div>
+                </div>
+                <button id="modal-tips-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content Slides (Interactive) -->
+            <div class="p-6 text-slate-800 space-y-4">
+                <!-- Slide 1 -->
+                <div class="tip-slide space-y-3" data-step="1">
+                    <div class="flex items-center space-x-2 text-blue-600 font-bold text-sm">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">1</span>
+                        <span>Setting Your Budget & Suburb Filters</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                        <p><strong>• Max Rent Slider:</strong> Pre-set to <strong>$550/week</strong>. You can slide down to $400 or up to $650. Every listing above your chosen limit is filtered out immediately.</p>
+                        <p><strong>• Suburb Quick Pills:</strong> Click any suburb button (<em>Nowra, Bomaderry, North Nowra, South Nowra, West Nowra</em>) to view rentals in that specific neighborhood.</p>
+                        <p><strong>• Inspection Toggle:</strong> Check <em>"Has Upcoming Inspection"</em> to exclusively see properties with scheduled open homes.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="tip-slide hidden space-y-3" data-step="2">
+                    <div class="flex items-center space-x-2 text-blue-600 font-bold text-sm">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">2</span>
+                        <span>Interactive 2541 Map & Local Landmarks</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                        <p><strong>• Color-Coded Price Pins:</strong></p>
+                        <div class="flex items-center space-x-3 text-[11px] my-1 font-semibold">
+                            <span class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">🟢 Under $450 (Bargain)</span>
+                            <span class="text-blue-700 bg-blue-100 px-2 py-0.5 rounded">🔵 $450 - $500 (Great Value)</span>
+                            <span class="text-amber-800 bg-amber-100 px-2 py-0.5 rounded">🟠 $501 - $550 (Upper Cap)</span>
+                        </div>
+                        <p><strong>• Landmark Shortcuts:</strong> Toggle <em>🚆 Bomaderry Railway Station</em> (for commuters travelling to Sydney/Wollongong), <em>🏥 Shoalhaven Hospital</em>, and <em>🛍️ Stockland Nowra</em> to check travel proximity.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="tip-slide hidden space-y-3" data-step="3">
+                    <div class="flex items-center space-x-2 text-blue-600 font-bold text-sm">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">3</span>
+                        <span>Inspections, 1-Click Calendar & Open House Run Sheet</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                        <p><strong>• 1-Click Calendar (.ics):</strong> Click into any property with an inspection and hit <em>"Add to Calendar"</em> to automatically save it to your phone's Google Calendar, Apple Calendar, or Outlook.</p>
+                        <p><strong>• Saturday Run Sheet:</strong> Click <em>"Run Sheet"</em> in the header before Saturday morning viewings to generate a clean, print-friendly schedule of open homes so you don't miss inspection windows.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 4 -->
+                <div class="tip-slide hidden space-y-3" data-step="4">
+                    <div class="flex items-center space-x-2 text-blue-600 font-bold text-sm">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">4</span>
+                        <span>Application Pipeline Tracker (Kanban)</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                        <p><strong>• Manage Your Rental Pipeline:</strong> Move properties between <em>Discovered</em>, <em>Shortlisted</em>, <em>Inspecting</em>, <em>Applied</em>, and <em>Offered</em> using the card dropdown.</p>
+                        <p><strong>• Private Notes & Star Ratings:</strong> Click into any property card to rate it (1-5 stars) and record personal inspection notes (e.g., "Agent said NBN is connected, big backyard, application submitted via 2Apply").</p>
+                    </div>
+                </div>
+
+                <!-- Slide 5 -->
+                <div class="tip-slide hidden space-y-3" data-step="5">
+                    <div class="flex items-center space-x-2 text-blue-600 font-bold text-sm">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">5</span>
+                        <span>Super Search Portals & Adding Custom Rentals</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                        <p><strong>• 1-Click Multi-App Portals:</strong> Check the <em>"Super Search Portals"</em> tab for direct pre-filtered searches on Realestate.com.au, Domain, Allhomes, Gumtree (for private rentals), and Flatmates.</p>
+                        <p><strong>• + Add Rental:</strong> Found a private rental on Facebook Marketplace or saw a "For Lease" board on Kinghorne Street? Click <em>"+ Add Rental"</em> to track it alongside all other listings on your map and pipeline.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 6 -->
+                <div class="tip-slide hidden space-y-3" data-step="6">
+                    <div class="flex items-center space-x-2 text-blue-600 font-bold text-sm">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">6</span>
+                        <span>NSW Bond Calculator & Auto Renter Bio Generator</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                        <p><strong>• Bond & Cost Calculator:</strong> Computes the exact 4-week NSW rental bond ($2,200 for $550/wk), 2 weeks advance rent ($1,100), and total move-in capital ($3,300), plus the 30% affordability income guideline.</p>
+                        <p><strong>• Renter Bio Generator:</strong> Generate a customized, professional tenant cover letter tailored for Shoalhaven agents, ready to copy and paste directly into 2Apply or Ignite.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer with Step Dots and Navigation -->
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+                <label class="flex items-center space-x-2 cursor-pointer text-xs text-slate-500">
+                    <input type="checkbox" id="tips-dont-show" class="rounded text-blue-600 focus:ring-blue-500">
+                    <span>Don't show automatically on start</span>
+                </label>
+                <div class="flex items-center space-x-2">
+                    <!-- Dots -->
+                    <div class="flex space-x-1 mr-3" id="tips-dots">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                    </div>
+                    <button id="btn-tip-prev" class="px-3 py-1.5 border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold disabled:opacity-40" disabled>
+                        Previous
+                    </button>
+                    <button id="btn-tip-next" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification Banner -->
     <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-xs transition-all duration-300">
         <i data-lucide="bell" class="w-5 h-5 text-emerald-400"></i>
-        <span id="toast-msg">Notification</span>
+        <span id="toast-msg">Notification message</span>
     </div>
 
-</div>
+    <!-- Application Script -->
+    <script>
 
-<!-- Embedded App Script with LocalStorage Persistence -->
-<script>
-    const INITIAL_LISTINGS = [{"id": "6481203", "url": "https://www.rent.com.au/property/9b-mattes-way-bomaderry-nsw-2541-6481203", "title": "9B Mattes Way, bomaderry NSW 2541", "street": "9B Mattes Way", "suburb": "Bomaderry", "postcode": "2541", "price": 360, "beds": 1, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267750297/695972de7be195435a101686-uploads_2F1764635789248-v7fpiwggjeg-3f6b98543d827cf02025a90a44fb5004_2Fimage__2810_29-1788747273-primary.jpg?1788747273", "lat": -34.85913, "lng": 150.598707, "inspection_date": "2026-10-06T10:35:00+11:00", "description": "$360 pw 1 bed, 1 bath property at 9B Mattes Way, bomaderry NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.292785", "last_seen": "2026-10-04T12:40:57.292785", "price_history": []}, {"id": "6494234", "url": "https://www.rent.com.au/property/14f-yeovil-dr-bomaderry-nsw-2541-6494234", "title": "14F Yeovil Drive, bomaderry NSW 2541", "street": "14F Yeovil Drive", "suburb": "Bomaderry", "postcode": "2541", "price": 390, "beds": 1, "baths": 1, "cars": 1, "prop_type": "Duplex", "image_url": "https://cdn.rent.com.au/photos/images/267965582/773e193271939ac427ca67bb-176784990146525578-rsd-1789966969-primary.jpg?1789966969", "lat": -34.841115, "lng": 150.607954, "inspection_date": null, "description": "$390 pw 1 bed, 1 bath property at 14F Yeovil Drive, bomaderry NSW 2541. Available 15th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.289861", "last_seen": "2026-10-04T12:40:57.289861", "price_history": []}, {"id": "6502936", "url": "https://www.rent.com.au/property/3-73-plunkett-st-nowra-nsw-2541-6502936", "title": "3/73 Plunkett Street, nowra NSW 2541", "street": "3/73 Plunkett Street", "suburb": "Nowra", "postcode": "2541", "price": 425, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Unit", "image_url": "https://cdn.rent.com.au/photos/images/268126827/3726bce6713f26af3cae951f-images_2F25974264_2F442730908-image-M-1790898612-primary.jpg?1790898612", "lat": -34.878086, "lng": 150.60022, "inspection_date": "2026-10-08T16:00:00+11:00", "description": "$425 pw 2 bed, 1 bath property at 3/73 Plunkett Street, nowra NSW 2541. Available 5th November 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.244892", "last_seen": "2026-10-04T12:40:57.244892", "price_history": []}, {"id": "6490495", "url": "https://www.rent.com.au/property/1-22-hawthorn-ave-nowra-nsw-2541-6490495", "title": "1/22 Hawthorn Avenue, nowra NSW 2541", "street": "1/22 Hawthorn Avenue", "suburb": "Nowra", "postcode": "2541", "price": 430, "beds": 2, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267993673/e4d40a5f7db5de6cb546190c-179011676653074164-rsd-1790116790-primary.jpg?1790116790", "lat": -34.867716, "lng": 150.603186, "inspection_date": null, "description": "$430 pw 2 bed, 1 bath property at 1/22 Hawthorn Avenue, nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.269218", "last_seen": "2026-10-04T12:40:57.269218", "price_history": []}, {"id": "6453612", "url": "https://www.rent.com.au/property/1-5-albatross-rd-nowra-nsw-2541-6453612", "title": "1/5 Albatross Road, nowra NSW 2541", "street": "1/5 Albatross Road", "suburb": "Nowra", "postcode": "2541", "price": 460, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Unit", "image_url": "https://cdn.rent.com.au/photos/images/267305390/d9a722cbdc9c22d0c3ca86b4-213092739__1785896588-213092739__1785895490-250664-7-1786070542-primary.png?1786070542", "lat": -34.887349, "lng": 150.599425, "inspection_date": null, "description": "$460 pw 2 bed, 1 bath property at 1/5 Albatross Road, nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.275238", "last_seen": "2026-10-04T12:40:57.275238", "price_history": []}, {"id": "6504892", "url": "https://www.rent.com.au/property/10-102-kalandar-st-nowra-nsw-2541-6504892", "title": "10/102 Kalandar Street, nowra NSW 2541", "street": "10/102 Kalandar Street", "suburb": "Nowra", "postcode": "2541", "price": 460, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/268140174/2626cb00bf024287a667b3f8-187512649__1771304948-187512649__1771304910-98930-IMG2504-1790922144-primary.jpg?1790922144", "lat": -34.888617, "lng": 150.606805, "inspection_date": "2026-10-06T12:45:00+11:00", "description": "$460 pw 2 bed, 1 bath property at 10/102 Kalandar Street, nowra NSW 2541. Available 12th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.239257", "last_seen": "2026-10-04T12:40:57.239257", "price_history": []}, {"id": "6497826", "url": "https://www.rent.com.au/property/1-2-mcmahons-rd-north-nowra-nsw-2541-6497826", "title": "1/2 Mcmahons Road, north nowra NSW 2541", "street": "1/2 Mcmahons Road", "suburb": "North Nowra", "postcode": "2541", "price": 500, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/268027489/ef901c83c10a6ef0a15e4f18-179023073005287703-rsd-1790230984-primary.jpg?1790230984", "lat": -34.858653, "lng": 150.583709, "inspection_date": null, "description": "$500 pw 2 bed, 1 bath property at 1/2 Mcmahons Road, north nowra NSW 2541. Available 21st October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.281091", "last_seen": "2026-10-04T12:40:57.281091", "price_history": []}, {"id": "6494267", "url": "https://www.rent.com.au/property/4-95-albatross-rd-west-nowra-nsw-2541-6494267", "title": "4/95 Albatross Road, west nowra NSW 2541", "street": "4/95 Albatross Road", "suburb": "West Nowra", "postcode": "2541", "price": 500, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/267969354/a2220eed0f8238b43d2f5c6e-178997101005287703-rsd-1789971593-primary.jpg?1789971593", "lat": -34.894336, "lng": 150.590801, "inspection_date": null, "description": "$500 pw 2 bed, 1 bath property at 4/95 Albatross Road, west nowra NSW 2541. Available 18th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.219726", "last_seen": "2026-10-04T12:40:57.219726", "price_history": []}, {"id": "6502205", "url": "https://www.rent.com.au/property/16-stuart-st-nowra-nsw-2541-6502205", "title": "16 Stuart Street, nowra NSW 2541", "street": "16 Stuart Street", "suburb": "Nowra", "postcode": "2541", "price": 510, "beds": 3, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268098821/3b30e3303dc1357a57c8091b-179074480516564160-rsd-1790745114-primary.jpg?1790745114", "lat": -34.889852, "lng": 150.61007, "inspection_date": null, "description": "$510 pw 3 bed, 1 bath property at 16 Stuart Street, nowra NSW 2541. Available 16th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.250944", "last_seen": "2026-10-04T12:40:57.250944", "price_history": []}, {"id": "6498545", "url": "https://www.rent.com.au/property/11-aspromonte-dr-south-nowra-nsw-2541-6498545", "title": "11 Aspromonte Drive, south nowra NSW 2541", "street": "11 Aspromonte Drive", "suburb": "South Nowra", "postcode": "2541", "price": 520, "beds": 2, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268036583/dd35228966ebff8407bf43fc-220509654__1790302797-51028-Capture-1790303358-primary.PNG?1790303358", "lat": -34.919589, "lng": 150.610696, "inspection_date": "2026-10-08T16:30:00+11:00", "description": "$520 pw 2 bed, 1 bath property at 11 Aspromonte Drive, south nowra NSW 2541. Available 12th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.228212", "last_seen": "2026-10-04T12:40:57.228212", "price_history": []}, {"id": "6442408", "url": "https://www.rent.com.au/property/22-sampson-cres-bomaderry-nsw-2541-6442408", "title": "22 Sampson Crescent, bomaderry NSW 2541", "street": "22 Sampson Crescent", "suburb": "Bomaderry", "postcode": "2541", "price": 540, "beds": 3, "baths": 1, "cars": 2, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267120231/569cbc65ae924e8d390fb9e8-200191980__1778039108-200191980__1778039064-69534-1-1785114738-primary.png?1785114738", "lat": -34.846664, "lng": 150.607518, "inspection_date": null, "description": "$540 pw 3 bed, 1 bath property at 22 Sampson Crescent, bomaderry NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.295730", "last_seen": "2026-10-04T12:40:57.295730", "price_history": []}, {"id": "6494598", "url": "https://www.rent.com.au/property/5-burr-ave-nowra-nsw-2541-6494598", "title": "5 Burr Avenue, nowra NSW 2541", "street": "5 Burr Avenue", "suburb": "Nowra", "postcode": "2541", "price": 540, "beds": 4, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267975932/49caf8330c005fd81a6d622e-179003539438915624-rsd-1790035916-primary.jpg?1790035916", "lat": -34.87695, "lng": 150.598541, "inspection_date": null, "description": "$540 pw 4 bed, 1 bath property at 5 Burr Avenue, nowra NSW 2541. Available 5th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.262807", "last_seen": "2026-10-04T12:40:57.262807", "price_history": []}, {"id": "5785009", "url": "https://www.rent.com.au/property/69-st-anns-st-nowra-nsw-2541-5785009", "title": "69 St Anns Street, nowra NSW 2541", "street": "69 St Anns Street", "suburb": "Nowra", "postcode": "2541", "price": 540, "beds": 3, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/252280121/928302464a5a9e2e892360d1-ee0927a8_2D8b72_2D6341_2D7816_2Dc866e3418f14-1725265361-primary.jpg?1725265361", "lat": -34.884709, "lng": 150.604202, "inspection_date": "2026-10-07T13:30:00+11:00", "description": "$540 pw 3 bed, 1 bath property at 69 St Anns Street, nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.259864", "last_seen": "2026-10-04T12:40:57.259864", "price_history": []}, {"id": "6499926", "url": "https://www.rent.com.au/property/2-8-meroo-rd-bomaderry-nsw-2541-6499926", "title": "2/8 Meroo Road, bomaderry NSW 2541", "street": "2/8 Meroo Road", "suburb": "Bomaderry", "postcode": "2541", "price": 550, "beds": 3, "baths": 2, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/268087040/2fdf5b5be9e04a895aa006e2-179072326355306537-rsd-1790723387-primary.jpg?1790723387", "lat": -34.834936, "lng": 150.60939, "inspection_date": null, "description": "$550 pw 3 bed, 2 bath property at 2/8 Meroo Road, bomaderry NSW 2541. Available 19th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.286990", "last_seen": "2026-10-04T12:40:57.286990", "price_history": []}, {"id": "6505000", "url": "https://www.rent.com.au/property/22-mcmahons-rd-north-nowra-nsw-2541-6505000", "title": "22 Mcmahons Road, north nowra NSW 2541", "street": "22 Mcmahons Road", "suburb": "North Nowra", "postcode": "2541", "price": 550, "beds": 4, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268141836/74aca3dbe0b0caf2e492cb59-178875771351358024-rsd-1790925286-primary.jpg?1790925286", "lat": -34.859462, "lng": 150.58174, "inspection_date": null, "description": "$550 pw 4 bed, 1 bath property at 22 Mcmahons Road, north nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.278334", "last_seen": "2026-10-04T12:40:57.278334", "price_history": []}, {"id": "6499898", "url": "https://www.rent.com.au/property/5-75-albatross-rd-west-nowra-nsw-2541-6499898", "title": "5/75 Albatross Road, west nowra NSW 2541", "street": "5/75 Albatross Road", "suburb": "West Nowra", "postcode": "2541", "price": 550, "beds": 3, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268058274/f0f5fd02e5766cd3dfe0d445-171581918651358024-rsd-1790569141-primary.jpg?1790569141", "lat": -34.8929, "lng": 150.592181, "inspection_date": null, "description": "$550 pw 3 bed, 1 bath property at 5/75 Albatross Road, west nowra NSW 2541. Available 5th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.216829", "last_seen": "2026-10-04T12:40:57.216829", "price_history": []}];
-    const PORTALS_DATA = [
-        { name: "Realestate.com.au", desc: "Top Australian rental portal", url: "https://www.realestate.com.au/rent/with-maxPrice-550-in-2541/list-1?activeSort=list-date" },
-        { name: "Domain.com.au", desc: "Leading property portal", url: "https://www.domain.com.au/rent/?postcode=2541&price=0-550&sort=dateupdated-desc" },
-        { name: "Rent.com.au", desc: "Renter-focused directory", url: "https://www.rent.com.au/properties/2541?price_max=550" },
-        { name: "Allhomes.com.au", desc: "Regional NSW listings", url: "https://www.allhomes.com.au/rent/nowra-nsw-2541/?price=0-550" },
-        { name: "Homely.com.au", desc: "Nowra community reviews & rentals", url: "https://www.homely.com.au/for-rent/nowra-nsw-2541/properties?price=0-550" },
-        { name: "Gumtree Nowra", desc: "Private landlord listings", url: "https://www.gumtree.com.au/s-property-for-rent/nowra-2541/c18364l3000947?price=__550" },
-        { name: "Flatmates Nowra", desc: "Granny flats & studios", url: "https://flatmates.com.au/rent/nowra-2541?max_price=550" },
-        { name: "Ray White Nowra", desc: "Local agency listings", url: "https://raywhiteshoalhavencentralgroup.com.au/properties/residential-for-rent?price_max=550" },
-        { name: "Integrity Real Estate", desc: "Nowra independent agency", url: "https://www.integrityre.com.au/renting/properties-for-lease/" },
-        { name: "LJ Hooker Nowra", desc: "Kinghorne St rentals", url: "https://nowra.ljhooker.com.au/search/property-for-rent/page-1" },
-        { name: "Raine & Horne Nowra", desc: "Shoalhaven regional leasing", url: "https://www.raineandhorne.com.au/nowra/search/properties-for-rent?price_max=550" }
-    ];
-
-    // Local Storage state management
-    let storedListings = JSON.parse(localStorage.getItem('2541_rentals') || 'null');
-    if (!storedListings || storedListings.length === 0) {
-        storedListings = INITIAL_LISTINGS;
-        localStorage.setItem('2541_rentals', JSON.stringify(storedListings));
-    }
-
-    let allListings = storedListings;
-    let activeListing = null;
-    let leafletMap = null;
-    let markersGroup = null;
-    let landmarkGroup = null;
-    let currentTab = 'grid';
-
-    const filters = {
-        max_price: 550,
-        suburb: 'all',
-        min_beds: 0,
-        prop_type: 'all',
-        query: '',
-        sort_by: 'price_asc',
-        only_inspections: false,
-        only_favorites: false
+    // Google Sites Fallback: if fetch fails, use embedded listings
+    const origFetch = window.fetch;
+    window.fetch = async function(...args) {
+        try {
+            return await origFetch.apply(this, args);
+        } catch(e) {
+            console.log("Using embedded 2541 dataset:", args[0]);
+            const url = args[0] || '';
+            if (url.includes('/api/listings')) {
+                return {
+                    ok: true,
+                    json: async () => ({ count: INITIAL_LISTINGS.length, listings: INITIAL_LISTINGS })
+                };
+            }
+            if (url.includes('/api/stats')) {
+                const under550 = INITIAL_LISTINGS.filter(l => l.price && l.price <= 550);
+                const sum = under550.reduce((acc, c) => acc + c.price, 0);
+                return {
+                    ok: true,
+                    json: async () => ({
+                        total_under_550: under550.length,
+                        avg_price: Math.round(sum / (under550.length || 1)),
+                        min_price: 360,
+                        max_price: 550,
+                        inspections_count: INITIAL_LISTINGS.filter(l => l.inspection_date).length,
+                        favorites_count: 0,
+                        suburbs: [
+                            { suburb: 'Nowra', count: 7 },
+                            { suburb: 'Bomaderry', count: 4 },
+                            { suburb: 'North Nowra', count: 2 },
+                            { suburb: 'West Nowra', count: 2 },
+                            { suburb: 'South Nowra', count: 1 }
+                        ]
+                    })
+                };
+            }
+            if (url.includes('/api/portal-links')) {
+                return {
+                    ok: true,
+                    json: async () => ({
+                        portals: [
+                            { name: "Realestate.com.au", tagline: "Top Australian rental portal", category: "Major Portals", url: "https://www.realestate.com.au/rent/with-maxPrice-550-in-2541/list-1?activeSort=list-date" },
+                            { name: "Domain.com.au", tagline: "Leading property portal", category: "Major Portals", url: "https://www.domain.com.au/rent/?postcode=2541&price=0-550&sort=dateupdated-desc" },
+                            { name: "Rent.com.au", tagline: "Renter-focused directory", category: "Major Portals", url: "https://www.rent.com.au/properties/2541?price_max=550" },
+                            { name: "Allhomes.com.au", tagline: "Regional NSW listings", category: "Major Portals", url: "https://www.allhomes.com.au/rent/nowra-nsw-2541/?price=0-550" },
+                            { name: "Homely.com.au", tagline: "Nowra reviews & rentals", category: "Alternative Portals", url: "https://www.homely.com.au/for-rent/nowra-nsw-2541/properties?price=0-550" },
+                            { name: "Gumtree Nowra", tagline: "Private landlord listings", category: "Private & Share", url: "https://www.gumtree.com.au/s-property-for-rent/nowra-2541/c18364l3000947?price=__550" },
+                            { name: "Flatmates Nowra", tagline: "Granny flats & studios", category: "Private & Share", url: "https://flatmates.com.au/rent/nowra-2541?max_price=550" },
+                            { name: "Ray White Nowra", tagline: "Local agency rentals", category: "Local Agencies", url: "https://raywhiteshoalhavencentralgroup.com.au/properties/residential-for-rent?price_max=550" }
+                        ]
+                    })
+                };
+            }
+            return { ok: true, json: async () => ({ success: true }) };
+        }
     };
+    
 
-    document.addEventListener('DOMContentLoaded', () => {
-        initIcons();
-        initEventListeners();
-        initCalculator();
-        initBioGenerator();
-        renderPortals();
-        applyFilters();
+    // Pre-baked live listings for Google Sites
+    const INITIAL_LISTINGS = [{"id": "6481203", "url": "https://www.rent.com.au/property/9b-mattes-way-bomaderry-nsw-2541-6481203", "title": "9B Mattes Way, bomaderry NSW 2541", "street": "9B Mattes Way", "suburb": "Bomaderry", "postcode": "2541", "price": 360, "beds": 1, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267750297/695972de7be195435a101686-uploads_2F1764635789248-v7fpiwggjeg-3f6b98543d827cf02025a90a44fb5004_2Fimage__2810_29-1788747273-primary.jpg?1788747273", "lat": -34.85913, "lng": 150.598707, "inspection_date": "2026-10-06T10:35:00+11:00", "description": "$360 pw 1 bed, 1 bath property at 9B Mattes Way, bomaderry NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.292785", "last_seen": "2026-10-04T14:28:09.521079", "price_history": []}, {"id": "6494234", "url": "https://www.rent.com.au/property/14f-yeovil-dr-bomaderry-nsw-2541-6494234", "title": "14F Yeovil Drive, bomaderry NSW 2541", "street": "14F Yeovil Drive", "suburb": "Bomaderry", "postcode": "2541", "price": 390, "beds": 1, "baths": 1, "cars": 1, "prop_type": "Duplex", "image_url": "https://cdn.rent.com.au/photos/images/267965582/773e193271939ac427ca67bb-176784990146525578-rsd-1789966969-primary.jpg?1789966969", "lat": -34.841115, "lng": 150.607954, "inspection_date": null, "description": "$390 pw 1 bed, 1 bath property at 14F Yeovil Drive, bomaderry NSW 2541. Available 15th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.289861", "last_seen": "2026-10-04T14:28:09.518112", "price_history": []}, {"id": "6502936", "url": "https://www.rent.com.au/property/3-73-plunkett-st-nowra-nsw-2541-6502936", "title": "3/73 Plunkett Street, nowra NSW 2541", "street": "3/73 Plunkett Street", "suburb": "Nowra", "postcode": "2541", "price": 425, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Unit", "image_url": "https://cdn.rent.com.au/photos/images/268126827/3726bce6713f26af3cae951f-images_2F25974264_2F442730908-image-M-1790898612-primary.jpg?1790898612", "lat": -34.878086, "lng": 150.60022, "inspection_date": "2026-10-08T16:00:00+11:00", "description": "$425 pw 2 bed, 1 bath property at 3/73 Plunkett Street, nowra NSW 2541. Available 5th November 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.244892", "last_seen": "2026-10-04T14:28:09.477987", "price_history": []}, {"id": "6490495", "url": "https://www.rent.com.au/property/1-22-hawthorn-ave-nowra-nsw-2541-6490495", "title": "1/22 Hawthorn Avenue, nowra NSW 2541", "street": "1/22 Hawthorn Avenue", "suburb": "Nowra", "postcode": "2541", "price": 430, "beds": 2, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267993673/e4d40a5f7db5de6cb546190c-179011676653074164-rsd-1790116790-primary.jpg?1790116790", "lat": -34.867716, "lng": 150.603186, "inspection_date": null, "description": "$430 pw 2 bed, 1 bath property at 1/22 Hawthorn Avenue, nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.269218", "last_seen": "2026-10-04T14:28:09.498941", "price_history": []}, {"id": "6453612", "url": "https://www.rent.com.au/property/1-5-albatross-rd-nowra-nsw-2541-6453612", "title": "1/5 Albatross Road, nowra NSW 2541", "street": "1/5 Albatross Road", "suburb": "Nowra", "postcode": "2541", "price": 460, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Unit", "image_url": "https://cdn.rent.com.au/photos/images/267305390/d9a722cbdc9c22d0c3ca86b4-213092739__1785896588-213092739__1785895490-250664-7-1786070542-primary.png?1786070542", "lat": -34.887349, "lng": 150.599425, "inspection_date": null, "description": "$460 pw 2 bed, 1 bath property at 1/5 Albatross Road, nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.275238", "last_seen": "2026-10-04T14:28:09.504362", "price_history": []}, {"id": "6504892", "url": "https://www.rent.com.au/property/10-102-kalandar-st-nowra-nsw-2541-6504892", "title": "10/102 Kalandar Street, nowra NSW 2541", "street": "10/102 Kalandar Street", "suburb": "Nowra", "postcode": "2541", "price": 460, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/268140174/2626cb00bf024287a667b3f8-187512649__1771304948-187512649__1771304910-98930-IMG2504-1790922144-primary.jpg?1790922144", "lat": -34.888617, "lng": 150.606805, "inspection_date": "2026-10-06T12:45:00+11:00", "description": "$460 pw 2 bed, 1 bath property at 10/102 Kalandar Street, nowra NSW 2541. Available 12th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.239257", "last_seen": "2026-10-04T14:28:09.472820", "price_history": []}, {"id": "6497826", "url": "https://www.rent.com.au/property/1-2-mcmahons-rd-north-nowra-nsw-2541-6497826", "title": "1/2 Mcmahons Road, north nowra NSW 2541", "street": "1/2 Mcmahons Road", "suburb": "North Nowra", "postcode": "2541", "price": 500, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/268027489/ef901c83c10a6ef0a15e4f18-179023073005287703-rsd-1790230984-primary.jpg?1790230984", "lat": -34.858653, "lng": 150.583709, "inspection_date": null, "description": "$500 pw 2 bed, 1 bath property at 1/2 Mcmahons Road, north nowra NSW 2541. Available 21st October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.281091", "last_seen": "2026-10-04T14:28:09.509975", "price_history": []}, {"id": "6494267", "url": "https://www.rent.com.au/property/4-95-albatross-rd-west-nowra-nsw-2541-6494267", "title": "4/95 Albatross Road, west nowra NSW 2541", "street": "4/95 Albatross Road", "suburb": "West Nowra", "postcode": "2541", "price": 500, "beds": 2, "baths": 1, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/267969354/a2220eed0f8238b43d2f5c6e-178997101005287703-rsd-1789971593-primary.jpg?1789971593", "lat": -34.894336, "lng": 150.590801, "inspection_date": null, "description": "$500 pw 2 bed, 1 bath property at 4/95 Albatross Road, west nowra NSW 2541. Available 18th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.219726", "last_seen": "2026-10-04T14:28:09.454598", "price_history": []}, {"id": "6502205", "url": "https://www.rent.com.au/property/16-stuart-st-nowra-nsw-2541-6502205", "title": "16 Stuart Street, nowra NSW 2541", "street": "16 Stuart Street", "suburb": "Nowra", "postcode": "2541", "price": 510, "beds": 3, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268098821/3b30e3303dc1357a57c8091b-179074480516564160-rsd-1790745114-primary.jpg?1790745114", "lat": -34.889852, "lng": 150.61007, "inspection_date": null, "description": "$510 pw 3 bed, 1 bath property at 16 Stuart Street, nowra NSW 2541. Available 16th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.250944", "last_seen": "2026-10-04T14:28:09.483119", "price_history": []}, {"id": "6498545", "url": "https://www.rent.com.au/property/11-aspromonte-dr-south-nowra-nsw-2541-6498545", "title": "11 Aspromonte Drive, south nowra NSW 2541", "street": "11 Aspromonte Drive", "suburb": "South Nowra", "postcode": "2541", "price": 520, "beds": 2, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268036583/dd35228966ebff8407bf43fc-220509654__1790302797-51028-Capture-1790303358-primary.PNG?1790303358", "lat": -34.919589, "lng": 150.610696, "inspection_date": "2026-10-08T16:30:00+11:00", "description": "$520 pw 2 bed, 1 bath property at 11 Aspromonte Drive, south nowra NSW 2541. Available 12th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.228212", "last_seen": "2026-10-04T14:28:09.462301", "price_history": []}, {"id": "6442408", "url": "https://www.rent.com.au/property/22-sampson-cres-bomaderry-nsw-2541-6442408", "title": "22 Sampson Crescent, bomaderry NSW 2541", "street": "22 Sampson Crescent", "suburb": "Bomaderry", "postcode": "2541", "price": 540, "beds": 3, "baths": 1, "cars": 2, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267120231/569cbc65ae924e8d390fb9e8-200191980__1778039108-200191980__1778039064-69534-1-1785114738-primary.png?1785114738", "lat": -34.846664, "lng": 150.607518, "inspection_date": null, "description": "$540 pw 3 bed, 1 bath property at 22 Sampson Crescent, bomaderry NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.295730", "last_seen": "2026-10-04T14:28:09.523887", "price_history": []}, {"id": "6494598", "url": "https://www.rent.com.au/property/5-burr-ave-nowra-nsw-2541-6494598", "title": "5 Burr Avenue, nowra NSW 2541", "street": "5 Burr Avenue", "suburb": "Nowra", "postcode": "2541", "price": 540, "beds": 4, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/267975932/49caf8330c005fd81a6d622e-179003539438915624-rsd-1790035916-primary.jpg?1790035916", "lat": -34.87695, "lng": 150.598541, "inspection_date": null, "description": "$540 pw 4 bed, 1 bath property at 5 Burr Avenue, nowra NSW 2541. Available 5th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.262807", "last_seen": "2026-10-04T14:28:09.493764", "price_history": []}, {"id": "5785009", "url": "https://www.rent.com.au/property/69-st-anns-st-nowra-nsw-2541-5785009", "title": "69 St Anns Street, nowra NSW 2541", "street": "69 St Anns Street", "suburb": "Nowra", "postcode": "2541", "price": 540, "beds": 3, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/252280121/928302464a5a9e2e892360d1-ee0927a8_2D8b72_2D6341_2D7816_2Dc866e3418f14-1725265361-primary.jpg?1725265361", "lat": -34.884709, "lng": 150.604202, "inspection_date": "2026-10-07T13:30:00+11:00", "description": "$540 pw 3 bed, 1 bath property at 69 St Anns Street, nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.259864", "last_seen": "2026-10-04T14:28:09.491033", "price_history": []}, {"id": "6499926", "url": "https://www.rent.com.au/property/2-8-meroo-rd-bomaderry-nsw-2541-6499926", "title": "2/8 Meroo Road, bomaderry NSW 2541", "street": "2/8 Meroo Road", "suburb": "Bomaderry", "postcode": "2541", "price": 550, "beds": 3, "baths": 2, "cars": 1, "prop_type": "Villa", "image_url": "https://cdn.rent.com.au/photos/images/268087040/2fdf5b5be9e04a895aa006e2-179072326355306537-rsd-1790723387-primary.jpg?1790723387", "lat": -34.834936, "lng": 150.60939, "inspection_date": null, "description": "$550 pw 3 bed, 2 bath property at 2/8 Meroo Road, bomaderry NSW 2541. Available 19th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.286990", "last_seen": "2026-10-04T14:28:09.515375", "price_history": []}, {"id": "6505000", "url": "https://www.rent.com.au/property/22-mcmahons-rd-north-nowra-nsw-2541-6505000", "title": "22 Mcmahons Road, north nowra NSW 2541", "street": "22 Mcmahons Road", "suburb": "North Nowra", "postcode": "2541", "price": 550, "beds": 4, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268141836/74aca3dbe0b0caf2e492cb59-178875771351358024-rsd-1790925286-primary.jpg?1790925286", "lat": -34.859462, "lng": 150.58174, "inspection_date": null, "description": "$550 pw 4 bed, 1 bath property at 22 Mcmahons Road, north nowra NSW 2541. Available now.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.278334", "last_seen": "2026-10-04T14:28:09.507158", "price_history": []}, {"id": "6499898", "url": "https://www.rent.com.au/property/5-75-albatross-rd-west-nowra-nsw-2541-6499898", "title": "5/75 Albatross Road, west nowra NSW 2541", "street": "5/75 Albatross Road", "suburb": "West Nowra", "postcode": "2541", "price": 550, "beds": 3, "baths": 1, "cars": 1, "prop_type": "House", "image_url": "https://cdn.rent.com.au/photos/images/268058274/f0f5fd02e5766cd3dfe0d445-171581918651358024-rsd-1790569141-primary.jpg?1790569141", "lat": -34.8929, "lng": 150.592181, "inspection_date": null, "description": "$550 pw 3 bed, 1 bath property at 5/75 Albatross Road, west nowra NSW 2541. Available 5th October 2026.", "source": "rent.com.au", "status": "discovered", "notes": "", "rating": 0, "is_favorite": 0, "is_new": 1, "first_seen": "2026-10-04T12:40:57.216829", "last_seen": "2026-10-04T14:28:09.451757", "price_history": []}];
+
+    // Override fetchListings for offline/iframe embedding if local API is unreachable
+    const originalFetchListings = window.fetchListings;
+    // 2541 Rental Radar Frontend Engine
+
+let allListings = JSON.parse(localStorage.getItem('2541_rentals') || 'null') || INITIAL_LISTINGS;
+let activeListing = null;
+let leafletMap = null;
+let markersGroup = null;
+let landmarkGroup = null;
+let currentTab = 'grid';
+
+const filters = {
+    max_price: 550,
+    suburb: 'all',
+    min_beds: 0,
+    prop_type: 'all',
+    query: '',
+    sort_by: 'price_asc',
+    only_inspections: false,
+    only_favorites: false
+};
+
+// Initialize App
+document.addEventListener('DOMContentLoaded', () => {
+    initIcons();
+    initEventListeners();
+    initCalculator();
+    initBioGenerator();
+    initTipsModal();
+    loadSettings();
+    loadPortals();
+    fetchStats();
+    fetchListings();
+});
+
+function initIcons() {
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+}
+
+// Event Listeners
+function initEventListeners() {
+    // Navigation Tabs
+    document.querySelectorAll('.view-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetView = tab.getAttribute('data-view');
+            switchView(targetView);
+        });
     });
 
-    function initIcons() {
-        if (window.lucide) lucide.createIcons();
-    }
-
-    function initEventListeners() {
-        // Navigation Tabs
-        document.querySelectorAll('.view-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const targetView = tab.getAttribute('data-view');
-                switchView(targetView);
+    // Suburb Pills
+    document.querySelectorAll('.suburb-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.suburb-btn').forEach(b => {
+                b.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+                b.classList.add('bg-slate-100', 'text-slate-700');
             });
+            btn.classList.remove('bg-slate-100', 'text-slate-700');
+            btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+
+            filters.suburb = btn.getAttribute('data-suburb');
+            fetchListings();
         });
+    });
 
-        // Suburb Pills
-        document.querySelectorAll('.suburb-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.suburb-btn').forEach(b => {
-                    b.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
-                    b.classList.add('bg-slate-100', 'text-slate-700');
-                });
-                btn.classList.remove('bg-slate-100', 'text-slate-700');
-                btn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
-                filters.suburb = btn.getAttribute('data-suburb');
-                applyFilters();
-            });
-        });
+    // Filter controls
+    const priceSlider = document.getElementById('filter-max-price');
+    const priceVal = document.getElementById('price-slider-val');
+    priceSlider.addEventListener('input', (e) => {
+        priceVal.textContent = `$${e.target.value}`;
+        filters.max_price = parseInt(e.target.value);
+        fetchListings();
+    });
 
-        // Filter controls
-        const priceSlider = document.getElementById('filter-max-price');
-        const priceVal = document.getElementById('price-slider-val');
-        priceSlider.addEventListener('input', (e) => {
-            priceVal.textContent = `$${e.target.value}`;
-            filters.max_price = parseInt(e.target.value);
-            applyFilters();
-        });
+    document.getElementById('filter-beds').addEventListener('change', (e) => {
+        filters.min_beds = parseInt(e.target.value);
+        fetchListings();
+    });
 
-        document.getElementById('filter-beds').addEventListener('change', (e) => {
-            filters.min_beds = parseInt(e.target.value);
-            applyFilters();
-        });
+    document.getElementById('filter-prop-type').addEventListener('change', (e) => {
+        filters.prop_type = e.target.value;
+        fetchListings();
+    });
 
-        document.getElementById('filter-prop-type').addEventListener('change', (e) => {
-            filters.prop_type = e.target.value;
-            applyFilters();
-        });
+    document.getElementById('filter-sort').addEventListener('change', (e) => {
+        filters.sort_by = e.target.value;
+        fetchListings();
+    });
 
-        document.getElementById('filter-sort').addEventListener('change', (e) => {
-            filters.sort_by = e.target.value;
-            applyFilters();
-        });
+    let searchTimeout;
+    document.getElementById('filter-query').addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            filters.query = e.target.value.trim();
+            fetchListings();
+        }, 300);
+    });
 
-        document.getElementById('filter-query').addEventListener('input', (e) => {
-            filters.query = e.target.value.trim().toLowerCase();
-            applyFilters();
-        });
+    document.getElementById('filter-only-inspections').addEventListener('change', (e) => {
+        filters.only_inspections = e.target.checked;
+        fetchListings();
+    });
 
-        document.getElementById('filter-only-inspections').addEventListener('change', (e) => {
-            filters.only_inspections = e.target.checked;
-            applyFilters();
-        });
+    document.getElementById('filter-only-favorites').addEventListener('change', (e) => {
+        filters.only_favorites = e.target.checked;
+        fetchListings();
+    });
 
-        document.getElementById('filter-only-favorites').addEventListener('change', (e) => {
-            filters.only_favorites = e.target.checked;
-            applyFilters();
-        });
+    document.getElementById('btn-reset-filters').addEventListener('click', resetFilters);
 
-        document.getElementById('btn-reset-filters').addEventListener('click', resetFilters);
+    // Header buttons
+    document.getElementById('btn-refresh').addEventListener('click', syncLive);
+    document.getElementById('btn-add-modal').addEventListener('click', () => showModal('modal-add'));
+    document.getElementById('btn-settings-modal').addEventListener('click', () => showModal('modal-settings'));
+    document.getElementById('btn-print').addEventListener('click', printRunSheet);
+    document.getElementById('btn-export-csv').addEventListener('click', () => {
+        window.location.href = `/api/export/csv?max_price=${filters.max_price}`;
+    });
 
-        // Header buttons
-        document.getElementById('btn-add-modal').addEventListener('click', () => showModal('modal-add'));
-        document.getElementById('btn-print').addEventListener('click', () => window.print());
-        document.getElementById('btn-export-csv').addEventListener('click', exportCsv);
+    // Modal close buttons
+    document.getElementById('modal-close-btn').addEventListener('click', () => hideModal('modal-property'));
+    document.getElementById('modal-add-close').addEventListener('click', () => hideModal('modal-add'));
+    document.getElementById('modal-add-cancel').addEventListener('click', () => hideModal('modal-add'));
+    document.getElementById('modal-settings-close').addEventListener('click', () => hideModal('modal-settings'));
+    document.getElementById('modal-settings-cancel').addEventListener('click', () => hideModal('modal-settings'));
 
-        // Modal buttons
-        document.getElementById('modal-close-btn').addEventListener('click', () => hideModal('modal-property'));
-        document.getElementById('modal-add-close').addEventListener('click', () => hideModal('modal-add'));
-        document.getElementById('modal-add-cancel').addEventListener('click', () => hideModal('modal-add'));
-        document.getElementById('modal-save-btn').addEventListener('click', saveActiveListingMeta);
-        document.getElementById('modal-fav-btn').addEventListener('click', toggleActiveFavorite);
-        document.getElementById('form-add-rental').addEventListener('submit', handleAddRental);
+    // Save Listing Meta
+    document.getElementById('modal-save-btn').addEventListener('click', saveActiveListingMeta);
+    document.getElementById('modal-fav-btn').addEventListener('click', toggleActiveFavorite);
 
-        // Landmark toggles
-        document.getElementById('toggle-train')?.addEventListener('click', () => panToLandmark(-34.8517, 150.6120, "Bomaderry Station"));
-        document.getElementById('toggle-hospital')?.addEventListener('click', () => panToLandmark(-34.8765, 150.5985, "Shoalhaven Hospital"));
-        document.getElementById('toggle-shops')?.addEventListener('click', () => panToLandmark(-34.8745, 150.6025, "Stockland Nowra"));
+    // Add Custom Rental Form
+    document.getElementById('form-add-rental').addEventListener('submit', handleAddRental);
+
+    // Save Settings
+    document.getElementById('modal-settings-save').addEventListener('click', handleSaveSettings);
+    document.getElementById('btn-request-notify').addEventListener('click', requestBrowserNotification);
+
+    // Landmark toggles
+    document.getElementById('toggle-train')?.addEventListener('click', () => panToLandmark(-34.8517, 150.6120, "Bomaderry Railway Station (Trains to Sydney)"));
+    document.getElementById('toggle-hospital')?.addEventListener('click', () => panToLandmark(-34.8765, 150.5985, "Shoalhaven District Memorial Hospital"));
+    document.getElementById('toggle-shops')?.addEventListener('click', () => panToLandmark(-34.8745, 150.6025, "Stockland Nowra Shopping Centre"));
+}
+
+function switchView(viewName) {
+    currentTab = viewName;
+    document.querySelectorAll('.view-tab').forEach(t => {
+        if (t.getAttribute('data-view') === viewName) {
+            t.classList.add('border-blue-600', 'text-blue-600');
+            t.classList.remove('border-transparent', 'text-slate-500');
+        } else {
+            t.classList.remove('border-blue-600', 'text-blue-600');
+            t.classList.add('border-transparent', 'text-slate-500');
+        }
+    });
+
+    document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden'));
+    const target = document.getElementById(`view-${viewName}`);
+    if (target) target.classList.remove('hidden');
+
+    if (viewName === 'map') {
+        setTimeout(initOrUpdateMap, 100);
+    } else if (viewName === 'kanban') {
+        renderKanban();
     }
+}
 
-    function switchView(viewName) {
-        currentTab = viewName;
-        document.querySelectorAll('.view-tab').forEach(t => {
-            if (t.getAttribute('data-view') === viewName) {
-                t.classList.add('border-blue-600', 'text-blue-600');
-                t.classList.remove('border-transparent', 'text-slate-500');
-            } else {
-                t.classList.remove('border-blue-600', 'text-blue-600');
-                t.classList.add('border-transparent', 'text-slate-500');
-            }
-        });
+// Fetch Listings from API
+async function fetchListings() {
+    try {
+        const params = new URLSearchParams();
+        params.append('max_price', filters.max_price);
+        if (filters.suburb !== 'all') params.append('suburb', filters.suburb);
+        if (filters.min_beds > 0) params.append('min_beds', filters.min_beds);
+        if (filters.prop_type !== 'all') params.append('prop_type', filters.prop_type);
+        if (filters.query) params.append('query', filters.query);
+        params.append('sort_by', filters.sort_by);
+        if (filters.only_inspections) params.append('only_inspections', 'true');
+        if (filters.only_favorites) params.append('only_favorites', 'true');
 
-        document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden'));
-        const target = document.getElementById(`view-${viewName}`);
-        if (target) target.classList.remove('hidden');
+        const res = await fetch(`/api/listings?${params.toString()}`);
+        const data = await res.json();
+        allListings = (data.listings && data.listings.length > 0) ? data.listings : INITIAL_LISTINGS;
+        localStorage.setItem('2541_rentals', JSON.stringify(allListings));
 
-        if (viewName === 'map') {
-            setTimeout(initOrUpdateMap, 100);
-        } else if (viewName === 'kanban') {
+        document.getElementById('results-count').textContent = allListings.length;
+        renderListingsGrid(allListings);
+
+        if (currentTab === 'map') {
+            initOrUpdateMap();
+        } else if (currentTab === 'kanban') {
             renderKanban();
         }
-    }
 
-    function applyFilters() {
-        let filtered = allListings.filter(item => {
-            if (item.price && item.price > filters.max_price) return false;
-            if (filters.suburb !== 'all' && item.suburb.toLowerCase() !== filters.suburb.toLowerCase()) return false;
-            if (filters.min_beds > 0 && (item.beds || 1) < filters.min_beds) return false;
-            if (filters.prop_type !== 'all' && (item.prop_type || '').toLowerCase() !== filters.prop_type.toLowerCase()) return false;
-            if (filters.only_inspections && !item.inspection_date) return false;
-            if (filters.only_favorites && !item.is_favorite) return false;
-            if (filters.query) {
-                const q = filters.query;
-                const text = `${item.street} ${item.suburb} ${item.description || ''}`.toLowerCase();
-                if (!text.includes(q)) return false;
-            }
-            return true;
-        });
-
-        // Sort
-        if (filters.sort_by === 'price_asc') {
-            filtered.sort((a,b) => (a.price || 0) - (b.price || 0));
-        } else if (filters.sort_by === 'price_desc') {
-            filtered.sort((a,b) => (b.price || 0) - (a.price || 0));
-        } else if (filters.sort_by === 'beds_desc') {
-            filtered.sort((a,b) => (b.beds || 1) - (a.beds || 1));
-        } else if (filters.sort_by === 'inspection') {
-            filtered.sort((a,b) => {
-                if (!a.inspection_date) return 1;
-                if (!b.inspection_date) return -1;
-                return new Date(a.inspection_date) - new Date(b.inspection_date);
-            });
-        }
-
-        document.getElementById('results-count').textContent = filtered.length;
-        renderListingsGrid(filtered);
-
-        if (currentTab === 'map') initOrUpdateMap(filtered);
-        else if (currentTab === 'kanban') renderKanban(filtered);
-        updateStats();
         initIcons();
+    } catch (e) {
+        console.error("Error fetching listings:", e);
+        showToast("Error loading listings. Make sure the server is running.");
+    }
+}
+
+// Render Property Grid Cards
+function renderListingsGrid(items) {
+    const grid = document.getElementById('listings-grid');
+    const noResults = document.getElementById('no-results');
+
+    if (!items || items.length === 0) {
+        grid.innerHTML = '';
+        noResults.classList.remove('hidden');
+        return;
     }
 
-    function renderListingsGrid(items) {
-        const grid = document.getElementById('listings-grid');
-        const noResults = document.getElementById('no-results');
+    noResults.classList.add('hidden');
+    grid.innerHTML = items.map(item => createListingCardHtml(item)).join('');
+}
 
-        if (!items || items.length === 0) {
-            grid.innerHTML = '';
-            noResults.classList.remove('hidden');
-            return;
-        }
+function createListingCardHtml(item) {
+    const isUnder500 = item.price && item.price <= 500;
+    const priceColor = item.price <= 450 ? 'text-emerald-700 bg-emerald-50' : (item.price <= 500 ? 'text-blue-700 bg-blue-50' : 'text-amber-800 bg-amber-50');
+    const fallbackImg = "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80";
+    const imgUrl = item.image_url || fallbackImg;
 
-        noResults.classList.add('hidden');
-        const fallbackImg = "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80";
+    // Inspection badge
+    let inspBadge = '';
+    if (item.inspection_date) {
+        inspBadge = `
+            <div class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                <i data-lucide="calendar" class="w-3 h-3 mr-1 text-indigo-500"></i>
+                <span>Open: ${formatInspection(item.inspection_date)}</span>
+            </div>
+        `;
+    }
 
-        grid.innerHTML = items.map(item => {
-            const priceColor = item.price <= 450 ? 'text-emerald-700 bg-emerald-50' : (item.price <= 500 ? 'text-blue-700 bg-blue-50' : 'text-amber-800 bg-amber-50');
-            const imgUrl = item.image_url || fallbackImg;
-            const favColor = item.is_favorite ? 'text-rose-500 fill-current' : 'text-slate-400 hover:text-rose-500';
+    // New Badge
+    const newBadge = item.is_new ? `
+        <span class="absolute top-3 left-3 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-600 text-white shadow-md tracking-wider">
+            NEW
+        </span>
+    ` : '';
 
-            const inspBadge = item.inspection_date ? `
-                <div class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
-                    <i data-lucide="calendar" class="w-3 h-3 mr-1 text-indigo-500"></i>
-                    <span>Open: ${formatInspection(item.inspection_date)}</span>
+    const favColor = item.is_favorite ? 'text-rose-500 fill-current' : 'text-slate-400 hover:text-rose-500';
+
+    return `
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col group" data-id="${item.id}">
+            <!-- Card Image -->
+            <div class="relative h-48 bg-slate-100 overflow-hidden cursor-pointer" onclick="openListingModal('${item.id}')">
+                <img src="${imgUrl}" alt="${escapeHtml(item.street)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='${fallbackImg}'">
+                ${newBadge}
+                <button onclick="event.stopPropagation(); quickToggleFav('${item.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-md transition">
+                    <i data-lucide="heart" class="w-4 h-4 ${favColor}"></i>
+                </button>
+                <div class="absolute bottom-3 left-3 flex items-center space-x-1.5">
+                    <span class="px-2 py-1 rounded-md text-[11px] font-bold uppercase bg-slate-900/80 text-white backdrop-blur-sm">
+                        ${escapeHtml(item.prop_type || 'Rental')}
+                    </span>
+                    <span class="px-2 py-1 rounded-md text-[10px] font-semibold bg-blue-600/90 text-white backdrop-blur-sm">
+                        ${escapeHtml(item.source || 'Portal')}
+                    </span>
                 </div>
-            ` : '';
+            </div>
 
-            return `
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col group">
-                    <div class="relative h-48 bg-slate-100 overflow-hidden cursor-pointer" onclick="openListingModal('${item.id}')">
-                        <img src="${imgUrl}" alt="${escapeHtml(item.street)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='${fallbackImg}'">
-                        <button onclick="event.stopPropagation(); quickToggleFav('${item.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow transition">
-                            <i data-lucide="heart" class="w-4 h-4 ${favColor}"></i>
-                        </button>
-                        <div class="absolute bottom-3 left-3">
-                            <span class="px-2 py-1 rounded-md text-[11px] font-bold uppercase bg-slate-900/80 text-white">
-                                ${escapeHtml(item.prop_type || 'Rental')}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
-                        <div>
-                            <div class="flex items-baseline justify-between">
-                                <span class="text-2xl font-extrabold text-slate-900">$${item.price}<span class="text-xs font-normal text-slate-500"> /wk</span></span>
-                                <span class="text-xs font-bold px-2 py-0.5 rounded-full ${priceColor}">
-                                    ${item.price <= 450 ? 'Bargain' : (item.price <= 500 ? 'Great Value' : 'Under $550')}
-                                </span>
-                            </div>
-                            <h3 class="font-bold text-sm text-slate-900 mt-1 cursor-pointer hover:text-blue-600 transition truncate" onclick="openListingModal('${item.id}')">
-                                ${escapeHtml(item.street)}
-                            </h3>
-                            <p class="text-xs text-slate-500 flex items-center mt-0.5">
-                                <i data-lucide="map-pin" class="w-3 h-3 mr-1 text-slate-400"></i>
-                                <span>${escapeHtml(item.suburb)} NSW 2541</span>
-                            </p>
-                            <div class="flex items-center space-x-4 mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600">
-                                <span class="flex items-center"><i data-lucide="bed" class="w-3.5 h-3.5 mr-1 text-slate-400"></i> ${item.beds || 1} Bed</span>
-                                <span class="flex items-center"><i data-lucide="bath" class="w-3.5 h-3.5 mr-1 text-slate-400"></i> ${item.baths || 1} Bath</span>
-                                <span class="flex items-center"><i data-lucide="car" class="w-3.5 h-3.5 mr-1 text-slate-400"></i> ${item.cars || 1} Car</span>
-                            </div>
-                            <div class="mt-2.5">${inspBadge}</div>
-                        </div>
-                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                            <select onchange="updateListingStatus('${item.id}', this.value)" class="text-[11px] font-semibold py-1 px-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-700">
-                                <option value="discovered" ${item.status === 'discovered' ? 'selected' : ''}>🔍 Discovered</option>
-                                <option value="saved" ${item.status === 'saved' ? 'selected' : ''}>⭐ Shortlisted</option>
-                                <option value="inspecting" ${item.status === 'inspecting' ? 'selected' : ''}>📅 Inspecting</option>
-                                <option value="applied" ${item.status === 'applied' ? 'selected' : ''}>📝 Applied</option>
-                                <option value="offered" ${item.status === 'offered' ? 'selected' : ''}>🎉 Offered</option>
-                            </select>
-                            <button onclick="openListingModal('${item.id}')" class="font-bold text-blue-600 hover:text-blue-800 transition flex items-center">
-                                <span>Details</span>
-                                <i data-lucide="chevron-right" class="w-3.5 h-3.5 ml-0.5"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    function initOrUpdateMap(items) {
-        const mapContainer = document.getElementById('map');
-        if (!mapContainer) return;
-        if (!items) items = allListings;
-
-        if (!leafletMap) {
-            leafletMap = L.map('map').setView([-34.8727, 150.6019], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(leafletMap);
-            markersGroup = L.layerGroup().addTo(leafletMap);
-            landmarkGroup = L.layerGroup().addTo(leafletMap);
-            addLandmarks();
-        }
-
-        leafletMap.invalidateSize();
-        markersGroup.clearLayers();
-        const bounds = [];
-
-        items.forEach(item => {
-            if (!item.lat || !item.lng) return;
-            const pinClass = item.price <= 450 ? 'pin-green' : (item.price <= 500 ? 'pin-blue' : 'pin-amber');
-            const customIcon = L.divIcon({
-                className: `custom-price-pin ${pinClass}`,
-                html: `<span>$${item.price}</span>`,
-                iconSize: [52, 26],
-                iconAnchor: [26, 13]
-            });
-
-            const marker = L.marker([item.lat, item.lng], { icon: customIcon });
-            marker.bindPopup(`
-                <div style="width: 200px;" class="p-2 space-y-1 text-xs">
-                    <span class="font-bold text-sm text-slate-900">$${item.price}/wk</span>
-                    <p class="font-semibold truncate">${escapeHtml(item.street)}, ${escapeHtml(item.suburb)}</p>
-                    <p class="text-slate-500">${item.beds || 1}b • ${item.baths || 1}ba • ${item.cars || 1}c</p>
-                    <button onclick="openListingModal('${item.id}')" class="w-full mt-2 py-1 bg-blue-600 text-white rounded font-bold text-center block">View Details</button>
-                </div>
-            `);
-            markersGroup.addLayer(marker);
-            bounds.push([item.lat, item.lng]);
-        });
-
-        if (bounds.length > 0) leafletMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
-    }
-
-    function addLandmarks() {
-        const landmarks = [
-            { name: "🚆 Bomaderry Railway Station", lat: -34.8517, lng: 150.6120, desc: "Direct Sydney Central electric link" },
-            { name: "🏥 Shoalhaven Hospital", lat: -34.8765, lng: 150.5985, desc: "Nowra Memorial Hospital" },
-            { name: "🛍️ Stockland Nowra", lat: -34.8745, lng: 150.6025, desc: "Central shopping centre" }
-        ];
-        landmarks.forEach(l => {
-            const marker = L.circleMarker([l.lat, l.lng], { radius: 7, color: '#dc2626', fillColor: '#ef4444', fillOpacity: 0.9 });
-            marker.bindPopup(`<b>${l.name}</b><br><small>${l.desc}</small>`);
-            landmarkGroup.addLayer(marker);
-        });
-    }
-
-    function panToLandmark(lat, lng, name) {
-        if (leafletMap) {
-            leafletMap.setView([lat, lng], 15, { animate: true });
-            showToast(`Centered on ${name}`);
-        }
-    }
-
-    function renderKanban(items) {
-        if (!items) items = allListings;
-        const cols = {
-            discovered: document.getElementById('kanban-discovered'),
-            saved: document.getElementById('kanban-saved'),
-            inspecting: document.getElementById('kanban-inspecting'),
-            applied: document.getElementById('kanban-applied'),
-            offered: document.getElementById('kanban-offered')
-        };
-        Object.values(cols).forEach(c => { if (c) c.innerHTML = ''; });
-        const counts = { discovered: 0, saved: 0, inspecting: 0, applied: 0, offered: 0 };
-
-        items.forEach(item => {
-            const st = item.status || 'discovered';
-            if (cols[st]) {
-                counts[st]++;
-                const card = document.createElement('div');
-                card.className = "bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-1.5 cursor-pointer hover:border-blue-400 transition";
-                card.onclick = () => openListingModal(item.id);
-                card.innerHTML = `
-                    <div class="flex justify-between items-baseline font-bold">
-                        <span class="text-slate-900">$${item.price}/wk</span>
-                        <span class="text-[10px] text-slate-500 uppercase">${escapeHtml(item.suburb)}</span>
-                    </div>
-                    <p class="font-semibold text-xs text-slate-800 truncate">${escapeHtml(item.street)}</p>
-                    <div class="text-[11px] text-slate-500">${item.beds || 1}b • ${item.baths || 1}ba (${escapeHtml(item.prop_type || 'House')})</div>
-                `;
-                cols[st].appendChild(card);
-            }
-        });
-
-        Object.keys(counts).forEach(k => {
-            const el = document.getElementById(`kanban-${k}-count`);
-            if (el) el.textContent = counts[k];
-        });
-    }
-
-    function openListingModal(listingId) {
-        const item = allListings.find(l => l.id == listingId);
-        if (!item) return;
-        activeListing = item;
-        const fallbackImg = "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80";
-
-        document.getElementById('modal-img').src = item.image_url || fallbackImg;
-        document.getElementById('modal-price').innerHTML = `$${item.price} <span class="text-base font-normal text-slate-200">/ week</span>`;
-        document.getElementById('modal-address').textContent = `${item.street}, ${item.suburb} NSW 2541`;
-        document.getElementById('modal-type-badge').textContent = item.prop_type || 'House';
-        document.getElementById('modal-beds').textContent = item.beds || 1;
-        document.getElementById('modal-baths').textContent = item.baths || 1;
-        document.getElementById('modal-cars').textContent = item.cars || 1;
-        document.getElementById('modal-bond').textContent = `$${(item.price || 0) * 4}`;
-        document.getElementById('modal-desc').textContent = item.description || "Active rental listing in 2541.";
-        document.getElementById('modal-notes').value = item.notes || "";
-        document.getElementById('modal-status-select').value = item.status || "discovered";
-        document.getElementById('modal-rating-select').value = item.rating || 0;
-
-        const inspBox = document.getElementById('modal-inspection-box');
-        if (item.inspection_date) {
-            inspBox.classList.remove('hidden');
-            document.getElementById('modal-inspection-text').textContent = formatInspection(item.inspection_date);
-        } else {
-            inspBox.classList.add('hidden');
-        }
-
-        const q = encodeURIComponent(`${item.street}, ${item.suburb} NSW 2541`);
-        document.getElementById('modal-maps-link').href = `https://www.google.com/maps/search/?api=1&query=${q}`;
-        document.getElementById('modal-portal-link').href = item.url;
-        updateModalFavIcon(item.is_favorite);
-
-        showModal('modal-property');
-        initIcons();
-    }
-
-    function updateModalFavIcon(isFav) {
-        const icon = document.getElementById('modal-fav-icon');
-        if (icon) {
-            if (isFav) {
-                icon.classList.add('text-rose-500', 'fill-current');
-                icon.classList.remove('text-white');
-            } else {
-                icon.classList.remove('text-rose-500', 'fill-current');
-                icon.classList.add('text-white');
-            }
-        }
-    }
-
-    function toggleActiveFavorite() {
-        if (!activeListing) return;
-        activeListing.is_favorite = activeListing.is_favorite ? 0 : 1;
-        updateModalFavIcon(activeListing.is_favorite);
-        persistListings();
-        applyFilters();
-    }
-
-    function quickToggleFav(lid) {
-        const item = allListings.find(l => l.id == lid);
-        if (!item) return;
-        item.is_favorite = item.is_favorite ? 0 : 1;
-        persistListings();
-        applyFilters();
-    }
-
-    function updateListingStatus(lid, newStatus) {
-        const item = allListings.find(l => l.id == lid);
-        if (item) item.status = newStatus;
-        persistListings();
-        showToast(`Moved to ${newStatus}`);
-        applyFilters();
-    }
-
-    function saveActiveListingMeta() {
-        if (!activeListing) return;
-        activeListing.status = document.getElementById('modal-status-select').value;
-        activeListing.notes = document.getElementById('modal-notes').value;
-        activeListing.rating = parseInt(document.getElementById('modal-rating-select').value);
-        persistListings();
-        hideModal('modal-property');
-        showToast("Saved!");
-        applyFilters();
-    }
-
-    function handleAddRental(e) {
-        e.preventDefault();
-        const newRental = {
-            id: 'custom_' + Date.now(),
-            street: document.getElementById('add-street').value,
-            suburb: document.getElementById('add-suburb').value,
-            price: parseInt(document.getElementById('add-price').value),
-            beds: parseInt(document.getElementById('add-beds').value),
-            baths: parseInt(document.getElementById('add-baths').value),
-            cars: parseInt(document.getElementById('add-cars').value),
-            prop_type: 'House',
-            url: document.getElementById('add-url').value || '#',
-            image_url: '',
-            status: 'discovered',
-            notes: '',
-            lat: -34.8727,
-            lng: 150.6019
-        };
-        allListings.unshift(newRental);
-        persistListings();
-        hideModal('modal-add');
-        document.getElementById('form-add-rental').reset();
-        showToast("Custom rental added!");
-        applyFilters();
-    }
-
-    function persistListings() {
-        localStorage.setItem('2541_rentals', JSON.stringify(allListings));
-    }
-
-    function updateStats() {
-        const under550 = allListings.filter(l => l.price && l.price <= 550);
-        document.getElementById('stat-count').textContent = under550.length;
-        if (under550.length > 0) {
-            const sum = under550.reduce((acc, c) => acc + c.price, 0);
-            const min = Math.min(...under550.map(c => c.price));
-            document.getElementById('stat-avg').textContent = `$${Math.round(sum / under550.length)}`;
-            document.getElementById('stat-min').textContent = `$${min}`;
-        }
-        document.getElementById('stat-saved').textContent = allListings.filter(l => l.is_favorite).length;
-    }
-
-    function renderPortals() {
-        const container = document.getElementById('portal-cards');
-        if (!container) return;
-        container.innerHTML = PORTALS_DATA.map(p => `
-            <a href="${p.url}" target="_blank" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow hover:border-blue-400 transition flex flex-col justify-between group">
+            <!-- Card Content -->
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
                 <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="font-bold text-sm text-slate-900 group-hover:text-blue-600 transition">${escapeHtml(p.name)}</span>
-                        <i data-lucide="external-link" class="w-4 h-4 text-slate-400 group-hover:text-blue-600"></i>
+                    <!-- Price and Suburb -->
+                    <div class="flex items-baseline justify-between">
+                        <span class="text-2xl font-extrabold text-slate-900">$${item.price || '--'}<span class="text-xs font-normal text-slate-500"> /wk</span></span>
+                        <span class="text-xs font-bold px-2 py-0.5 rounded-full ${priceColor}">
+                            ${item.price <= 450 ? 'Bargain' : (item.price <= 500 ? 'Great Value' : 'Under $550')}
+                        </span>
                     </div>
-                    <p class="text-xs text-slate-500 leading-relaxed">${escapeHtml(p.desc)}</p>
+
+                    <!-- Address -->
+                    <h3 class="font-bold text-sm text-slate-900 mt-1 cursor-pointer hover:text-blue-600 transition truncate" onclick="openListingModal('${item.id}')" title="${escapeHtml(item.street)}, ${escapeHtml(item.suburb)}">
+                        ${escapeHtml(item.street)}
+                    </h3>
+                    <p class="text-xs text-slate-500 flex items-center mt-0.5">
+                        <i data-lucide="map-pin" class="w-3 h-3 mr-1 text-slate-400 flex-shrink-0"></i>
+                        <span>${escapeHtml(item.suburb)} NSW ${item.postcode || '2541'}</span>
+                    </p>
+
+                    <!-- Features -->
+                    <div class="flex items-center space-x-4 mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600">
+                        <span class="flex items-center font-medium" title="Bedrooms">
+                            <i data-lucide="bed" class="w-3.5 h-3.5 mr-1 text-slate-400"></i> ${item.beds || 1} Bed
+                        </span>
+                        <span class="flex items-center font-medium" title="Bathrooms">
+                            <i data-lucide="bath" class="w-3.5 h-3.5 mr-1 text-slate-400"></i> ${item.baths || 1} Bath
+                        </span>
+                        <span class="flex items-center font-medium" title="Parking / Car spaces">
+                            <i data-lucide="car" class="w-3.5 h-3.5 mr-1 text-slate-400"></i> ${item.cars || 0} Car
+                        </span>
+                    </div>
+
+                    <!-- Inspection / Badges -->
+                    <div class="mt-2.5">
+                        ${inspBadge}
+                    </div>
                 </div>
-                <div class="mt-3 pt-2 border-t border-slate-100 flex items-center text-[11px] font-semibold text-blue-600">
-                    <span>Search 2541 &lt;=$550</span>
-                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
+
+                <!-- Footer Actions -->
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <!-- Status selector -->
+                    <select onchange="updateListingStatus('${item.id}', this.value)" class="text-[11px] font-semibold py-1 px-2 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 hover:bg-slate-100 transition focus:outline-none">
+                        <option value="discovered" ${item.status === 'discovered' ? 'selected' : ''}>🔍 Discovered</option>
+                        <option value="saved" ${item.status === 'saved' ? 'selected' : ''}>⭐ Shortlisted</option>
+                        <option value="inspecting" ${item.status === 'inspecting' ? 'selected' : ''}>📅 Inspecting</option>
+                        <option value="applied" ${item.status === 'applied' ? 'selected' : ''}>📝 Applied</option>
+                        <option value="offered" ${item.status === 'offered' ? 'selected' : ''}>🎉 Offered</option>
+                    </select>
+
+                    <button onclick="openListingModal('${item.id}')" class="font-bold text-blue-600 hover:text-blue-800 transition flex items-center">
+                        <span>Details</span>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 ml-0.5"></i>
+                    </button>
                 </div>
-            </a>
+            </div>
+        </div>
+    `;
+}
+
+// Leaflet Map Logic
+function initOrUpdateMap() {
+    const mapContainer = document.getElementById('map');
+    if (!mapContainer) return;
+
+    if (!leafletMap) {
+        // Center on Nowra CBD
+        leafletMap = L.map('map').setView([-34.8727, 150.6019], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(leafletMap);
+
+        markersGroup = L.layerGroup().addTo(leafletMap);
+        landmarkGroup = L.layerGroup().addTo(leafletMap);
+
+        addLandmarks();
+    }
+
+    leafletMap.invalidateSize();
+    markersGroup.clearLayers();
+
+    const bounds = [];
+
+    allListings.forEach(item => {
+        if (!item.lat || !item.lng) return;
+
+        const pinClass = item.price <= 450 ? 'pin-green' : (item.price <= 500 ? 'pin-blue' : 'pin-amber');
+        const customIcon = L.divIcon({
+            className: `custom-price-pin ${pinClass}`,
+            html: `<span>$${item.price || '?'}</span>`,
+            iconSize: [52, 26],
+            iconAnchor: [26, 13]
+        });
+
+        const marker = L.marker([item.lat, item.lng], { icon: customIcon });
+
+        const popupContent = `
+            <div style="width: 220px;" class="p-2 space-y-1 text-xs">
+                ${item.image_url ? `<img src="${item.image_url}" class="w-full h-24 object-cover rounded-lg mb-2">` : ''}
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-sm text-slate-900">$${item.price}/wk</span>
+                    <span class="text-[10px] uppercase font-bold text-slate-500">${escapeHtml(item.suburb)}</span>
+                </div>
+                <p class="font-semibold text-slate-800 truncate">${escapeHtml(item.street)}</p>
+                <p class="text-slate-500">${item.beds || 1}b • ${item.baths || 1}ba • ${item.cars || 0}c (${escapeHtml(item.prop_type || 'House')})</p>
+                ${item.inspection_date ? `<p class="text-indigo-600 font-medium">📅 ${formatInspection(item.inspection_date)}</p>` : ''}
+                <button onclick="openListingModal('${item.id}')" class="w-full mt-2 py-1 bg-blue-600 text-white rounded font-bold text-center block">
+                    View Details
+                </button>
+            </div>
+        `;
+
+        marker.bindPopup(popupContent);
+        markersGroup.addLayer(marker);
+        bounds.push([item.lat, item.lng]);
+    });
+
+    if (bounds.length > 0) {
+        leafletMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+    }
+}
+
+function addLandmarks() {
+    const landmarks = [
+        { name: "🚆 Bomaderry Railway Station", lat: -34.8517, lng: 150.6120, desc: "Direct South Coast train link to Sydney Central" },
+        { name: "🏥 Shoalhaven District Hospital", lat: -34.8765, lng: 150.5985, desc: "Shoalhaven Memorial Hospital & Health Services" },
+        { name: "🛍️ Stockland Nowra", lat: -34.8745, lng: 150.6025, desc: "Central shopping mall, Woolworths, Kmart, stores" },
+        { name: "🎓 UOW Shoalhaven Campus", lat: -34.8967, lng: 150.5790, desc: "University of Wollongong campus (West Nowra)" },
+        { name: "🚌 Nowra Bus Interchange", lat: -34.8755, lng: 150.6040, desc: "Stewart Place regional bus connections" }
+    ];
+
+    landmarks.forEach(l => {
+        const marker = L.circleMarker([l.lat, l.lng], {
+            radius: 7,
+            color: '#dc2626',
+            fillColor: '#ef4444',
+            fillOpacity: 0.9,
+            weight: 2
+        });
+        marker.bindPopup(`<b>${l.name}</b><br><small class="text-slate-600">${l.desc}</small>`);
+        landmarkGroup.addLayer(marker);
+    });
+}
+
+function panToLandmark(lat, lng, name) {
+    if (leafletMap) {
+        leafletMap.setView([lat, lng], 15, { animate: true });
+        showToast(`Centered on ${name}`);
+    }
+}
+
+// Kanban Board Renderer
+function renderKanban() {
+    const cols = {
+        discovered: document.getElementById('kanban-discovered'),
+        saved: document.getElementById('kanban-saved'),
+        inspecting: document.getElementById('kanban-inspecting'),
+        applied: document.getElementById('kanban-applied'),
+        offered: document.getElementById('kanban-offered')
+    };
+
+    // Clear columns
+    Object.values(cols).forEach(c => { if (c) c.innerHTML = ''; });
+
+    const counts = { discovered: 0, saved: 0, inspecting: 0, applied: 0, offered: 0 };
+
+    allListings.forEach(item => {
+        const st = item.status || 'discovered';
+        if (cols[st]) {
+            counts[st]++;
+            const card = document.createElement('div');
+            card.className = "bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2 cursor-pointer hover:border-blue-400 transition";
+            card.onclick = () => openListingModal(item.id);
+
+            card.innerHTML = `
+                <div class="flex justify-between items-baseline">
+                    <span class="font-extrabold text-slate-900">$${item.price}/wk</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">${escapeHtml(item.suburb)}</span>
+                </div>
+                <p class="font-semibold text-xs text-slate-800 truncate">${escapeHtml(item.street)}</p>
+                <div class="text-[11px] text-slate-500 flex justify-between">
+                    <span>${item.beds || 1}b • ${item.baths || 1}ba</span>
+                    <span>${escapeHtml(item.prop_type || 'House')}</span>
+                </div>
+                ${item.inspection_date ? `<div class="text-[10px] font-medium text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">📅 ${formatInspection(item.inspection_date)}</div>` : ''}
+            `;
+            cols[st].appendChild(card);
+        }
+    });
+
+    Object.keys(counts).forEach(k => {
+        const el = document.getElementById(`kanban-${k}-count`);
+        if (el) el.textContent = counts[k];
+    });
+}
+
+// Listing Details Modal
+function openListingModal(listingId) {
+    const item = allListings.find(l => l.id == listingId);
+    if (!item) return;
+
+    activeListing = item;
+    const fallbackImg = "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80";
+
+    document.getElementById('modal-img').src = item.image_url || fallbackImg;
+    document.getElementById('modal-price').innerHTML = `$${item.price || '--'} <span class="text-base font-normal text-slate-200">/ week</span>`;
+    document.getElementById('modal-address').textContent = `${item.street}, ${item.suburb} NSW ${item.postcode || '2541'}`;
+    document.getElementById('modal-type-badge').textContent = item.prop_type || 'Property';
+
+    document.getElementById('modal-beds').textContent = item.beds || 1;
+    document.getElementById('modal-baths').textContent = item.baths || 1;
+    document.getElementById('modal-cars').textContent = item.cars || 0;
+    document.getElementById('modal-bond').textContent = `$${(item.price || 0) * 4}`;
+
+    document.getElementById('modal-desc').textContent = item.description || "No full description provided.";
+    document.getElementById('modal-notes').value = item.notes || "";
+    document.getElementById('modal-status-select').value = item.status || "discovered";
+    document.getElementById('modal-rating-select').value = item.rating || 0;
+
+    // Inspection Box
+    const inspBox = document.getElementById('modal-inspection-box');
+    if (item.inspection_date) {
+        inspBox.classList.remove('hidden');
+        document.getElementById('modal-inspection-text').textContent = formatInspection(item.inspection_date);
+        document.getElementById('modal-ical-btn').href = `/api/calendar/${item.id}.ics`;
+    } else {
+        inspBox.classList.add('hidden');
+    }
+
+    // Google Maps Link
+    const q = encodeURIComponent(`${item.street}, ${item.suburb} NSW 2541`);
+    document.getElementById('modal-maps-link').href = `https://www.google.com/maps/search/?api=1&query=${q}`;
+
+    // External Portal Link
+    document.getElementById('modal-portal-link').href = item.url;
+
+    // Favorite heart icon
+    updateModalFavIcon(item.is_favorite);
+
+    showModal('modal-property');
+    initIcons();
+}
+
+function updateModalFavIcon(isFav) {
+    const icon = document.getElementById('modal-fav-icon');
+    if (icon) {
+        if (isFav) {
+            icon.classList.add('text-rose-500', 'fill-current');
+            icon.classList.remove('text-white');
+        } else {
+            icon.classList.remove('text-rose-500', 'fill-current');
+            icon.classList.add('text-white');
+        }
+    }
+}
+
+async function toggleActiveFavorite() {
+    if (!activeListing) return;
+    const newFav = activeListing.is_favorite ? 0 : 1;
+    activeListing.is_favorite = newFav;
+    updateModalFavIcon(newFav);
+
+    await fetch(`/api/listings/${activeListing.id}/meta`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_favorite: newFav })
+    });
+    fetchStats();
+    fetchListings();
+}
+
+async function quickToggleFav(lid) {
+    const item = allListings.find(l => l.id == lid);
+    if (!item) return;
+    const newFav = item.is_favorite ? 0 : 1;
+    item.is_favorite = newFav;
+
+    await fetch(`/api/listings/${lid}/meta`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_favorite: newFav })
+    });
+    fetchStats();
+    fetchListings();
+}
+
+async function updateListingStatus(lid, newStatus) {
+    await fetch(`/api/listings/${lid}/meta`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+    });
+    const item = allListings.find(l => l.id == lid);
+    if (item) item.status = newStatus;
+    showToast(`Updated status to ${newStatus}`);
+    fetchStats();
+    if (currentTab === 'kanban') renderKanban();
+}
+
+async function saveActiveListingMeta() {
+    if (!activeListing) return;
+    const newStatus = document.getElementById('modal-status-select').value;
+    const newNotes = document.getElementById('modal-notes').value;
+    const newRating = parseInt(document.getElementById('modal-rating-select').value);
+
+    await fetch(`/api/listings/${activeListing.id}/meta`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            status: newStatus,
+            notes: newNotes,
+            rating: newRating
+        })
+    });
+
+    activeListing.status = newStatus;
+    activeListing.notes = newNotes;
+    activeListing.rating = newRating;
+
+    hideModal('modal-property');
+    showToast("Changes saved successfully!");
+    fetchListings();
+}
+
+// Sync Live Scraper
+async function syncLive() {
+    const icon = document.getElementById('refresh-icon');
+    if (icon) icon.classList.add('animate-spin');
+
+    try {
+        showToast("Checking for new 2541 listings...");
+        const res = await fetch('/api/listings/refresh', { method: 'POST' });
+        const data = await res.json();
+
+        if (data.newly_added > 0) {
+            playChime();
+            showToast(`🎉 Found ${data.newly_added} new rental(s) in 2541!`);
+            sendDesktopNotification(`2541 Rental Radar`, `Found ${data.newly_added} new rental(s) under $550/wk!`);
+        } else {
+            showToast(`Sync complete: ${data.scraped} properties checked, up to date.`);
+        }
+
+        fetchStats();
+        fetchListings();
+    } catch (e) {
+        showToast("Sync failed. Check connection.");
+    } finally {
+        if (icon) icon.classList.remove('animate-spin');
+    }
+}
+
+// Add Custom Rental
+async function handleAddRental(e) {
+    e.preventDefault();
+    const payload = {
+        street: document.getElementById('add-street').value,
+        suburb: document.getElementById('add-suburb').value,
+        price: parseInt(document.getElementById('add-price').value),
+        beds: parseInt(document.getElementById('add-beds').value),
+        baths: parseInt(document.getElementById('add-baths').value),
+        cars: parseInt(document.getElementById('add-cars').value),
+        prop_type: document.getElementById('add-type').value,
+        url: document.getElementById('add-url').value,
+        image_url: document.getElementById('add-image').value,
+        notes: document.getElementById('add-notes').value
+    };
+
+    try {
+        const res = await fetch('/api/listings/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            hideModal('modal-add');
+            document.getElementById('form-add-rental').reset();
+            showToast("Custom rental added to your tracker!");
+            fetchStats();
+            fetchListings();
+        }
+    } catch (e) {
+        showToast("Failed to add custom rental.");
+    }
+}
+
+// Settings & Preferences
+async function loadSettings() {
+    try {
+        const res = await fetch('/api/settings');
+        const data = await res.json();
+        if (data.max_price) document.getElementById('setting-max-price').value = data.max_price;
+        if (data.auto_refresh_interval) document.getElementById('setting-refresh-interval').value = data.auto_refresh_interval;
+        if (data.webhook_url) document.getElementById('setting-webhook-url').value = data.webhook_url;
+        if (data.sound_enabled) document.getElementById('setting-sound').checked = data.sound_enabled === 'true';
+    } catch (e) {}
+}
+
+async function handleSaveSettings() {
+    const payload = {
+        max_price: document.getElementById('setting-max-price').value,
+        auto_refresh_interval: document.getElementById('setting-refresh-interval').value,
+        webhook_url: document.getElementById('setting-webhook-url').value,
+        sound_enabled: document.getElementById('setting-sound').checked ? 'true' : 'false'
+    };
+
+    try {
+        await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        hideModal('modal-settings');
+        showToast("Preferences saved!");
+    } catch (e) {
+        showToast("Failed to save settings.");
+    }
+}
+
+// Load Super Search Portals
+async function loadPortals() {
+    try {
+        const res = await fetch('/api/portal-links?max_price=550');
+        const data = await res.json();
+        const portals = data.portals || [];
+
+        const majorContainer = document.getElementById('portal-major-cards');
+        const agencyContainer = document.getElementById('portal-agency-cards');
+        const privateContainer = document.getElementById('portal-private-cards');
+
+        portals.forEach(p => {
+            const card = `
+                <a href="${p.url}" target="_blank" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-400 transition flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-sm text-slate-900 group-hover:text-blue-600 transition">${escapeHtml(p.name)}</span>
+                            <i data-lucide="external-link" class="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition"></i>
+                        </div>
+                        <p class="text-xs text-slate-500 leading-relaxed">${escapeHtml(p.tagline)}</p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 flex items-center text-[11px] font-semibold text-blue-600">
+                        <span>Search 2541 &lt;=$550</span>
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
+                    </div>
+                </a>
+            `;
+
+            if (p.category === 'Major Portals' && majorContainer) majorContainer.innerHTML += card;
+            else if (p.category === 'Local Agencies' && agencyContainer) agencyContainer.innerHTML += card;
+            else if (privateContainer) privateContainer.innerHTML += card;
+        });
+
+        initIcons();
+    } catch (e) {
+        console.error("Error loading portals:", e);
+    }
+}
+
+// Calculator & Bond
+function initCalculator() {
+    const input = document.getElementById('calc-rent-input');
+    if (!input) return;
+
+    const update = () => {
+        const rent = parseFloat(input.value) || 0;
+        const bond = rent * 4;
+        const advance = rent * 2;
+        const upfront = bond + advance;
+        const monthly = (rent * 52) / 12;
+        const annual = rent * 52;
+        const grossWeekly = (rent / 0.3);
+        const grossAnnual = grossWeekly * 52;
+
+        document.getElementById('calc-bond').textContent = `$${bond.toLocaleString()}`;
+        document.getElementById('calc-advance').textContent = `$${advance.toLocaleString()}`;
+        document.getElementById('calc-upfront').textContent = `$${upfront.toLocaleString()}`;
+        document.getElementById('calc-monthly').textContent = `$${Math.round(monthly).toLocaleString()} / mo`;
+        document.getElementById('calc-annual').textContent = `$${Math.round(annual).toLocaleString()} / yr`;
+        document.getElementById('calc-income-weekly').textContent = `$${Math.round(grossWeekly).toLocaleString()}/wk`;
+        document.getElementById('calc-income-annual').textContent = `$${Math.round(grossAnnual).toLocaleString()}/yr`;
+    };
+
+    input.addEventListener('input', update);
+    update();
+}
+
+// Renter Bio Generator
+function initBioGenerator() {
+    const nameInput = document.getElementById('gen-name');
+    const jobInput = document.getElementById('gen-job');
+    const houseInput = document.getElementById('gen-household');
+    const petsInput = document.getElementById('gen-pets');
+    const output = document.getElementById('gen-output');
+    const copyBtn = document.getElementById('btn-copy-bio');
+
+    if (!nameInput || !output) return;
+
+    const generate = () => {
+        const text = `Dear Property Manager,\n\nI am writing to express my strong interest in leasing a rental property in the Nowra / Bomaderry (2541) area. My name is ${nameInput.value}, working as a ${jobInput.value} with secure and reliable income.\n\nHousehold Profile:\n- Occupants: ${houseInput.value}\n- Pets: ${petsInput.value}\n- Rental Track Record: Spotless rental payment ledger, non-smokers, exceptionally respectful of property upkeep.\n\nMy 100 points of ID, 3 recent payslips, bank statements, and rental references are attached and verified on 2Apply/Ignite. I am ready to pay the 4-week bond and 2 weeks advance rent immediately upon approval.\n\nThank you for your time and consideration,\n${nameInput.value}`;
+        output.value = text;
+    };
+
+    [nameInput, jobInput, houseInput, petsInput].forEach(inp => inp.addEventListener('input', generate));
+    generate();
+
+    copyBtn?.addEventListener('click', () => {
+        navigator.clipboard.writeText(output.value);
+        showToast("Cover letter copied to clipboard!");
+    });
+}
+
+// Print Run Sheet
+function printRunSheet() {
+    const list = document.getElementById('print-inspections-list');
+    document.getElementById('print-date').textContent = new Date().toLocaleDateString('en-AU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    const withInspections = allListings.filter(l => l.inspection_date);
+    if (withInspections.length === 0) {
+        list.innerHTML = `<p class="text-gray-500">No scheduled open home inspections found right now. Check individual listings on the portals.</p>`;
+    } else {
+        list.innerHTML = withInspections.map(item => `
+            <div class="card-print p-3 border border-gray-300 rounded mb-2">
+                <div class="flex justify-between font-bold text-sm">
+                    <span>${formatInspection(item.inspection_date)}</span>
+                    <span>$${item.price}/wk</span>
+                </div>
+                <div class="text-sm font-semibold">${escapeHtml(item.street)}, ${escapeHtml(item.suburb)} NSW 2541</div>
+                <div class="text-xs text-gray-600">${item.beds || 1} Bed, ${item.baths || 1} Bath, ${item.cars || 0} Car (${escapeHtml(item.prop_type || 'House')})</div>
+                ${item.notes ? `<div class="text-xs italic text-gray-700 mt-1">Notes: ${escapeHtml(item.notes)}</div>` : ''}
+            </div>
         `).join('');
     }
 
-    function initCalculator() {
-        const input = document.getElementById('calc-rent-input');
-        if (!input) return;
-        const update = () => {
-            const rent = parseFloat(input.value) || 0;
-            document.getElementById('calc-bond').textContent = `$${(rent * 4).toLocaleString()}`;
-            document.getElementById('calc-advance').textContent = `$${(rent * 2).toLocaleString()}`;
-            document.getElementById('calc-upfront').textContent = `$${(rent * 6).toLocaleString()}`;
-            document.getElementById('calc-monthly').textContent = `$${Math.round((rent * 52) / 12).toLocaleString()} / mo`;
-            document.getElementById('calc-annual').textContent = `$${(rent * 52).toLocaleString()} / yr`;
-            document.getElementById('calc-income-weekly').textContent = `$${Math.round(rent / 0.3).toLocaleString()}/wk`;
-            document.getElementById('calc-income-annual').textContent = `$${Math.round((rent / 0.3) * 52).toLocaleString()}/yr`;
-        };
-        input.addEventListener('input', update);
-        update();
-    }
+    window.print();
+}
 
-    function initBioGenerator() {
-        const nameInput = document.getElementById('gen-name');
-        const jobInput = document.getElementById('gen-job');
-        const houseInput = document.getElementById('gen-household');
-        const petsInput = document.getElementById('gen-pets');
-        const output = document.getElementById('gen-output');
-        const copyBtn = document.getElementById('btn-copy-bio');
-        if (!nameInput || !output) return;
+// Fetch Stats from API
+async function fetchStats() {
+    try {
+        const res = await fetch('/api/stats');
+        const s = await res.json();
+        document.getElementById('stat-count').textContent = s.total_under_550;
+        document.getElementById('stat-avg').textContent = `$${Math.round(s.avg_price)}`;
+        document.getElementById('stat-min').textContent = `$${s.min_price}`;
+        document.getElementById('stat-inspections').textContent = s.inspections_count;
+        document.getElementById('stat-saved').textContent = s.favorites_count;
 
-        const gen = () => {
-            output.value = `Dear Property Manager,\n\nI am applying for a rental property in the Nowra / Bomaderry area (2541). My name is ${nameInput.value}, working as a ${jobInput.value} with dependable income.\n\nProfile:\n- Occupants: ${houseInput.value}\n- Pets: ${petsInput.value}\n- Ledger: Excellent rental history, reliable, non-smoking.\n\n100 points of ID, payslips, and references ready. Ready to pay 4 weeks bond and 2 weeks advance immediately.\n\nThank you,\n${nameInput.value}`;
-        };
-        [nameInput, jobInput, houseInput, petsInput].forEach(i => i.addEventListener('input', gen));
-        gen();
-        copyBtn?.addEventListener('click', () => {
-            navigator.clipboard.writeText(output.value);
-            showToast("Copied cover letter to clipboard!");
+        // Suburb counts in pills
+        s.suburbs.forEach(sub => {
+            const el = document.getElementById(`sub-${sub.suburb.toLowerCase().replace(/\s+/g, '-')}-count`);
+            if (el) el.textContent = sub.count;
         });
+        const allEl = document.getElementById('sub-all-count');
+        if (allEl) allEl.textContent = s.total_under_550;
+    } catch (e) {
+        console.error("Error fetching stats:", e);
+    }
+}
+
+// Helpers
+function resetFilters() {
+    filters.max_price = 550;
+    filters.suburb = 'all';
+    filters.min_beds = 0;
+    filters.prop_type = 'all';
+    filters.query = '';
+    filters.sort_by = 'price_asc';
+    filters.only_inspections = false;
+    filters.only_favorites = false;
+
+    document.getElementById('filter-max-price').value = 550;
+    document.getElementById('price-slider-val').textContent = '$550';
+    document.getElementById('filter-beds').value = 0;
+    document.getElementById('filter-prop-type').value = 'all';
+    document.getElementById('filter-query').value = '';
+    document.getElementById('filter-sort').value = 'price_asc';
+    document.getElementById('filter-only-inspections').checked = false;
+    document.getElementById('filter-only-favorites').checked = false;
+
+    document.querySelectorAll('.suburb-btn').forEach(b => {
+        b.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+        b.classList.add('bg-slate-100', 'text-slate-700');
+    });
+    const allBtn = document.querySelector('.suburb-btn[data-suburb="all"]');
+    if (allBtn) {
+        allBtn.classList.remove('bg-slate-100', 'text-slate-700');
+        allBtn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
     }
 
-    function exportCsv() {
-        let csv = "Price,Street,Suburb,Beds,Baths,Type,Status,URL\n";
-        allListings.forEach(l => {
-            csv += `"${l.price}","${l.street}","${l.suburb}","${l.beds || 1}","${l.baths || 1}","${l.prop_type || 'House'}","${l.status || 'discovered'}","${l.url}"\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = '2541-rentals.csv';
-        a.click();
+    fetchListings();
+}
+
+function formatInspection(isoStr) {
+    if (!isoStr) return '';
+    try {
+        const d = new Date(isoStr);
+        return d.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    } catch (e) {
+        return isoStr;
+    }
+}
+
+function showModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('hidden');
+}
+
+function hideModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    const msgEl = document.getElementById('toast-msg');
+    if (!toast || !msgEl) return;
+
+    msgEl.textContent = msg;
+    toast.classList.remove('hidden');
+    setTimeout(() => {
+        toast.classList.add('hidden');
+    }, 4000);
+}
+
+function playChime() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+        osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15); // A5
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.5);
+    } catch (e) {}
+}
+
+function requestBrowserNotification() {
+    if (!("Notification" in window)) {
+        showToast("Desktop notifications not supported in this browser.");
+        return;
+    }
+    Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+            showToast("Notifications enabled!");
+            new Notification("2541 Rental Radar", { body: "You will be alerted when new rentals under $550 are found!" });
+        } else {
+            showToast("Notification permission denied.");
+        }
+    });
+}
+
+function sendDesktopNotification(title, body) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(title, { body: body, icon: "/favicon.ico" });
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+// First-Time Tips & Walkthrough Tour
+let currentTipStep = 1;
+const totalTipSteps = 6;
+
+function initTipsModal() {
+    const btnTips = document.getElementById('btn-tips');
+    const modalTips = document.getElementById('modal-tips');
+    const closeBtn = document.getElementById('modal-tips-close');
+    const prevBtn = document.getElementById('btn-tip-prev');
+    const nextBtn = document.getElementById('btn-tip-next');
+    const dontShowCheck = document.getElementById('tips-dont-show');
+
+    if (!modalTips) return;
+
+    btnTips?.addEventListener('click', () => {
+        currentTipStep = 1;
+        updateTipStep();
+        showModal('modal-tips');
+    });
+
+    closeBtn?.addEventListener('click', () => {
+        hideModal('modal-tips');
+    });
+
+    prevBtn?.addEventListener('click', () => {
+        if (currentTipStep > 1) {
+            currentTipStep--;
+            updateTipStep();
+        }
+    });
+
+    nextBtn?.addEventListener('click', () => {
+        if (currentTipStep < totalTipSteps) {
+            currentTipStep++;
+            updateTipStep();
+        } else {
+            hideModal('modal-tips');
+            showToast("You're all set! Start exploring 2541 rentals.");
+        }
+    });
+
+    dontShowCheck?.addEventListener('change', (e) => {
+        localStorage.setItem('2541_tips_dont_show', e.target.checked ? 'true' : 'false');
+    });
+
+    // Auto-open on first visit if not disabled
+    const dontShow = localStorage.getItem('2541_tips_dont_show');
+    if (dontShow !== 'true') {
+        setTimeout(() => {
+            currentTipStep = 1;
+            updateTipStep();
+            showModal('modal-tips');
+        }, 600);
+    }
+}
+
+function updateTipStep() {
+    const slides = document.querySelectorAll('.tip-slide');
+    const dotsContainer = document.getElementById('tips-dots');
+    const prevBtn = document.getElementById('btn-tip-prev');
+    const nextBtn = document.getElementById('btn-tip-next');
+
+    slides.forEach(s => {
+        const step = parseInt(s.getAttribute('data-step'));
+        if (step === currentTipStep) {
+            s.classList.remove('hidden');
+        } else {
+            s.classList.add('hidden');
+        }
+    });
+
+    // Update Dots
+    if (dotsContainer) {
+        dotsContainer.innerHTML = Array.from({ length: totalTipSteps }).map((_, i) => {
+            const active = (i + 1) === currentTipStep;
+            return `<span class="w-2.5 h-2.5 rounded-full ${active ? 'bg-blue-600' : 'bg-slate-300'} transition-colors"></span>`;
+        }).join('');
     }
 
-    function resetFilters() {
-        filters.max_price = 550;
-        filters.suburb = 'all';
-        filters.min_beds = 0;
-        filters.prop_type = 'all';
-        filters.query = '';
-        filters.sort_by = 'price_asc';
-        filters.only_inspections = false;
-        filters.only_favorites = false;
-        document.getElementById('filter-max-price').value = 550;
-        document.getElementById('price-slider-val').textContent = '$550';
-        document.getElementById('filter-beds').value = 0;
-        document.getElementById('filter-prop-type').value = 'all';
-        document.getElementById('filter-query').value = '';
-        document.getElementById('filter-sort').value = 'price_asc';
-        document.getElementById('filter-only-inspections').checked = false;
-        document.getElementById('filter-only-favorites').checked = false;
-        document.querySelectorAll('.suburb-btn').forEach(b => {
-            b.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
-            b.classList.add('bg-slate-100', 'text-slate-700');
-        });
-        document.querySelector('.suburb-btn[data-suburb="all"]')?.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
-        applyFilters();
+    if (prevBtn) prevBtn.disabled = (currentTipStep === 1);
+    if (nextBtn) {
+        nextBtn.textContent = (currentTipStep === totalTipSteps) ? 'Got it, let\'s explore!' : 'Next';
     }
+    initIcons();
+}
 
-    function formatInspection(isoStr) {
-        try {
-            const d = new Date(isoStr);
-            return d.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-        } catch (e) { return isoStr; }
-    }
-
-    function showModal(id) {
-        document.getElementById(id)?.classList.remove('hidden');
-    }
-    function hideModal(id) {
-        document.getElementById(id)?.classList.add('hidden');
-    }
-    function showToast(msg) {
-        const toast = document.getElementById('toast');
-        const msgEl = document.getElementById('toast-msg');
-        if (!toast || !msgEl) return;
-        msgEl.textContent = msg;
-        toast.classList.remove('hidden');
-        setTimeout(() => toast.classList.add('hidden'), 3500);
-    }
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
 </script>
 </body>
 </html>

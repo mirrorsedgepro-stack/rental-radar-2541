@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initEventListeners();
     initCalculator();
     initBioGenerator();
+    initTipsModal();
     loadSettings();
     loadPortals();
     fetchStats();
@@ -245,9 +246,12 @@ function createListingCardHtml(item) {
                 <button onclick="event.stopPropagation(); quickToggleFav('${item.id}')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-md transition">
                     <i data-lucide="heart" class="w-4 h-4 ${favColor}"></i>
                 </button>
-                <div class="absolute bottom-3 left-3">
+                <div class="absolute bottom-3 left-3 flex items-center space-x-1.5">
                     <span class="px-2 py-1 rounded-md text-[11px] font-bold uppercase bg-slate-900/80 text-white backdrop-blur-sm">
                         ${escapeHtml(item.prop_type || 'Rental')}
+                    </span>
+                    <span class="px-2 py-1 rounded-md text-[10px] font-semibold bg-blue-600/90 text-white backdrop-blur-sm">
+                        ${escapeHtml(item.source || 'Portal')}
                     </span>
                 </div>
             </div>
@@ -916,4 +920,90 @@ function sendDesktopNotification(title, body) {
 function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+// First-Time Tips & Walkthrough Tour
+let currentTipStep = 1;
+const totalTipSteps = 6;
+
+function initTipsModal() {
+    const btnTips = document.getElementById('btn-tips');
+    const modalTips = document.getElementById('modal-tips');
+    const closeBtn = document.getElementById('modal-tips-close');
+    const prevBtn = document.getElementById('btn-tip-prev');
+    const nextBtn = document.getElementById('btn-tip-next');
+    const dontShowCheck = document.getElementById('tips-dont-show');
+
+    if (!modalTips) return;
+
+    btnTips?.addEventListener('click', () => {
+        currentTipStep = 1;
+        updateTipStep();
+        showModal('modal-tips');
+    });
+
+    closeBtn?.addEventListener('click', () => {
+        hideModal('modal-tips');
+    });
+
+    prevBtn?.addEventListener('click', () => {
+        if (currentTipStep > 1) {
+            currentTipStep--;
+            updateTipStep();
+        }
+    });
+
+    nextBtn?.addEventListener('click', () => {
+        if (currentTipStep < totalTipSteps) {
+            currentTipStep++;
+            updateTipStep();
+        } else {
+            hideModal('modal-tips');
+            showToast("You're all set! Start exploring 2541 rentals.");
+        }
+    });
+
+    dontShowCheck?.addEventListener('change', (e) => {
+        localStorage.setItem('2541_tips_dont_show', e.target.checked ? 'true' : 'false');
+    });
+
+    // Auto-open on first visit if not disabled
+    const dontShow = localStorage.getItem('2541_tips_dont_show');
+    if (dontShow !== 'true') {
+        setTimeout(() => {
+            currentTipStep = 1;
+            updateTipStep();
+            showModal('modal-tips');
+        }, 600);
+    }
+}
+
+function updateTipStep() {
+    const slides = document.querySelectorAll('.tip-slide');
+    const dotsContainer = document.getElementById('tips-dots');
+    const prevBtn = document.getElementById('btn-tip-prev');
+    const nextBtn = document.getElementById('btn-tip-next');
+
+    slides.forEach(s => {
+        const step = parseInt(s.getAttribute('data-step'));
+        if (step === currentTipStep) {
+            s.classList.remove('hidden');
+        } else {
+            s.classList.add('hidden');
+        }
+    });
+
+    // Update Dots
+    if (dotsContainer) {
+        dotsContainer.innerHTML = Array.from({ length: totalTipSteps }).map((_, i) => {
+            const active = (i + 1) === currentTipStep;
+            return `<span class="w-2.5 h-2.5 rounded-full ${active ? 'bg-blue-600' : 'bg-slate-300'} transition-colors"></span>`;
+        }).join('');
+    }
+
+    if (prevBtn) prevBtn.disabled = (currentTipStep === 1);
+    if (nextBtn) {
+        nextBtn.textContent = (currentTipStep === totalTipSteps) ? 'Got it, let\'s explore!' : 'Next';
+    }
+    initIcons();
 }

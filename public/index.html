@@ -53,6 +53,10 @@
 
                 <!-- Action Buttons -->
                 <div class="flex items-center space-x-2 sm:space-x-3">
+                    <button id="btn-tips" class="inline-flex items-center px-3 py-1.5 border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg text-xs font-semibold shadow-sm transition active:scale-95" title="First-time user guide & search tips">
+                        <i data-lucide="lightbulb" class="w-4 h-4 mr-1.5 text-amber-600"></i>
+                        <span>Tips & Tour</span>
+                    </button>
                     <button id="btn-refresh" class="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm active:scale-95">
                         <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4 mr-1.5 text-blue-600"></i>
                         <span>Sync Live</span>
@@ -813,6 +817,133 @@
             <p class="text-xs text-gray-600">Upcoming Rental Inspections under $550/wk | Generated on <span id="print-date"></span></p>
         </div>
         <div id="print-inspections-list" class="space-y-3"></div>
+    </div>
+
+    <!-- First-Time Tips & Walkthrough Modal -->
+    <div id="modal-tips" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-2xl w-full flex flex-col shadow-2xl overflow-hidden my-auto border border-slate-200">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-amber-300">
+                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-white">How to Use 2541 Rental Radar</h3>
+                        <p class="text-xs text-blue-100">6 essential tips for securing a rental under $550/wk in Nowra & Bomaderry</p>
+                    </div>
+                </div>
+                <button id="modal-tips-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content Slides (Interactive) -->
+            <div class="p-6 text-slate-800 space-y-4">
+                <!-- Slide 1 -->
+                <div class="tip-slide space-y-3" data-step="1">
+                    <div class="flex items-center space-x-2 text-blue-600 font-bold text-sm">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">1</span>
+                        <span>Setting Your Budget & Suburb Filters</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                        <p><strong>• Max Rent Slider:</strong> Pre-set to <strong>$550/week</strong>. You can slide down to $400 or up to $650. Every listing above your chosen limit is filtered out immediately.</p>
+                        <p><strong>• Suburb Quick Pills:</strong> Click any suburb button (<em>Nowra, Bomaderry, North Nowra, South Nowra, West Nowra</em>) to view rentals in that specific neighborhood.</p>
+                        <p><strong>• Inspection Toggle:</strong> Check <em>"Has Upcoming Inspection"</em> to exclusively see properties with scheduled open homes.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="tip-slide hidden space-y-3" data-step="2">
+                    <div class="flex items-center space-x-2 text-blue-600 font-bold text-sm">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">2</span>
+                        <span>Interactive 2541 Map & Local Landmarks</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                        <p><strong>• Color-Coded Price Pins:</strong></p>
+                        <div class="flex items-center space-x-3 text-[11px] my-1 font-semibold">
+                            <span class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">🟢 Under $450 (Bargain)</span>
+                            <span class="text-blue-700 bg-blue-100 px-2 py-0.5 rounded">🔵 $450 - $500 (Great Value)</span>
+                            <span class="text-amber-800 bg-amber-100 px-2 py-0.5 rounded">🟠 $501 - $550 (Upper Cap)</span>
+                        </div>
+                        <p><strong>• Landmark Shortcuts:</strong> Toggle <em>🚆 Bomaderry Railway Station</em> (for commuters travelling to Sydney/Wollongong), <em>🏥 Shoalhaven Hospital</em>, and <em>🛍️ Stockland Nowra</em> to check travel proximity.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="tip-slide hidden space-y-3" data-step="3">
+                    <div class="flex items-center space-x-2 text-blue-600 font-bold text-sm">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">3</span>
+                        <span>Inspections, 1-Click Calendar & Open House Run Sheet</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                        <p><strong>• 1-Click Calendar (.ics):</strong> Click into any property with an inspection and hit <em>"Add to Calendar"</em> to automatically save it to your phone's Google Calendar, Apple Calendar, or Outlook.</p>
+                        <p><strong>• Saturday Run Sheet:</strong> Click <em>"Run Sheet"</em> in the header before Saturday morning viewings to generate a clean, print-friendly schedule of open homes so you don't miss inspection windows.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 4 -->
+                <div class="tip-slide hidden space-y-3" data-step="4">
+                    <div class="flex items-center space-x-2 text-blue-600 font-bold text-sm">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">4</span>
+                        <span>Application Pipeline Tracker (Kanban)</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                        <p><strong>• Manage Your Rental Pipeline:</strong> Move properties between <em>Discovered</em>, <em>Shortlisted</em>, <em>Inspecting</em>, <em>Applied</em>, and <em>Offered</em> using the card dropdown.</p>
+                        <p><strong>• Private Notes & Star Ratings:</strong> Click into any property card to rate it (1-5 stars) and record personal inspection notes (e.g., "Agent said NBN is connected, big backyard, application submitted via 2Apply").</p>
+                    </div>
+                </div>
+
+                <!-- Slide 5 -->
+                <div class="tip-slide hidden space-y-3" data-step="5">
+                    <div class="flex items-center space-x-2 text-blue-600 font-bold text-sm">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">5</span>
+                        <span>Super Search Portals & Adding Custom Rentals</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                        <p><strong>• 1-Click Multi-App Portals:</strong> Check the <em>"Super Search Portals"</em> tab for direct pre-filtered searches on Realestate.com.au, Domain, Allhomes, Gumtree (for private rentals), and Flatmates.</p>
+                        <p><strong>• + Add Rental:</strong> Found a private rental on Facebook Marketplace or saw a "For Lease" board on Kinghorne Street? Click <em>"+ Add Rental"</em> to track it alongside all other listings on your map and pipeline.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 6 -->
+                <div class="tip-slide hidden space-y-3" data-step="6">
+                    <div class="flex items-center space-x-2 text-blue-600 font-bold text-sm">
+                        <span class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs">6</span>
+                        <span>NSW Bond Calculator & Auto Renter Bio Generator</span>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2 leading-relaxed">
+                        <p><strong>• Bond & Cost Calculator:</strong> Computes the exact 4-week NSW rental bond ($2,200 for $550/wk), 2 weeks advance rent ($1,100), and total move-in capital ($3,300), plus the 30% affordability income guideline.</p>
+                        <p><strong>• Renter Bio Generator:</strong> Generate a customized, professional tenant cover letter tailored for Shoalhaven agents, ready to copy and paste directly into 2Apply or Ignite.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer with Step Dots and Navigation -->
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+                <label class="flex items-center space-x-2 cursor-pointer text-xs text-slate-500">
+                    <input type="checkbox" id="tips-dont-show" class="rounded text-blue-600 focus:ring-blue-500">
+                    <span>Don't show automatically on start</span>
+                </label>
+                <div class="flex items-center space-x-2">
+                    <!-- Dots -->
+                    <div class="flex space-x-1 mr-3" id="tips-dots">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                    </div>
+                    <button id="btn-tip-prev" class="px-3 py-1.5 border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold disabled:opacity-40" disabled>
+                        Previous
+                    </button>
+                    <button id="btn-tip-next" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Toast Notification Banner -->

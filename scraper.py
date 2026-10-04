@@ -207,6 +207,93 @@ def scrape_2541_rentals(max_price: int = 550) -> List[Dict[str, Any]]:
             
     return listings
 
+def scrape_raywhite_shoalhaven(max_price: int = 550) -> List[Dict[str, Any]]:
+    """Scrapes local listings from Ray White Shoalhaven Central Group."""
+    url = "https://raywhiteshoalhavencentralgroup.com.au/properties/residential-for-rent"
+    results = []
+    try:
+        logger.info(f"Fetching Ray White Shoalhaven: {url}")
+        resp = requests.get(url, headers=HEADERS, timeout=12)
+        if resp.status_code != 200:
+            return []
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        for it in soup.find_all('div', class_='proplist_item'):
+            text = it.get_text(' | ', strip=True)
+            link_el = it.find('a', href=re.compile(r'/properties/residential-for-rent/'))
+            if not link_el:
+                continue
+            href = link_el['href']
+            full_url = href if href.startswith('http') else 'https://raywhiteshoalhavencentralgroup.com.au' + href
+            
+            # Check if 2541 suburb
+            suburb = None
+            for s in ["North Nowra", "South Nowra", "West Nowra", "Bomaderry", "Bangalee", "Worrigee", "Nowra"]:
+                if s.lower() in text.lower() or s.lower().replace(' ', '-') in full_url.lower():
+                    suburb = s
+                    break
+            if not suburb:
+                continue
+                
+            price = extract_price(text)
+            
+            # beds, baths, cars
+            beds = 1
+            baths = 1
+            cars = 1
+            bm = re.search(r'(\d+)\s*\|\s*Beds', text, re.I)
+            if bm: beds = int(bm.group(1))
+            bam = re.search(r'(\d+)\s*\|\s*Baths', text, re.I)
+            if bam: baths = int(bam.group(1))
+            cm = re.search(r'(\d+)\s*\|\s*Car', text, re.I)
+            if cm: cars = int(cm.group(1))
+            
+            # Address
+            addr_m = re.search(r'(?:Weekly|Now|Friday|Thursday|Monday|Tuesday|Wednesday|Saturday|Sunday)\s*\|\s*([0-9A-Za-z\s\/]+,\s*[A-Za-z\s]+)', text)
+            street = addr_m.group(1).split(',')[0].strip() if addr_m else f"Property in {suburb}"
+            
+            # Image
+            img = it.find('img')
+            img_url = img.get('src') if img else None
+            
+            # Fallback coords
+            fallback = SUBURB_FALLBACK_COORDS.get(suburb.lower(), (-34.8727, 150.6019))
+            import random
+            lat = fallback[0] + random.uniform(-0.005, 0.005)
+            lng = fallback[1] + random.uniform(-0.005, 0.005)
+            
+            # Prop type
+            prop_type = 'House'
+            for pt in ['Duplex', 'Townhouse', 'Villa', 'Unit', 'Apartment', 'House']:
+                if pt.lower() in text.lower():
+                    prop_type = pt
+                    break
+                    
+            lid_m = re.search(r'/(\d+)$', full_url)
+            lid = "rw_" + (lid_m.group(1) if lid_m else str(abs(hash(full_url))))
+            
+            results.append({
+                'id': lid,
+                'url': full_url,
+                'title': f"{street}, {suburb}",
+                'street': street,
+                'suburb': suburb,
+                'postcode': '2541',
+                'price': price,
+                'beds': beds,
+                'baths': baths,
+                'cars': cars,
+                'prop_type': prop_type,
+                'image': img_url,
+                'lat': lat,
+                'lng': lng,
+                'inspection': None,
+                'desc': text[:250],
+                'source': 'Ray White Nowra'
+            })
+    except Exception as e:
+        logger.error(f"Error scraping Ray White: {e}")
+    return results
+
 def send_webhook_alert(webhook_url: str, new_listings: List[Dict[str, Any]]):
     """Sends notification to Discord or custom webhook if new listings are found."""
     if not webhook_url or not new_listings:
@@ -226,13 +313,19 @@ def send_webhook_alert(webhook_url: str, new_listings: List[Dict[str, Any]]):
         logger.warning(f"Failed to send webhook notification: {e}")
 
 def run_scraper_and_sync() -> Dict[str, Any]:
-    """Runs the scraper, updates the database, and returns sync summary."""
+    """Runs the multi-portal scraper, updates the database, and returns sync summary."""
     database.init_db()
     settings = database.get_settings()
     max_price = int(settings.get("max_price", 550))
     webhook_url = settings.get("webhook_url", "")
     
-    items = scrape_2541_rentals(max_price=max_price)
+    # 1. Scrape Rent.com.au (Aggregator of all agency CRM feeds)
+    items_rent = scrape_2541_rentals(max_price=max_price)
+    
+    # 2. Scrape Ray White Shoalhaven Central Group (Direct local agency)
+    items_rw = scrape_raywhite_shoalhaven(max_price=max_price)
+    
+    items = items_rent + items_rw
     new_items = []
     
     for it in items:

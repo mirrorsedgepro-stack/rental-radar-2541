@@ -6,18 +6,18 @@ The **2541 Rental Radar** app is now deployed and running live on **Vercel** wit
 
 ## 🌐 Live Deployment URL
 
-* **Live Web App**: [**https://temporary-swift-oxygen-q52zibr.vercel.app**](https://temporary-swift-oxygen-q52zibr.vercel.app)
+* **Live Web App**: [**https://temporary-rapid-harp-fphga0n.vercel.app**](https://temporary-rapid-harp-fphga0n.vercel.app)
 * **API Endpoints**:
-  * [Listings API](https://temporary-swift-oxygen-q52zibr.vercel.app/api/listings?max_price=550) (`GET /api/listings?max_price=550`)
-  * [Stats API](https://temporary-swift-oxygen-q52zibr.vercel.app/api/stats) (`GET /api/stats`)
-  * [Portal Links API](https://temporary-swift-oxygen-q52zibr.vercel.app/api/portal-links) (`GET /api/portal-links`)
+  * [Listings API](https://temporary-rapid-harp-fphga0n.vercel.app/api/listings?listing_type=rent) (`GET /api/listings?listing_type=rent`)
+  * [Stats API](https://temporary-rapid-harp-fphga0n.vercel.app/api/stats) (`GET /api/stats`)
+  * [Portal Links API](https://temporary-rapid-harp-fphga0n.vercel.app/api/portal-links) (`GET /api/portal-links`)
 
 ---
 
 ## 🔑 How to Claim & Keep this Deployment Forever
 
 1. Open this link in your browser to permanently attach it to your Vercel account:
-   👉 **[https://vercel.com/claim-deployment?code=9611992a-0e59-4fb6-8b14-9badaa4bc24d](https://vercel.com/claim-deployment?code=9611992a-0e59-4fb6-8b14-9badaa4bc24d)**
+   👉 **[https://vercel.com/claim-deployment?code=c7951a4f-c69c-4805-9692-f2ab2e2e1637](https://vercel.com/claim-deployment?code=c7951a4f-c69c-4805-9692-f2ab2e2e1637)**
 2. Sign in or create a free Vercel account (with GitHub, Google, or Email).
 3. The deployment will be permanently attached to your Vercel account with a custom `*.vercel.app` domain and free automatic SSL!
 

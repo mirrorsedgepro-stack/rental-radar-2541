@@ -37,8 +37,10 @@ def init_db():
         title TEXT,
         street TEXT,
         suburb TEXT,
+        state TEXT DEFAULT 'NSW',
         postcode TEXT DEFAULT '2541',
         price INTEGER,
+        listing_type TEXT DEFAULT 'rent',
         beds INTEGER,
         baths INTEGER,
         cars INTEGER,
@@ -55,18 +57,34 @@ def init_db():
         is_favorite INTEGER DEFAULT 0,
         is_new INTEGER DEFAULT 1,
         pets_allowed INTEGER DEFAULT 0,
+        features TEXT DEFAULT '[]',
+        user_id TEXT DEFAULT 'public',
         first_seen TEXT,
         last_seen TEXT,
         price_history TEXT DEFAULT '[]'
     )
     """)
     
-    # Run migration to add pets_allowed if existing db lacks it
-    try:
-        cursor.execute("ALTER TABLE listings ADD COLUMN pets_allowed INTEGER DEFAULT 0")
-    except sqlite3.OperationalError:
-        pass
-        
+    # Schema migrations for Australia-wide support and user isolation
+    migrations = [
+        ("pets_allowed", "INTEGER DEFAULT 0"),
+        ("listing_type", "TEXT DEFAULT 'rent'"),
+        ("state", "TEXT DEFAULT 'NSW'"),
+        ("features", "TEXT DEFAULT '[]'"),
+        ("user_id", "TEXT DEFAULT 'public'")
+    ]
+    for col, col_def in migrations:
+        try:
+            cursor.execute(f"ALTER TABLE listings ADD COLUMN {col} {col_def}")
+        except sqlite3.OperationalError:
+            pass
+
+    # Ensure existing records have default values
+    cursor.execute("UPDATE listings SET listing_type = 'rent' WHERE listing_type IS NULL OR listing_type = ''")
+    cursor.execute("UPDATE listings SET state = 'NSW' WHERE state IS NULL OR state = ''")
+    cursor.execute("UPDATE listings SET user_id = 'public' WHERE user_id IS NULL OR user_id = ''")
+    cursor.execute("UPDATE listings SET features = '[]' WHERE features IS NULL OR features = ''")
+
     # Mark verified pet friendly listings
     pet_addresses = [
         '%St Anns%',
@@ -84,6 +102,20 @@ def init_db():
     ]
     for addr in pet_addresses:
         cursor.execute("UPDATE listings SET pets_allowed = 1 WHERE street LIKE ?", (addr,))
+
+    # User interactions table for cookie-isolated personal workspaces
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS user_interactions (
+        user_id TEXT,
+        listing_id TEXT,
+        is_favorite INTEGER DEFAULT 0,
+        status TEXT DEFAULT 'discovered',
+        notes TEXT DEFAULT '',
+        rating INTEGER DEFAULT 0,
+        updated_at TEXT,
+        PRIMARY KEY (user_id, listing_id)
+    )
+    """)
 
     # Settings table
     cursor.execute("""
@@ -106,6 +138,49 @@ def init_db():
     for k, v in default_settings.items():
         cursor.execute("INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)", (k, v))
         
+    # Seed Australia-wide properties (Houses for Sale & Metro Rentals)
+    try:
+        from seed_data import AUSTRALIA_LISTINGS
+        now_str = datetime.now().isoformat()
+        for item in AUSTRALIA_LISTINGS:
+            cursor.execute("SELECT id FROM listings WHERE id = ?", (item["id"],))
+            if not cursor.fetchone():
+                cursor.execute("""
+                INSERT INTO listings (
+                    id, url, title, street, suburb, state, postcode, price,
+                    listing_type, beds, baths, cars, prop_type, image_url,
+                    lat, lng, inspection_date, description, source, status,
+                    notes, rating, is_favorite, is_new, pets_allowed,
+                    features, user_id, first_seen, last_seen, price_history
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'discovered', '', 0, 0, 1, ?, ?, 'public', ?, ?, '[]')
+                """, (
+                    item["id"],
+                    item["url"],
+                    item["title"],
+                    item["street"],
+                    item["suburb"],
+                    item.get("state", "NSW"),
+                    item.get("postcode", "2000"),
+                    item.get("price", 0),
+                    item.get("listing_type", "sale"),
+                    item.get("beds", 1),
+                    item.get("baths", 1),
+                    item.get("cars", 1),
+                    item.get("prop_type", "House"),
+                    item.get("image_url", ""),
+                    item.get("lat", -33.8688),
+                    item.get("lng", 151.2093),
+                    item.get("inspection_date"),
+                    item.get("description", ""),
+                    item.get("source", "domain.com.au"),
+                    item.get("pets_allowed", 0),
+                    json.dumps(item.get("features", [])),
+                    now_str,
+                    now_str
+                ))
+    except Exception as e:
+        print(f"Australia seed notice: {e}")
+
     conn.commit()
     conn.close()
 
@@ -144,7 +219,9 @@ def upsert_listing(item: Dict[str, Any]) -> bool:
             title = COALESCE(?, title),
             street = COALESCE(?, street),
             suburb = COALESCE(?, suburb),
+            state = COALESCE(?, state),
             price = COALESCE(?, price),
+            listing_type = COALESCE(?, listing_type),
             beds = COALESCE(?, beds),
             baths = COALESCE(?, baths),
             cars = COALESCE(?, cars),
@@ -155,6 +232,7 @@ def upsert_listing(item: Dict[str, Any]) -> bool:
             inspection_date = COALESCE(?, inspection_date),
             description = COALESCE(?, description),
             pets_allowed = COALESCE(?, pets_allowed),
+            features = COALESCE(?, features),
             last_seen = ?,
             price_history = ?
         WHERE id = ?
@@ -162,49 +240,56 @@ def upsert_listing(item: Dict[str, Any]) -> bool:
             item.get("title"),
             item.get("street"),
             item.get("suburb"),
+            item.get("state", "NSW"),
             item.get("price"),
+            item.get("listing_type", "rent"),
             item.get("beds"),
             item.get("baths"),
             item.get("cars"),
             item.get("prop_type"),
-            item.get("image"),
+            item.get("image_url"),
             item.get("lat"),
             item.get("lng"),
-            item.get("inspection"),
-            item.get("desc"),
-            item.get("pets_allowed"),
+            item.get("inspection_date"),
+            item.get("description"),
+            item.get("pets_allowed", 0),
+            json.dumps(item.get("features", [])) if "features" in item else None,
             now_str,
             json.dumps(history),
             current_id
         ))
     else:
         is_brand_new = True
-        price = item.get("price")
         cursor.execute("""
         INSERT INTO listings (
-            id, url, title, street, suburb, postcode, price, beds, baths, cars,
-            prop_type, image_url, lat, lng, inspection_date, description,
-            source, status, notes, rating, is_favorite, is_new, pets_allowed, first_seen, last_seen, price_history
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'discovered', '', 0, 0, 1, ?, ?, ?, '[]')
+            id, url, title, street, suburb, state, postcode, price,
+            listing_type, beds, baths, cars, prop_type, image_url,
+            lat, lng, inspection_date, description, source, status,
+            notes, rating, is_favorite, is_new, pets_allowed,
+            features, user_id, first_seen, last_seen, price_history
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'discovered', '', 0, 0, 1, ?, ?, 'public', ?, ?, '[]')
         """, (
             lid,
             url,
-            item.get("title"),
-            item.get("street"),
-            item.get("suburb", "Nowra"),
+            item.get("title") or f"{item.get('street', '')}, {item.get('suburb', '')}",
+            item.get("street", ""),
+            item.get("suburb", ""),
+            item.get("state", "NSW"),
             item.get("postcode", "2541"),
-            price,
-            item.get("beds"),
-            item.get("baths"),
-            item.get("cars"),
-            item.get("prop_type", "Unit"),
-            item.get("image"),
+            item.get("price"),
+            item.get("listing_type", "rent"),
+            item.get("beds", 1),
+            item.get("baths", 1),
+            item.get("cars", 1),
+            item.get("prop_type", "House"),
+            item.get("image_url", ""),
             item.get("lat"),
             item.get("lng"),
-            item.get("inspection"),
-            item.get("desc"),
+            item.get("inspection_date"),
+            item.get("description", ""),
             item.get("source", "rent.com.au"),
             item.get("pets_allowed", 0),
+            json.dumps(item.get("features", [])),
             now_str,
             now_str
         ))
@@ -214,6 +299,9 @@ def upsert_listing(item: Dict[str, Any]) -> bool:
     return is_brand_new
 
 def get_listings(
+    listing_type: Optional[str] = "all",
+    state: Optional[str] = "all",
+    min_price: Optional[int] = None,
     max_price: Optional[int] = None,
     suburb: Optional[str] = None,
     min_beds: Optional[int] = None,
@@ -224,70 +312,114 @@ def get_listings(
     only_inspections: bool = False,
     only_favorites: bool = False,
     only_pets: bool = False,
+    only_pool: bool = False,
+    only_aircon: bool = False,
     query: Optional[str] = None,
-    sort_by: str = "price_asc"
+    sort_by: str = "price_asc",
+    user_id: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     conn = get_connection()
     cursor = conn.cursor()
     
-    sql = "SELECT * FROM listings WHERE 1=1"
-    params = []
+    current_uid = user_id or "guest"
     
-    if max_price is not None:
-        sql += " AND (price IS NULL OR price <= ?)"
+    # Left join user_interactions to isolate each user's favorites, notes, pipeline stage
+    sql = """
+    SELECT 
+        l.id, l.url, l.title, l.street, l.suburb, l.state, l.postcode, l.price,
+        l.listing_type, l.beds, l.baths, l.cars, l.prop_type, l.image_url,
+        l.lat, l.lng, l.inspection_date, l.description, l.source,
+        COALESCE(ui.status, l.status) AS status,
+        COALESCE(ui.notes, '') AS notes,
+        COALESCE(ui.rating, 0) AS rating,
+        COALESCE(ui.is_favorite, 0) AS is_favorite,
+        l.is_new, l.pets_allowed, l.features, l.user_id, l.first_seen, l.last_seen, l.price_history
+    FROM listings l
+    LEFT JOIN user_interactions ui 
+        ON ui.listing_id = l.id AND ui.user_id = ?
+    WHERE (l.user_id = 'public' OR l.user_id = ?)
+    """
+    params = [current_uid, current_uid]
+    
+    # Listing type: rent vs sale
+    if listing_type and listing_type.lower() != "all":
+        sql += " AND LOWER(l.listing_type) = LOWER(?)"
+        params.append(listing_type)
+        
+    # State filter
+    if state and state.lower() != "all":
+        sql += " AND LOWER(l.state) = LOWER(?)"
+        params.append(state)
+        
+    # Min & Max Price
+    if min_price is not None and min_price > 0:
+        sql += " AND (l.price IS NOT NULL AND l.price >= ?)"
+        params.append(min_price)
+        
+    if max_price is not None and max_price > 0:
+        sql += " AND (l.price IS NULL OR l.price <= ?)"
         params.append(max_price)
         
+    # Suburb / Location
     if suburb and suburb.lower() != "all":
-        sql += " AND LOWER(suburb) = LOWER(?)"
-        params.append(suburb)
+        sql += " AND (LOWER(l.suburb) = LOWER(?) OR LOWER(l.postcode) = LOWER(?))"
+        params.extend([suburb, suburb])
         
+    # Bedrooms, Baths, Cars
     if min_beds is not None and min_beds > 0:
-        sql += " AND beds >= ?"
+        sql += " AND l.beds >= ?"
         params.append(min_beds)
         
     if min_baths is not None and min_baths > 0:
-        sql += " AND baths >= ?"
+        sql += " AND l.baths >= ?"
         params.append(min_baths)
         
     if min_cars is not None and min_cars > 0:
-        sql += " AND cars >= ?"
+        sql += " AND l.cars >= ?"
         params.append(min_cars)
         
     if prop_type and prop_type.lower() != "all":
-        sql += " AND LOWER(prop_type) = LOWER(?)"
+        sql += " AND LOWER(l.prop_type) = LOWER(?)"
         params.append(prop_type)
         
+    # Status / Pipeline (User isolated)
     if status and status.lower() != "all":
-        sql += " AND status = ?"
+        sql += " AND COALESCE(ui.status, l.status) = ?"
         params.append(status)
         
     if only_inspections:
-        sql += " AND inspection_date IS NOT NULL AND inspection_date != ''"
+        sql += " AND l.inspection_date IS NOT NULL AND l.inspection_date != ''"
         
     if only_favorites:
-        sql += " AND is_favorite = 1"
+        sql += " AND COALESCE(ui.is_favorite, 0) = 1"
         
     if only_pets:
-        sql += " AND pets_allowed = 1"
+        sql += " AND l.pets_allowed = 1"
+        
+    if only_pool:
+        sql += " AND (l.features LIKE '%pool%' OR l.description LIKE '%pool%')"
+        
+    if only_aircon:
+        sql += " AND (l.features LIKE '%aircon%' OR l.description LIKE '%air%conditioning%' OR l.description LIKE '%ac%')"
         
     if query:
-        q = f"%{query}%"
-        sql += " AND (title LIKE ? OR street LIKE ? OR suburb LIKE ? OR description LIKE ?)"
-        params.extend([q, q, q, q])
+        q = f"%{query.strip()}%"
+        sql += " AND (l.title LIKE ? OR l.street LIKE ? OR l.suburb LIKE ? OR l.state LIKE ? OR l.postcode LIKE ? OR l.description LIKE ?)"
+        params.extend([q, q, q, q, q, q])
         
     # Sorting
     if sort_by == "price_asc":
-        sql += " ORDER BY price ASC, first_seen DESC"
+        sql += " ORDER BY l.price ASC, l.first_seen DESC"
     elif sort_by == "price_desc":
-        sql += " ORDER BY price DESC, first_seen DESC"
+        sql += " ORDER BY l.price DESC, l.first_seen DESC"
     elif sort_by == "newest":
-        sql += " ORDER BY first_seen DESC"
+        sql += " ORDER BY l.first_seen DESC"
     elif sort_by == "beds_desc":
-        sql += " ORDER BY beds DESC, price ASC"
+        sql += " ORDER BY l.beds DESC, l.price ASC"
     elif sort_by == "inspection":
-        sql += " ORDER BY CASE WHEN inspection_date IS NULL OR inspection_date = '' THEN 1 ELSE 0 END, inspection_date ASC"
+        sql += " ORDER BY CASE WHEN l.inspection_date IS NULL OR l.inspection_date = '' THEN 1 ELSE 0 END, l.inspection_date ASC"
     else:
-        sql += " ORDER BY price ASC"
+        sql += " ORDER BY l.price ASC"
         
     cursor.execute(sql, params)
     rows = cursor.fetchall()
@@ -296,54 +428,99 @@ def get_listings(
     for r in rows:
         d = dict(r)
         d["price_history"] = json.loads(d["price_history"] or "[]")
+        try:
+            d["features"] = json.loads(d.get("features") or "[]")
+        except Exception:
+            d["features"] = []
         results.append(d)
         
     conn.close()
     return results
 
-def get_listing_by_id(lid: str) -> Optional[Dict[str, Any]]:
+def get_listing_by_id(lid: str, user_id: Optional[str] = None) -> Optional[Dict[str, Any]]:
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM listings WHERE id = ?", (lid,))
+    current_uid = user_id or "guest"
+    
+    sql = """
+    SELECT 
+        l.id, l.url, l.title, l.street, l.suburb, l.state, l.postcode, l.price,
+        l.listing_type, l.beds, l.baths, l.cars, l.prop_type, l.image_url,
+        l.lat, l.lng, l.inspection_date, l.description, l.source,
+        COALESCE(ui.status, l.status) AS status,
+        COALESCE(ui.notes, '') AS notes,
+        COALESCE(ui.rating, 0) AS rating,
+        COALESCE(ui.is_favorite, 0) AS is_favorite,
+        l.is_new, l.pets_allowed, l.features, l.user_id, l.first_seen, l.last_seen, l.price_history
+    FROM listings l
+    LEFT JOIN user_interactions ui 
+        ON ui.listing_id = l.id AND ui.user_id = ?
+    WHERE l.id = ?
+    """
+    cursor.execute(sql, (current_uid, lid))
     row = cursor.fetchone()
     conn.close()
     if row:
         d = dict(row)
         d["price_history"] = json.loads(d["price_history"] or "[]")
+        try:
+            d["features"] = json.loads(d.get("features") or "[]")
+        except Exception:
+            d["features"] = []
         return d
     return None
 
-def update_listing_meta(lid: str, status: Optional[str] = None, notes: Optional[str] = None,
-                        rating: Optional[int] = None, is_favorite: Optional[int] = None,
-                        pets_allowed: Optional[int] = None) -> bool:
+def update_listing_meta(
+    lid: str, 
+    user_id: str = "guest",
+    status: Optional[str] = None, 
+    notes: Optional[str] = None,
+    rating: Optional[int] = None, 
+    is_favorite: Optional[int] = None,
+    pets_allowed: Optional[int] = None
+) -> bool:
+    """
+    Saves personal interactions per cookie user_id so every individual visitor only sees their own shortlist and notes.
+    """
     conn = get_connection()
     cursor = conn.cursor()
+    now_str = datetime.now().isoformat()
     
-    updates = []
-    params = []
+    # Check if user interaction row already exists
+    cursor.execute("SELECT is_favorite, status, notes, rating FROM user_interactions WHERE user_id = ? AND listing_id = ?", (user_id, lid))
+    existing = cursor.fetchone()
     
-    if status is not None:
-        updates.append("status = ?")
-        params.append(status)
-    if notes is not None:
-        updates.append("notes = ?")
-        params.append(notes)
-    if rating is not None:
-        updates.append("rating = ?")
-        params.append(rating)
-    if is_favorite is not None:
-        updates.append("is_favorite = ?")
-        params.append(is_favorite)
+    if existing:
+        new_fav = is_favorite if is_favorite is not None else existing["is_favorite"]
+        new_status = status if status is not None else existing["status"]
+        new_notes = notes if notes is not None else existing["notes"]
+        new_rating = rating if rating is not None else existing["rating"]
+        cursor.execute("""
+        UPDATE user_interactions SET
+            is_favorite = ?,
+            status = ?,
+            notes = ?,
+            rating = ?,
+            updated_at = ?
+        WHERE user_id = ? AND listing_id = ?
+        """, (new_fav, new_status, new_notes, new_rating, now_str, user_id, lid))
+    else:
+        cursor.execute("""
+        INSERT INTO user_interactions (user_id, listing_id, is_favorite, status, notes, rating, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            user_id,
+            lid,
+            is_favorite if is_favorite is not None else 0,
+            status if status is not None else "discovered",
+            notes if notes is not None else "",
+            rating if rating is not None else 0,
+            now_str
+        ))
+        
     if pets_allowed is not None:
-        updates.append("pets_allowed = ?")
-        params.append(pets_allowed)
+        cursor.execute("UPDATE listings SET pets_allowed = ? WHERE id = ?", (pets_allowed, lid))
         
-    if not updates:
-        conn.close()
-        return False
-        
-    params.append(lid)
-    cursor.execute(f"UPDATE listings SET {', '.join(updates)} WHERE id = ?", params)
     conn.commit()
     conn.close()
     return True
@@ -355,7 +532,7 @@ def mark_all_seen():
     conn.commit()
     conn.close()
 
-def add_custom_listing(data: Dict[str, Any]) -> str:
+def add_custom_listing(data: Dict[str, Any], user_id: str = "public") -> str:
     conn = get_connection()
     cursor = conn.cursor()
     import uuid
@@ -364,18 +541,22 @@ def add_custom_listing(data: Dict[str, Any]) -> str:
     
     cursor.execute("""
     INSERT INTO listings (
-        id, url, title, street, suburb, postcode, price, beds, baths, cars,
-        prop_type, image_url, lat, lng, inspection_date, description,
-        source, status, notes, rating, is_favorite, is_new, pets_allowed, first_seen, last_seen, price_history
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'manual', 'discovered', ?, 0, 1, 0, ?, ?, ?, '[]')
+        id, url, title, street, suburb, state, postcode, price,
+        listing_type, beds, baths, cars, prop_type, image_url,
+        lat, lng, inspection_date, description, source, status,
+        notes, rating, is_favorite, is_new, pets_allowed,
+        features, user_id, first_seen, last_seen, price_history
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'discovered', ?, 0, 1, 0, ?, ?, ?, ?, ?, '[]')
     """, (
         lid,
         data.get("url", ""),
         data.get("title") or f"{data.get('street', 'Custom')}, {data.get('suburb', 'Nowra')}",
         data.get("street", ""),
         data.get("suburb", "Nowra"),
+        data.get("state", "NSW"),
         data.get("postcode", "2541"),
         data.get("price", 0),
+        data.get("listing_type", "rent"),
         data.get("beds", 1),
         data.get("baths", 1),
         data.get("cars", 1),
@@ -385,8 +566,11 @@ def add_custom_listing(data: Dict[str, Any]) -> str:
         data.get("lng") or 150.6019,
         data.get("inspection_date"),
         data.get("description", ""),
+        "manual",
         data.get("notes", ""),
         data.get("pets_allowed", 0),
+        json.dumps(data.get("features", [])),
+        user_id,
         now_str,
         now_str
     ))
@@ -403,61 +587,91 @@ def delete_listing(lid: str) -> bool:
     conn.close()
     return affected > 0
 
-def get_stats() -> Dict[str, Any]:
+def get_stats(listing_type: str = "all", state: Optional[str] = None, user_id: str = "guest") -> Dict[str, Any]:
     conn = get_connection()
     cursor = conn.cursor()
     
-    cursor.execute("SELECT COUNT(*) FROM listings WHERE price <= 550")
-    total_under_550 = cursor.fetchone()[0]
+    where_clauses = ["(user_id = 'public' OR user_id = ?)"]
+    params = [user_id]
     
-    cursor.execute("SELECT COUNT(*) FROM listings")
-    total_all = cursor.fetchone()[0]
+    if listing_type and listing_type != "all":
+        where_clauses.append("LOWER(listing_type) = LOWER(?)")
+        params.append(listing_type)
+        
+    if state and state != "all":
+        where_clauses.append("LOWER(state) = LOWER(?)")
+        params.append(state)
+        
+    where_sql = " AND ".join(where_clauses)
     
-    cursor.execute("SELECT AVG(price), MIN(price), MAX(price) FROM listings WHERE price <= 550")
-    avg_price, min_price, max_price_val = cursor.fetchone()
+    cursor.execute(f"SELECT COUNT(*) FROM listings WHERE {where_sql}", params)
+    total_count = cursor.fetchone()[0]
     
-    cursor.execute("SELECT COUNT(*) FROM listings WHERE is_favorite = 1")
+    # Rent vs Sale counts
+    cursor.execute("SELECT COUNT(*) FROM listings WHERE listing_type = 'rent'")
+    rent_count = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM listings WHERE listing_type = 'sale'")
+    sale_count = cursor.fetchone()[0]
+    
+    # Averages
+    cursor.execute("SELECT AVG(price), MIN(price), MAX(price) FROM listings WHERE listing_type = 'rent'")
+    avg_rent, min_rent, max_rent = cursor.fetchone()
+    
+    cursor.execute("SELECT AVG(price), MIN(price), MAX(price) FROM listings WHERE listing_type = 'sale'")
+    avg_sale, min_sale, max_sale = cursor.fetchone()
+    
+    # User-specific favorites count
+    cursor.execute("SELECT COUNT(*) FROM user_interactions WHERE user_id = ? AND is_favorite = 1", (user_id,))
     favorites_count = cursor.fetchone()[0]
     
-    cursor.execute("SELECT COUNT(*) FROM listings WHERE inspection_date IS NOT NULL AND inspection_date != '' AND price <= 550")
+    cursor.execute("SELECT COUNT(*) FROM listings WHERE inspection_date IS NOT NULL AND inspection_date != ''")
     inspections_count = cursor.fetchone()[0]
     
-    cursor.execute("SELECT COUNT(*) FROM listings WHERE is_new = 1 AND price <= 550")
-    new_count = cursor.fetchone()[0]
-    
-    cursor.execute("SELECT COUNT(*) FROM listings WHERE pets_allowed = 1 AND price <= 550")
+    cursor.execute("SELECT COUNT(*) FROM listings WHERE pets_allowed = 1")
     pets_count = cursor.fetchone()[0]
     
     cursor.execute("""
-    SELECT suburb, COUNT(*), ROUND(AVG(price), 0)
+    SELECT suburb, state, COUNT(*), ROUND(AVG(price), 0), listing_type
     FROM listings
-    WHERE price <= 550
-    GROUP BY suburb
+    GROUP BY suburb, state, listing_type
     ORDER BY COUNT(*) DESC
+    LIMIT 20
     """)
-    suburbs = [{"suburb": r[0], "count": r[1], "avg_rent": r[2]} for r in cursor.fetchall()]
+    suburbs = [{"suburb": r[0], "state": r[1], "count": r[2], "avg_price": r[3], "type": r[4]} for r in cursor.fetchall()]
     
     cursor.execute("""
     SELECT prop_type, COUNT(*)
     FROM listings
-    WHERE price <= 550
     GROUP BY prop_type
     ORDER BY COUNT(*) DESC
     """)
     property_types = [{"type": r[0], "count": r[1]} for r in cursor.fetchall()]
+
+    cursor.execute("""
+    SELECT state, COUNT(*)
+    FROM listings
+    GROUP BY state
+    ORDER BY COUNT(*) DESC
+    """)
+    states = [{"state": r[0], "count": r[1]} for r in cursor.fetchall()]
     
     conn.close()
     return {
-        "total_under_550": total_under_550,
-        "total_all": total_all,
-        "avg_price": round(avg_price, 1) if avg_price else 0,
-        "min_price": min_price or 0,
-        "max_price": max_price_val or 0,
+        "total": total_count,
+        "rent_count": rent_count,
+        "sale_count": sale_count,
+        "avg_rent": round(avg_rent, 1) if avg_rent else 0,
+        "avg_sale": round(avg_sale, 0) if avg_sale else 0,
+        "min_rent": min_rent or 0,
+        "max_rent": max_rent or 0,
+        "min_sale": min_sale or 0,
+        "max_sale": max_sale or 0,
         "favorites_count": favorites_count,
         "inspections_count": inspections_count,
-        "new_count": new_count,
         "pets_count": pets_count,
         "suburbs": suburbs,
+        "states": states,
         "property_types": property_types
     }
 

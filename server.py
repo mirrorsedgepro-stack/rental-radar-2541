@@ -1,8 +1,9 @@
 import os
+import uuid
 import asyncio
 import logging
 from typing import Optional, Dict, Any, List
-from fastapi import FastAPI, Query, HTTPException, BackgroundTasks, Response
+from fastapi import FastAPI, Query, HTTPException, BackgroundTasks, Request, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel
@@ -12,13 +13,36 @@ import scraper
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("server")
 
-app = FastAPI(title="2541 Rental Finder API", description="App for finding rentals in 2541 under $550/week")
+app = FastAPI(
+    title="Radar Realty Australia API",
+    description="Australia-wide real estate search, rental tracker, and properties for sale"
+)
 
 # Initialize database on startup
 database.init_db()
 
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 os.makedirs(STATIC_DIR, exist_ok=True)
+
+def get_effective_user_id(request: Request, response: Response, explicit_user_id: Optional[str] = None) -> str:
+    """
+    Retrieves or generates a persistent cookie user_id to isolate each visitor's workspace.
+    """
+    uid = explicit_user_id or request.headers.get("x-user-id") or request.cookies.get("radar_user_token")
+    if not uid or len(uid.strip()) == 0:
+        uid = f"usr_{uuid.uuid4().hex[:12]}"
+        
+    # Ensure cookie is set for long-term persistence (1 year)
+    if "radar_user_token" not in request.cookies or request.cookies.get("radar_user_token") != uid:
+        response.set_cookie(
+            key="radar_user_token",
+            value=uid,
+            max_age=31536000,
+            httponly=False,
+            samesite="lax",
+            path="/"
+        )
+    return uid
 
 class ListingMetaUpdate(BaseModel):
     status: Optional[str] = None
@@ -31,8 +55,10 @@ class CustomListingInput(BaseModel):
     title: Optional[str] = None
     street: str
     suburb: str = "Nowra"
+    state: str = "NSW"
     postcode: str = "2541"
     price: int
+    listing_type: str = "rent" # 'rent' or 'sale'
     beds: int = 1
     baths: int = 1
     cars: int = 1
@@ -43,6 +69,7 @@ class CustomListingInput(BaseModel):
     description: Optional[str] = ""
     notes: Optional[str] = ""
     pets_allowed: Optional[int] = 0
+    features: Optional[List[str]] = []
     lat: Optional[float] = None
     lng: Optional[float] = None
 
@@ -65,7 +92,7 @@ async def periodic_scraper():
             if interval_mins <= 0:
                 interval_mins = 30
             await asyncio.sleep(interval_mins * 60)
-            logger.info("Running scheduled background scrape for 2541 rentals...")
+            logger.info("Running scheduled background scrape for Australian rentals...")
             result = scraper.run_scraper_and_sync()
             logger.info(f"Scheduled sync complete: {result['total_scraped']} scraped, {result['newly_added']} new.")
         except asyncio.CancelledError:
@@ -81,7 +108,7 @@ async def startup_event():
     if not os.environ.get("VERCEL"):
         # Run initial sync if DB is empty
         stats = database.get_stats()
-        if stats["total_all"] == 0:
+        if stats["total"] == 0:
             logger.info("Database empty on startup. Triggering initial scrape...")
             scraper.run_scraper_and_sync()
         _periodic_task = asyncio.create_task(periodic_scraper())
@@ -97,9 +124,19 @@ from fastapi import APIRouter
 
 api = APIRouter()
 
+@api.get("/user/me")
+def get_current_user(request: Request, response: Response, user_id: Optional[str] = None):
+    uid = get_effective_user_id(request, response, user_id)
+    return {"user_id": uid}
+
 @api.get("/listings")
 def get_listings(
-    max_price: Optional[int] = 550,
+    request: Request,
+    response: Response,
+    listing_type: Optional[str] = "all",
+    state: Optional[str] = "all",
+    min_price: Optional[int] = None,
+    max_price: Optional[int] = None,
     suburb: Optional[str] = "all",
     min_beds: Optional[int] = 0,
     min_baths: Optional[int] = 0,
@@ -109,10 +146,18 @@ def get_listings(
     only_inspections: bool = False,
     only_favorites: bool = False,
     only_pets: bool = False,
+    only_pool: bool = False,
+    only_aircon: bool = False,
     query: Optional[str] = None,
-    sort_by: str = "price_asc"
+    sort_by: str = "price_asc",
+    user_id: Optional[str] = None
 ):
+    uid = get_effective_user_id(request, response, user_id)
+    
     items = database.get_listings(
+        listing_type=listing_type,
+        state=state,
+        min_price=min_price,
         max_price=max_price,
         suburb=suburb,
         min_beds=min_beds,
@@ -123,25 +168,31 @@ def get_listings(
         only_inspections=only_inspections,
         only_favorites=only_favorites,
         only_pets=only_pets,
+        only_pool=only_pool,
+        only_aircon=only_aircon,
         query=query,
-        sort_by=sort_by
+        sort_by=sort_by,
+        user_id=uid
     )
     return {
         "count": len(items),
+        "user_id": uid,
         "listings": items
     }
 
 @api.get("/listings/{listing_id}")
-def get_single_listing(listing_id: str):
-    item = database.get_listing_by_id(listing_id)
+def get_single_listing(listing_id: str, request: Request, response: Response, user_id: Optional[str] = None):
+    uid = get_effective_user_id(request, response, user_id)
+    item = database.get_listing_by_id(listing_id, user_id=uid)
     if not item:
         raise HTTPException(status_code=404, detail="Listing not found")
     return item
 
 @api.post("/listings/refresh")
-def refresh_listings():
+def refresh_listings(request: Request, response: Response, user_id: Optional[str] = None):
+    uid = get_effective_user_id(request, response, user_id)
     result = scraper.run_scraper_and_sync()
-    stats = database.get_stats()
+    stats = database.get_stats(user_id=uid)
     return {
         "success": True,
         "scraped": result["total_scraped"],
@@ -150,17 +201,20 @@ def refresh_listings():
     }
 
 @api.patch("/listings/{listing_id}/meta")
-def update_meta(listing_id: str, payload: ListingMetaUpdate):
+def update_meta(listing_id: str, payload: ListingMetaUpdate, request: Request, response: Response, user_id: Optional[str] = None):
+    uid = get_effective_user_id(request, response, user_id)
     ok = database.update_listing_meta(
         listing_id,
+        user_id=uid,
         status=payload.status,
         notes=payload.notes,
         rating=payload.rating,
-        is_favorite=payload.is_favorite
+        is_favorite=payload.is_favorite,
+        pets_allowed=payload.pets_allowed
     )
     if not ok:
         raise HTTPException(status_code=400, detail="Could not update listing meta")
-    return {"success": True, "id": listing_id}
+    return {"success": True, "id": listing_id, "user_id": uid}
 
 @api.post("/listings/mark-seen")
 def mark_seen():
@@ -168,9 +222,10 @@ def mark_seen():
     return {"success": True}
 
 @api.post("/listings/add")
-def add_listing(payload: CustomListingInput):
-    new_id = database.add_custom_listing(payload.dict())
-    return {"success": True, "id": new_id}
+def add_listing(payload: CustomListingInput, request: Request, response: Response, user_id: Optional[str] = None):
+    uid = get_effective_user_id(request, response, user_id)
+    new_id = database.add_custom_listing(payload.dict(), user_id=uid)
+    return {"success": True, "id": new_id, "user_id": uid}
 
 @api.delete("/listings/{listing_id}")
 def delete_listing(listing_id: str):
@@ -180,8 +235,9 @@ def delete_listing(listing_id: str):
     return {"success": True}
 
 @api.get("/stats")
-def get_stats():
-    return database.get_stats()
+def get_stats(request: Request, response: Response, listing_type: str = "all", state: Optional[str] = None, user_id: Optional[str] = None):
+    uid = get_effective_user_id(request, response, user_id)
+    return database.get_stats(listing_type=listing_type, state=state, user_id=uid)
 
 @api.get("/settings")
 def get_settings():
@@ -196,160 +252,156 @@ def save_settings(payload: SettingsUpdate):
     return {"success": True, "settings": database.get_settings()}
 
 @api.get("/portal-links")
-def get_portal_links(max_price: int = 550):
+def get_portal_links(listing_type: str = "rent", max_price: Optional[int] = None, suburb: Optional[str] = None):
+    is_sale = listing_type == "sale"
+    mode_str = "buy" if is_sale else "rent"
+    price_val = max_price or (1500000 if is_sale else 550)
+    loc_str = suburb if suburb and suburb != "all" else "Australia"
+    loc_query = suburb if suburb and suburb != "all" else "2541"
+    
     return {
+        "mode": listing_type,
         "portals": [
             {
                 "name": "Realestate.com.au",
-                "tagline": "Australia's largest real estate portal",
+                "tagline": f"Australia's #1 portal for properties to {mode_str}",
                 "category": "Major Portals",
                 "icon": "home",
-                "url": f"https://www.realestate.com.au/rent/with-maxPrice-{max_price}-in-2541/list-1?activeSort=list-date"
+                "url": f"https://www.realestate.com.au/{mode_str}/in-{loc_query}/list-1?activeSort=list-date"
             },
             {
                 "name": "Domain.com.au",
-                "tagline": "Leading Australian property portal",
+                "tagline": f"Premium Australian listings to {mode_str}",
                 "category": "Major Portals",
                 "icon": "globe",
-                "url": f"https://www.domain.com.au/rent/?postcode=2541&price=0-{max_price}&sort=dateupdated-desc"
+                "url": f"https://www.domain.com.au/{mode_str}/?search={loc_query}&sort=dateupdated-desc"
             },
             {
-                "name": "Rent.com.au",
-                "tagline": "Renter-focused property directory",
+                "name": "Rent.com.au" if not is_sale else "Soho Real Estate",
+                "tagline": "Renter-dedicated directory" if not is_sale else "Fast property search & social alerts",
                 "category": "Major Portals",
-                "icon": "key",
-                "url": f"https://www.rent.com.au/properties/2541?price_max={max_price}"
+                "icon": "key" if not is_sale else "compass",
+                "url": f"https://www.rent.com.au/properties/{loc_query}" if not is_sale else f"https://soho.com.au/{mode_str}"
             },
             {
                 "name": "Allhomes.com.au",
-                "tagline": "Popular for regional NSW and ACT",
+                "tagline": "Leading portal across Regional NSW, ACT & Sydney",
                 "category": "Major Portals",
                 "icon": "compass",
-                "url": f"https://www.allhomes.com.au/rent/nowra-nsw-2541/?price=0-{max_price}"
+                "url": f"https://www.allhomes.com.au/{mode_str}/"
             },
             {
                 "name": "Homely.com.au",
-                "tagline": "Suburban reviews and rentals",
+                "tagline": "Suburban street reviews and property listings",
                 "category": "Alternative Portals",
                 "icon": "map-pin",
-                "url": f"https://www.homely.com.au/for-rent/nowra-nsw-2541/properties?price=0-{max_price}"
+                "url": f"https://www.homely.com.au/for-{mode_str}/"
             },
             {
-                "name": "Gumtree Australia",
-                "tagline": "Private landlord and direct rentals",
-                "category": "Private & Share",
-                "icon": "users",
-                "url": f"https://www.gumtree.com.au/s-property-for-rent/nowra-2541/c18364l3000947?price=__{max_price}"
-            },
-            {
-                "name": "Flatmates.com.au",
-                "tagline": "Granny flats, studios & shared houses",
-                "category": "Private & Share",
-                "icon": "coffee",
-                "url": f"https://flatmates.com.au/rent/nowra-2541?max_price={max_price}"
-            },
-            {
-                "name": "Ray White Nowra",
-                "tagline": "Local Shoalhaven agency rentals",
+                "name": "Ray White Group",
+                "tagline": "Australia's largest real estate franchise network",
                 "category": "Local Agencies",
                 "icon": "building",
-                "url": f"https://raywhiteshoalhavencentralgroup.com.au/properties/residential-for-rent?price_max={max_price}"
-            },
-            {
-                "name": "Integrity Real Estate",
-                "tagline": "Leading independent Nowra agency",
-                "category": "Local Agencies",
-                "icon": "award",
-                "url": "https://www.integrityre.com.au/renting/properties-for-lease/"
-            },
-            {
-                "name": "LJ Hooker Nowra",
-                "tagline": "Kinghorne St Nowra office rentals",
-                "category": "Local Agencies",
-                "icon": "shield-check",
-                "url": "https://nowra.ljhooker.com.au/search/property-for-rent/page-1"
-            },
-            {
-                "name": "Raine & Horne Nowra",
-                "tagline": "Shoalhaven regional leasing",
-                "category": "Local Agencies",
-                "icon": "briefcase",
-                "url": f"https://www.raineandhorne.com.au/nowra/search/properties-for-rent?price_max={max_price}"
+                "url": f"https://www.raywhite.com/properties/{mode_str}"
             }
         ]
     }
 
 @api.get("/calendar/{listing_id}.ics")
-def get_ics_calendar(listing_id: str):
+def get_calendar_invite(listing_id: str):
     item = database.get_listing_by_id(listing_id)
     if not item or not item.get("inspection_date"):
-        raise HTTPException(status_code=404, detail="No inspection date available for this listing")
+        raise HTTPException(status_code=404, detail="No inspection date found for this listing")
+    
+    from datetime import datetime, timedelta
+    try:
+        insp_dt = datetime.fromisoformat(item["inspection_date"])
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid inspection date format")
         
-    insp_iso = item["inspection_date"]
-    clean_dt = insp_iso.replace("-", "").replace(":", "")[:15]
+    start_str = insp_dt.strftime("%Y%m%dT%H%M%S")
+    end_dt = insp_dt + timedelta(minutes=30)
+    end_str = end_dt.strftime("%Y%m%dT%H%M%S")
+    
+    summary = f"Inspection: {item['street']}, {item['suburb']} ({item['prop_type']})"
+    description = f"Rental inspection for {item['street']}, {item['suburb']}. Price: ${item['price']}/wk. Beds: {item['beds']}, Baths: {item['baths']}."
+    location = f"{item['street']}, {item['suburb']} NSW {item['postcode']}"
     
     ics_content = f"""BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//2541 Rental Finder//EN
+PRODID:-//2541 Rental Radar//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
-SUMMARY:Inspection: {item.get('street')}, {item.get('suburb')} (${item.get('price')}/wk)
-DESCRIPTION:Rental property inspection in 2541.\\nPrice: ${item.get('price')}/wk\\nBeds: {item.get('beds')}, Baths: {item.get('baths')}\\nListing: {item.get('url')}
-LOCATION:{item.get('street')}, {item.get('suburb')} NSW 2541
-DTSTART:{clean_dt}
-DTEND:{clean_dt}
+SUMMARY:{summary}
+DESCRIPTION:{description}
+LOCATION:{location}
+DTSTART:{start_str}
+DTEND:{end_str}
 STATUS:CONFIRMED
 END:VEVENT
-END:VCALENDAR
-"""
-    return Response(content=ics_content, media_type="text/calendar", headers={
-        "Content-Disposition": f"attachment; filename=inspection-{listing_id}.ics"
-    })
+END:VCALENDAR"""
+
+    return Response(
+        content=ics_content,
+        media_type="text/calendar",
+        headers={"Content-Disposition": f"attachment; filename=inspection_{item['id']}.ics"}
+    )
 
 @api.get("/export/csv")
-def export_csv(max_price: int = 550):
-    items = database.get_listings(max_price=max_price)
+def export_csv(
+    request: Request,
+    response: Response,
+    listing_type: str = "all",
+    max_price: Optional[int] = None,
+    user_id: Optional[str] = None
+):
     import csv
     import io
+    
+    uid = get_effective_user_id(request, response, user_id)
+    listings = database.get_listings(listing_type=listing_type, max_price=max_price, user_id=uid)
     output = io.StringIO()
     writer = csv.writer(output)
+    
     writer.writerow([
-        "ID", "Price ($/wk)", "Street", "Suburb", "Postcode", "Beds", "Baths", "Cars",
-        "Property Type", "Status", "Pets Allowed", "Inspection Date", "Favorite", "Notes", "Listing URL"
+        "ID", "Type", "Street", "Suburb", "State", "Postcode", "Price",
+        "Beds", "Baths", "Cars", "Property Type", "Pets Allowed",
+        "Inspection Date", "Status", "My Notes", "My Rating", "URL"
     ])
-    for it in items:
+    
+    for l in listings:
         writer.writerow([
-            it.get("id"),
-            it.get("price"),
-            it.get("street"),
-            it.get("suburb"),
-            it.get("postcode"),
-            it.get("beds"),
-            it.get("baths"),
-            it.get("cars"),
-            it.get("prop_type"),
-            it.get("status"),
-            "Yes" if it.get("pets_allowed") else "No / Contact Agent",
-            it.get("inspection_date"),
-            "Yes" if it.get("is_favorite") else "No",
-            it.get("notes"),
-            it.get("url")
+            l["id"],
+            l.get("listing_type", "rent").upper(),
+            l["street"],
+            l["suburb"],
+            l.get("state", "NSW"),
+            l["postcode"],
+            l["price"],
+            l["beds"],
+            l["baths"],
+            l["cars"],
+            l["prop_type"],
+            "Yes" if l.get("pets_allowed") == 1 else "No",
+            l["inspection_date"] or "None scheduled",
+            l["status"],
+            l["notes"],
+            l["rating"],
+            l["url"]
         ])
+        
     return Response(
         content=output.getvalue(),
         media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=rentals-2541.csv"}
+        headers={"Content-Disposition": f"attachment; filename=radar_properties_export.csv"}
     )
 
-# Mount API router under both /api and root /
 app.include_router(api, prefix="/api")
-app.include_router(api, prefix="")
 
-# Serve Frontend static assets when running standalone
-if os.path.exists(STATIC_DIR) and not os.environ.get("VERCEL"):
-    app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+# Static frontend assets
+app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="127.0.0.1", port=8000, reload=False)
+    uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)

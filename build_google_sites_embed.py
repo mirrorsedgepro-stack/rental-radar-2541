@@ -4,7 +4,7 @@ import database
 
 def build_embed():
     database.init_db()
-    listings = database.get_listings(max_price=550)
+    listings = database.get_listings(listing_type="all")
     
     base_dir = os.path.dirname(os.path.abspath(__file__))
     static_dir = os.path.join(base_dir, "static")
@@ -40,7 +40,7 @@ def build_embed():
     
     # Embed initial listings and offline-first fallback in JS
     embedded_js = f"""
-    // Pre-baked live listings for Google Sites
+    // Pre-baked live listings for Google Sites (Australia-wide Rent & Sale)
     const INITIAL_LISTINGS = {listings_json};
 
     // Override fetchListings for offline/iframe embedding if local API is unreachable
@@ -65,14 +65,18 @@ def build_embed():
         try {
             return await origFetch.apply(this, args);
         } catch(e) {
-            console.log("Using embedded 2541 dataset:", args[0]);
+            console.log("Using embedded dataset:", args[0]);
             const url = args[0] || '';
             if (url.includes('/api/listings')) {
                 let items = [...INITIAL_LISTINGS];
                 try {
                     const parsedUrl = new URL(url, 'http://localhost');
-                    const maxP = parseInt(parsedUrl.searchParams.get('max_price') || '550');
-                    items = items.filter(l => (l.price || 0) <= maxP);
+                    const mode = parsedUrl.searchParams.get('listing_type');
+                    if (mode && mode !== 'all') items = items.filter(l => (l.listing_type || 'rent').toLowerCase() === mode.toLowerCase());
+                    const state = parsedUrl.searchParams.get('state');
+                    if (state && state !== 'all') items = items.filter(l => (l.state || '').toLowerCase() === state.toLowerCase());
+                    const maxP = parseInt(parsedUrl.searchParams.get('max_price') || '0');
+                    if (maxP > 0) items = items.filter(l => (l.price || 0) <= maxP);
                     const sub = parsedUrl.searchParams.get('suburb');
                     if (sub && sub !== 'all') items = items.filter(l => (l.suburb || '').toLowerCase() === sub.toLowerCase());
                     const beds = parseInt(parsedUrl.searchParams.get('min_beds') || '0');

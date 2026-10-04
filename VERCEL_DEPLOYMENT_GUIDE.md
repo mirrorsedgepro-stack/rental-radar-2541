@@ -1,6 +1,6 @@
 # Vercel Deployment Guide 🚀
 
-The **2541 Rental Radar** app is now deployed and running live on **Vercel** with full zero-configuration Python ASGI serverless backend and global CDN static caching!
+The **Radar Realty Australia** app is now deployed and running live on **Vercel** with full zero-configuration Python ASGI serverless backend and global CDN static caching!
 
 ---
 
@@ -33,11 +33,11 @@ Double-click [**`deploy_vercel.bat`**](file:///c:/Users/JED-Tools2/Downloads/Ren
 1. Push this folder to a GitHub repository:
    ```powershell
    git add .
-   git commit -m "2541 Rental Radar with Vercel deployment"
-   git remote add origin https://github.com/YOUR_USERNAME/rental-2541.git
+   git commit -m "Radar Realty Australia with Vercel deployment"
+   git remote add origin https://github.com/YOUR_USERNAME/rental-radar.git
    git push -u origin main
    ```
-2. Go to [https://vercel.com/new](https://vercel.com/new) and import your `rental-2541` repository.
+2. Go to [https://vercel.com/new](https://vercel.com/new) and import your repository.
 3. Click **Deploy**. Vercel will automatically re-deploy every time you push a commit!
 
 ---
@@ -46,4 +46,4 @@ Double-click [**`deploy_vercel.bat`**](file:///c:/Users/JED-Tools2/Downloads/Ren
 
 * **Static Frontend**: Located in `public/` (and `static/`). Vercel serves `index.html`, `app.js`, and `style.css` globally via its Edge CDN with sub-50ms latency.
 * **Serverless Backend**: Located in `api/index.py` which mounts the FastAPI application. Vercel automatically runs requests to `/api/*` as Python Serverless Functions.
-* **Pre-seeded Database**: The SQLite database (`rentals_2541.db`) is copied to `/tmp/rentals_2541.db` in serverless instances, providing persistent and fast local read/write queries.
+* **Pre-seeded Database**: The SQLite database (`australia_properties.db`) is copied to `/tmp/australia_properties.db` in serverless instances, providing persistent and fast local read/write queries.

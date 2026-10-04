@@ -1,6 +1,6 @@
 # How to Publish to Google Sites (sites.google.com) 🌐
 
-You can publish the **2541 Rental Radar** app to Google Sites for free in under 2 minutes.
+You can publish the **Radar Realty Australia** app to Google Sites for free in under 2 minutes.
 
 ---
 
@@ -16,7 +16,7 @@ This method embeds the complete, self-contained interactive app directly into yo
 1. Open your browser and go to **[https://sites.google.com](https://sites.google.com)**.
 2. Sign in with your Google account.
 3. Click **Blank** (or choose any template) to create a new site.
-4. Name your site (e.g. `Nowra & Bomaderry Rentals`).
+4. Name your site (e.g. `Radar Realty Australia`).
 
 ### Step 3: Embed the App
 1. In the right-hand sidebar under **Insert**, click on **Embed** (the `< >` icon).
@@ -29,7 +29,7 @@ This method embeds the complete, self-contained interactive app directly into yo
 1. Hover over the newly inserted block on your page.
 2. Click and drag the **blue corner handles** to expand the widget to **full width** and **full height** so the map, cards, and tabs have plenty of room to display.
 3. At the top right of the Google Sites editor, click the purple/blue **Publish** button.
-4. Choose a web address suffix (e.g. `2541-rentals` or `nowra-rentals`).
+4. Choose a web address suffix (e.g. `property-radar` or `radar-realty`).
 5. Click **Publish**!
 6. Your app is now live at:
    `https://sites.google.com/view/your-web-address`
@@ -49,9 +49,9 @@ If you want the Python backend and auto-scraper running continuously on Google C
    ```
 3. **Deploy with 1 command**:
    ```powershell
-   gcloud run deploy rental-2541 --source . --region australia-southeast1 --allow-unauthenticated
+   gcloud run deploy property-radar --source . --region australia-southeast1 --allow-unauthenticated
    ```
-4. Google Cloud will build the container with the provided [`Dockerfile`](file:///c:/Users/JED-Tools2/Downloads/Rental/Dockerfile) and give you a public HTTPS URL (e.g. `https://rental-2541-xxxx-ts.a.run.app`).
+4. Google Cloud will build the container with the provided [`Dockerfile`](file:///c:/Users/JED-Tools2/Downloads/Rental/Dockerfile) and give you a public HTTPS URL (e.g. `https://property-radar-xxxx-ts.a.run.app`).
 5. In Google Sites, you can simply click **Insert > Embed > By URL** and paste your Cloud Run URL!
 
 ---

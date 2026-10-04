@@ -1,7 +1,7 @@
 @echo off
-title 2541 Rental Radar
+title Radar Realty Australia - Property Radar
 echo ===================================================
-echo   2541 RENTAL RADAR (Nowra & Bomaderry ^< $550/wk)
+echo   RADAR REALTY AUSTRALIA - PROPERTY & RENTAL RADAR
 echo ===================================================
 python start.py
 if errorlevel 1 (

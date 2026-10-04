@@ -54,9 +54,9 @@ class ListingMetaUpdate(BaseModel):
 class CustomListingInput(BaseModel):
     title: Optional[str] = None
     street: str
-    suburb: str = "Nowra"
+    suburb: str = "Sydney"
     state: str = "NSW"
-    postcode: str = "2541"
+    postcode: str = "2000"
     price: int
     listing_type: str = "rent" # 'rent' or 'sale'
     beds: int = 1
@@ -257,7 +257,7 @@ def get_portal_links(listing_type: str = "rent", max_price: Optional[int] = None
     mode_str = "buy" if is_sale else "rent"
     price_val = max_price or (1500000 if is_sale else 550)
     loc_str = suburb if suburb and suburb != "all" else "Australia"
-    loc_query = suburb if suburb and suburb != "all" else "2541"
+    loc_query = suburb if suburb and suburb != "all" else "australia"
     
     return {
         "mode": listing_type,
@@ -325,11 +325,11 @@ def get_calendar_invite(listing_id: str):
     
     summary = f"Inspection: {item['street']}, {item['suburb']} ({item['prop_type']})"
     description = f"Rental inspection for {item['street']}, {item['suburb']}. Price: ${item['price']}/wk. Beds: {item['beds']}, Baths: {item['baths']}."
-    location = f"{item['street']}, {item['suburb']} NSW {item['postcode']}"
+    location = f"{item['street']}, {item['suburb']} {item.get('state', 'NSW')} {item.get('postcode', '')}".strip()
     
     ics_content = f"""BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//2541 Rental Radar//EN
+PRODID:-//Australia Property Radar//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT

@@ -7,10 +7,12 @@ from typing import List, Dict, Any, Optional
 import tempfile
 
 DB_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_FILENAME = "australia_properties.db"
+
 if os.environ.get("VERCEL"):
     temp_dir = tempfile.gettempdir()
-    DB_PATH = os.path.join(temp_dir, "rentals_2541.db")
-    repo_db = os.path.join(DB_DIR, "rentals_2541.db")
+    DB_PATH = os.path.join(temp_dir, DB_FILENAME)
+    repo_db = os.path.join(DB_DIR, DB_FILENAME)
     if not os.path.exists(DB_PATH) and os.path.exists(repo_db):
         import shutil
         try:
@@ -18,7 +20,7 @@ if os.environ.get("VERCEL"):
         except Exception:
             pass
 else:
-    DB_PATH = os.path.join(DB_DIR, "rentals_2541.db")
+    DB_PATH = os.path.join(DB_DIR, DB_FILENAME)
 
 def get_connection():
     conn = sqlite3.connect(DB_PATH)
@@ -38,7 +40,7 @@ def init_db():
         street TEXT,
         suburb TEXT,
         state TEXT DEFAULT 'NSW',
-        postcode TEXT DEFAULT '2541',
+        postcode TEXT DEFAULT '2000',
         price INTEGER,
         listing_type TEXT DEFAULT 'rent',
         beds INTEGER,
@@ -146,7 +148,7 @@ def init_db():
             cursor.execute("SELECT id FROM listings WHERE id = ?", (item["id"],))
             if not cursor.fetchone():
                 cursor.execute("""
-                INSERT INTO listings (
+                INSERT OR IGNORE INTO listings (
                     id, url, title, street, suburb, state, postcode, price,
                     listing_type, beds, baths, cars, prop_type, image_url,
                     lat, lng, inspection_date, description, source, status,
@@ -275,7 +277,7 @@ def upsert_listing(item: Dict[str, Any]) -> bool:
             item.get("street", ""),
             item.get("suburb", ""),
             item.get("state", "NSW"),
-            item.get("postcode", "2541"),
+            item.get("postcode", "2000"),
             item.get("price"),
             item.get("listing_type", "rent"),
             item.get("beds", 1),
@@ -550,11 +552,11 @@ def add_custom_listing(data: Dict[str, Any], user_id: str = "public") -> str:
     """, (
         lid,
         data.get("url", ""),
-        data.get("title") or f"{data.get('street', 'Custom')}, {data.get('suburb', 'Nowra')}",
+        data.get("title") or f"{data.get('street', 'Custom')}, {data.get('suburb', 'Sydney')}",
         data.get("street", ""),
-        data.get("suburb", "Nowra"),
+        data.get("suburb", "Sydney"),
         data.get("state", "NSW"),
-        data.get("postcode", "2541"),
+        data.get("postcode", "2000"),
         data.get("price", 0),
         data.get("listing_type", "rent"),
         data.get("beds", 1),

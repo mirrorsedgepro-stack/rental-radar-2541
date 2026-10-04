@@ -61,9 +61,9 @@ def detect_pets_allowed(text: str = "", desc: str = "", has_pet_tag: bool = Fals
         return 1
     return 0
 
-def scrape_2541_rentals(max_price: int = 550) -> List[Dict[str, Any]]:
+def scrape_rentals(suburb_or_postcode: str = "australia", max_price: int = 550) -> List[Dict[str, Any]]:
     """
-    Scrapes rental listings in postcode 2541 from Rent.com.au.
+    Scrapes rental listings from Rent.com.au.
     Returns list of parsed listing dictionaries.
     """
     listings = []
@@ -71,10 +71,10 @@ def scrape_2541_rentals(max_price: int = 550) -> List[Dict[str, Any]]:
     
     # Query up to max_price + 25 to catch edge cases
     query_price = max(max_price + 25, 550)
+    target = suburb_or_postcode.lower().strip()
     
     pages = [
-        f"https://www.rent.com.au/properties/2541?price_max={query_price}",
-        f"https://www.rent.com.au/properties/bangalee-nsw-2541,bomaderry-nsw-2541,north-nowra-nsw-2541,nowra-nsw-2541,south-nowra-nsw-2541,west-nowra-nsw-2541/p2?price_max={query_price}"
+        f"https://www.rent.com.au/properties/{target}?price_max={query_price}"
     ]
     
     for url in pages:
@@ -242,7 +242,7 @@ def scrape_raywhite_shoalhaven(max_price: int = 550) -> List[Dict[str, Any]]:
             href = link_el['href']
             full_url = href if href.startswith('http') else 'https://raywhiteshoalhavencentralgroup.com.au' + href
             
-            # Check if 2541 suburb
+            # Check if regional NSW suburb
             suburb = None
             for s in ["North Nowra", "South Nowra", "West Nowra", "Bomaderry", "Bangalee", "Worrigee", "Nowra"]:
                 if s.lower() in text.lower() or s.lower().replace(' ', '-') in full_url.lower():
@@ -313,12 +313,14 @@ def scrape_raywhite_shoalhaven(max_price: int = 550) -> List[Dict[str, Any]]:
         logger.error(f"Error scraping Ray White: {e}")
     return results
 
+scrape_2541_rentals = scrape_rentals
+
 def send_webhook_alert(webhook_url: str, new_listings: List[Dict[str, Any]]):
     """Sends notification to Discord or custom webhook if new listings are found."""
     if not webhook_url or not new_listings:
         return
     try:
-        content_lines = [f"🚨 **{len(new_listings)} New Rental(s) Found in 2541 Under $550/wk!**\n"]
+        content_lines = [f"🚨 **{len(new_listings)} New Rental(s) Found!**\n"]
         for item in new_listings[:5]:
             insp_text = f" | 📅 Inspection: {item.get('inspection')[:16]}" if item.get('inspection') else ""
             content_lines.append(
@@ -339,7 +341,7 @@ def run_scraper_and_sync() -> Dict[str, Any]:
     webhook_url = settings.get("webhook_url", "")
     
     # 1. Scrape Rent.com.au (Aggregator of all agency CRM feeds)
-    items_rent = scrape_2541_rentals(max_price=max_price)
+    items_rent = scrape_rentals(max_price=max_price)
     
     # 2. Scrape Ray White Shoalhaven Central Group (Direct local agency)
     items_rw = scrape_raywhite_shoalhaven(max_price=max_price)

@@ -88,7 +88,7 @@ function initPriceSelector() {
         const rentOptions = [
             { label: 'Any Rent', val: 0 },
             { label: '< $450/wk (Bargain)', val: 450 },
-            { label: '< $550/wk (2541 Cap)', val: 550 },
+            { label: '< $550/wk (Affordable)', val: 550 },
             { label: '< $700/wk', val: 700 },
             { label: '< $900/wk', val: 900 },
             { label: '< $1,200/wk (Executive)', val: 1200 },
@@ -862,7 +862,7 @@ function closeTour() {
 
     // Reset search input if tour simulated typing
     const searchInput = document.getElementById('filter-query');
-    if (searchInput && (searchInput.value === 'Sydney NSW' || searchInput.value === 'Nowra 2541')) {
+    if (searchInput && (searchInput.value === 'Sydney NSW' || searchInput.value === 'Melbourne VIC')) {
         searchInput.value = '';
         filters.query = '';
         fetchListings();
@@ -905,10 +905,10 @@ function renderTourStep() {
 
         // Simulated typewriter demo
         simulateTyping("Sydney NSW", () => {
-            actionText.textContent = 'Filtered to Sydney! Now typing "Nowra 2541"...';
+            actionText.textContent = 'Filtered to Sydney! Now typing "Melbourne VIC"...';
             setTimeout(() => {
-                simulateTyping("Nowra 2541", () => {
-                    actionText.textContent = 'Now showing 2541 regional rentals in real-time!';
+                simulateTyping("Melbourne VIC", () => {
+                    actionText.textContent = 'Now showing Melbourne properties in real-time!';
                 });
             }, 1200);
         });
@@ -1302,9 +1302,9 @@ async function handleAddRental(e) {
     const payload = {
         listing_type: document.getElementById('add-mode')?.value || 'rent',
         street: document.getElementById('add-street')?.value || '',
-        suburb: document.getElementById('add-suburb')?.value || 'Nowra',
+        suburb: document.getElementById('add-suburb')?.value || 'Sydney',
         state: document.getElementById('add-state')?.value || 'NSW',
-        postcode: document.getElementById('add-postcode')?.value || '2541',
+        postcode: document.getElementById('add-postcode')?.value || '2000',
         price: parseInt(document.getElementById('add-price')?.value) || 0,
         beds: parseInt(document.getElementById('add-beds')?.value) || 1,
         baths: parseInt(document.getElementById('add-baths')?.value) || 1,

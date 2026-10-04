@@ -360,7 +360,7 @@ button, a, select, input[type="range"] {
                                 <span>Australia</span>
                             </span>
                         </div>
-                        <p class="text-[11px] sm:text-xs text-slate-500 hidden sm:block">Rent & Buy Homes Nationwide • Postcode 2541 & All States</p>
+                        <p class="text-[11px] sm:text-xs text-slate-500 hidden sm:block">Rent & Buy Homes Nationwide • Across All States & Cities</p>
                     </div>
                 </div>
 
@@ -407,25 +407,19 @@ button, a, select, input[type="range"] {
             <!-- Row 1: Search Bar & Clear Button -->
             <div class="relative">
                 <i data-lucide="search" class="w-5 h-5 text-slate-400 absolute left-4 top-3.5"></i>
-                <input type="text" id="filter-query" placeholder="Search suburb, city, state or postcode (e.g. Nowra 2541, Sydney, Brisbane, Geelong)..." class="w-full pl-12 pr-10 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm sm:text-base font-medium focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition shadow-inner">
+                <input type="text" id="filter-query" placeholder="Search suburb, city, state or postcode (e.g. Sydney, Melbourne, Brisbane, Perth, Adelaide)..." class="w-full pl-12 pr-10 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm sm:text-base font-medium focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition shadow-inner">
                 <button id="btn-clear-search" class="hidden absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 p-1">
                     <i data-lucide="x-circle" class="w-5 h-5"></i>
                 </button>
             </div>
 
-            <!-- Row 2: Location Quick-Pills (Australia-wide & 2541 Regional) -->
+            <!-- Row 2: Location Quick-Pills (Australia-wide) -->
             <div class="flex items-center space-x-2 overflow-x-auto no-scrollbar text-xs pt-0.5" id="location-pills">
                 <span class="text-slate-400 font-semibold flex-shrink-0 flex items-center mr-1">
                     <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1 text-slate-400"></i> Popular:
                 </span>
                 <button class="loc-pill px-3.5 py-1.5 rounded-full border border-blue-600 bg-blue-600 text-white font-bold whitespace-nowrap shadow-xs active:scale-95 transition" data-suburb="all" data-state="all">
                     🇦🇺 All Australia
-                </button>
-                <button class="loc-pill px-3.5 py-1.5 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-suburb="Nowra" data-state="NSW">
-                    Nowra (2541)
-                </button>
-                <button class="loc-pill px-3.5 py-1.5 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-suburb="Bomaderry" data-state="NSW">
-                    Bomaderry
                 </button>
                 <button class="loc-pill px-3.5 py-1.5 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-suburb="Sydney" data-state="NSW">
                     Sydney NSW
@@ -443,13 +437,13 @@ button, a, select, input[type="range"] {
                     Adelaide SA
                 </button>
                 <button class="loc-pill px-3.5 py-1.5 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-suburb="Gold Coast" data-state="QLD">
-                    Gold Coast
-                </button>
-                <button class="loc-pill px-3.5 py-1.5 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-suburb="Canberra" data-state="ACT">
-                    Canberra ACT
+                    Gold Coast QLD
                 </button>
                 <button class="loc-pill px-3.5 py-1.5 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-suburb="Hobart" data-state="TAS">
                     Hobart TAS
+                </button>
+                <button class="loc-pill px-3.5 py-1.5 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium whitespace-nowrap active:scale-95 transition" data-suburb="Canberra" data-state="ACT">
+                    Canberra ACT
                 </button>
             </div>
 
@@ -602,7 +596,7 @@ button, a, select, input[type="range"] {
             </div>
         </section>
 
-        <!-- VIEW 2: Interactive Australia & 2541 Map View -->
+        <!-- VIEW 2: Interactive Australia Property Map View -->
         <section id="view-map" class="tab-view hidden space-y-4">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs">
                 <div class="flex items-center space-x-3">
@@ -614,11 +608,11 @@ button, a, select, input[type="range"] {
                 </div>
                 <div class="flex items-center space-x-2">
                     <span class="font-bold text-slate-500">Quick Zoom:</span>
-                    <button onclick="zoomToRegion(-34.8727, 150.6019, 13)" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold transition">Nowra 2541</button>
                     <button onclick="zoomToRegion(-33.8688, 151.2093, 11)" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold transition">Sydney</button>
                     <button onclick="zoomToRegion(-37.8136, 144.9631, 11)" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold transition">Melbourne</button>
                     <button onclick="zoomToRegion(-27.4698, 153.0251, 11)" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold transition">Brisbane</button>
                     <button onclick="zoomToRegion(-31.9505, 115.8605, 11)" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold transition">Perth</button>
+                    <button onclick="zoomToRegion(-34.9285, 138.6007, 11)" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 font-bold transition">Adelaide</button>
                 </div>
             </div>
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden h-[calc(100vh-280px)] min-h-[460px] max-h-[680px] relative">
@@ -838,7 +832,7 @@ button, a, select, input[type="range"] {
                     Search Anywhere in Australia
                 </h3>
                 <p id="tour-desc" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    Watch how you type: Try typing a suburb or postcode like Sydney, Melbourne, or 2541 Nowra to see real-time updates.
+                    Watch how you type: Try typing a suburb or postcode like Sydney, Melbourne, Brisbane, or Perth to see real-time updates.
                 </p>
             </div>
 
@@ -1131,7 +1125,7 @@ button, a, select, input[type="range"] {
                     </div>
                     <div>
                         <label class="block font-bold text-slate-700 mb-1">Postcode</label>
-                        <input type="text" id="add-postcode" value="2541" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-medium">
+                        <input type="text" id="add-postcode" placeholder="e.g. 2000, 3000, 4000" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-medium">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
@@ -1274,11 +1268,13 @@ button, a, select, input[type="range"] {
                         pets_count: INITIAL_LISTINGS.filter(l => l.pets_allowed === 1).length,
                         favorites_count: 0,
                         suburbs: [
-                            { suburb: 'Nowra', count: 7 },
-                            { suburb: 'Bomaderry', count: 4 },
-                            { suburb: 'North Nowra', count: 2 },
-                            { suburb: 'West Nowra', count: 2 },
-                            { suburb: 'South Nowra', count: 1 }
+                            { suburb: 'Sydney', count: 18 },
+                            { suburb: 'Melbourne', count: 14 },
+                            { suburb: 'Brisbane', count: 10 },
+                            { suburb: 'Perth', count: 8 },
+                            { suburb: 'Adelaide', count: 6 },
+                            { suburb: 'Hobart', count: 4 },
+                            { suburb: 'Canberra', count: 4 }
                         ]
                     })
                 };
@@ -1288,14 +1284,13 @@ button, a, select, input[type="range"] {
                     ok: true,
                     json: async () => ({
                         portals: [
-                            { name: "Realestate.com.au", tagline: "Top Australian rental portal", category: "Major Portals", url: "https://www.realestate.com.au/rent/with-maxPrice-550-in-2541/list-1?activeSort=list-date" },
-                            { name: "Domain.com.au", tagline: "Leading property portal", category: "Major Portals", url: "https://www.domain.com.au/rent/?postcode=2541&price=0-550&sort=dateupdated-desc" },
-                            { name: "Rent.com.au", tagline: "Renter-focused directory", category: "Major Portals", url: "https://www.rent.com.au/properties/2541?price_max=550" },
-                            { name: "Allhomes.com.au", tagline: "Regional NSW listings", category: "Major Portals", url: "https://www.allhomes.com.au/rent/nowra-nsw-2541/?price=0-550" },
-                            { name: "Homely.com.au", tagline: "Nowra reviews & rentals", category: "Alternative Portals", url: "https://www.homely.com.au/for-rent/nowra-nsw-2541/properties?price=0-550" },
-                            { name: "Gumtree Nowra", tagline: "Private landlord listings", category: "Private & Share", url: "https://www.gumtree.com.au/s-property-for-rent/nowra-2541/c18364l3000947?price=__550" },
-                            { name: "Flatmates Nowra", tagline: "Granny flats & studios", category: "Private & Share", url: "https://flatmates.com.au/rent/nowra-2541?max_price=550" },
-                            { name: "Ray White Nowra", tagline: "Local agency rentals", category: "Local Agencies", url: "https://raywhiteshoalhavencentralgroup.com.au/properties/residential-for-rent?price_max=550" }
+                            { name: "Realestate.com.au", tagline: "Top Australian property portal", category: "Major Portals", url: "https://www.realestate.com.au/rent/in-australia/list-1" },
+                            { name: "Domain.com.au", tagline: "Leading national property portal", category: "Major Portals", url: "https://www.domain.com.au/rent/?search=australia" },
+                            { name: "Rent.com.au", tagline: "Renter-focused national directory", category: "Major Portals", url: "https://www.rent.com.au/properties/australia" },
+                            { name: "Allhomes.com.au", tagline: "Leading portal across ACT & NSW", category: "Major Portals", url: "https://www.allhomes.com.au/rent/" },
+                            { name: "Homely.com.au", tagline: "Australian street reviews & rentals", category: "Alternative Portals", url: "https://www.homely.com.au/for-rent/" },
+                            { name: "Soho Real Estate", tagline: "Fast property matching & alerts", category: "Alternative Portals", url: "https://soho.com.au/rent" },
+                            { name: "Ray White Group", tagline: "Australia's largest real estate network", category: "Local Agencies", url: "https://www.raywhite.com/properties/for-rent" }
                         ]
                     })
                 };
@@ -1313,7 +1308,7 @@ button, a, select, input[type="range"] {
     // Radar Realty Australia Engine - Rent & Buy Nationwide
 // Supports Cookie-Isolated Workspaces, Australia-Wide Search, and Interactive "Show Don't Tell" Tour
 
-let allListings = JSON.parse(localStorage.getItem('2541_rentals') || 'null') || INITIAL_LISTINGS;
+let allListings = JSON.parse(localStorage.getItem('property_radar_listings') || 'null') || INITIAL_LISTINGS;
 let activeListing = null;
 let leafletMap = null;
 let markersGroup = null;
@@ -1400,7 +1395,7 @@ function initPriceSelector() {
         const rentOptions = [
             { label: 'Any Rent', val: 0 },
             { label: '< $450/wk (Bargain)', val: 450 },
-            { label: '< $550/wk (2541 Cap)', val: 550 },
+            { label: '< $550/wk (Affordable)', val: 550 },
             { label: '< $700/wk', val: 700 },
             { label: '< $900/wk', val: 900 },
             { label: '< $1,200/wk (Executive)', val: 1200 },
@@ -1747,7 +1742,7 @@ async function fetchListings() {
         const res = await fetch(`/api/listings?${params.toString()}`);
         const data = await res.json();
         allListings = (data.listings && data.listings.length > 0) ? data.listings : INITIAL_LISTINGS;
-        localStorage.setItem('2541_rentals', JSON.stringify(allListings));
+        localStorage.setItem('property_radar_listings', JSON.stringify(allListings));
 
         // Update results counter & headline
         const countBadge = document.getElementById('results-count-badge');
@@ -2175,7 +2170,7 @@ function closeTour() {
 
     // Reset search input if tour simulated typing
     const searchInput = document.getElementById('filter-query');
-    if (searchInput && (searchInput.value === 'Sydney NSW' || searchInput.value === 'Nowra 2541')) {
+    if (searchInput && (searchInput.value === 'Sydney NSW' || searchInput.value === 'Melbourne VIC')) {
         searchInput.value = '';
         filters.query = '';
         fetchListings();
@@ -2218,10 +2213,10 @@ function renderTourStep() {
 
         // Simulated typewriter demo
         simulateTyping("Sydney NSW", () => {
-            actionText.textContent = 'Filtered to Sydney! Now typing "Nowra 2541"...';
+            actionText.textContent = 'Filtered to Sydney! Now typing "Melbourne VIC"...';
             setTimeout(() => {
-                simulateTyping("Nowra 2541", () => {
-                    actionText.textContent = 'Now showing 2541 regional rentals in real-time!';
+                simulateTyping("Melbourne VIC", () => {
+                    actionText.textContent = 'Now showing Melbourne properties in real-time!';
                 });
             }, 1200);
         });
@@ -2615,9 +2610,9 @@ async function handleAddRental(e) {
     const payload = {
         listing_type: document.getElementById('add-mode')?.value || 'rent',
         street: document.getElementById('add-street')?.value || '',
-        suburb: document.getElementById('add-suburb')?.value || 'Nowra',
+        suburb: document.getElementById('add-suburb')?.value || 'Sydney',
         state: document.getElementById('add-state')?.value || 'NSW',
-        postcode: document.getElementById('add-postcode')?.value || '2541',
+        postcode: document.getElementById('add-postcode')?.value || '2000',
         price: parseInt(document.getElementById('add-price')?.value) || 0,
         beds: parseInt(document.getElementById('add-beds')?.value) || 1,
         baths: parseInt(document.getElementById('add-baths')?.value) || 1,

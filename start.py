@@ -13,9 +13,9 @@ def open_browser():
 
 if __name__ == "__main__":
     print("=" * 65)
-    print("   2541 RENTAL RADAR - Nowra & Bomaderry Housing Rentals under $550")
+    print("   RADAR REALTY AUSTRALIA - Nationwide Property & Rental Radar")
     print("=" * 65)
-    print(" • Postcode 2541: Nowra, Bomaderry, North Nowra, South Nowra, West Nowra")
+    print(" • Australia-Wide: Rent & Buy Properties Across All States")
     print(" • Live Tracker, Interactive Map, Application Kanban & Super Search")
     print(" • Server running at: http://127.0.0.1:8000")
     print(" • Press Ctrl+C in this window to stop the server.")

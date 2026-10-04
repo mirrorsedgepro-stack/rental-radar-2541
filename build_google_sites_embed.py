@@ -48,13 +48,13 @@ def build_embed():
     """ + js.replace(
         "allListings = data.listings || [];",
         """allListings = (data.listings && data.listings.length > 0) ? data.listings : INITIAL_LISTINGS;
-        localStorage.setItem('2541_rentals', JSON.stringify(allListings));"""
+        localStorage.setItem('property_radar_listings', JSON.stringify(allListings));"""
     ).replace(
         "let storedListings = [];",
-        "let storedListings = JSON.parse(localStorage.getItem('2541_rentals') || 'null') || INITIAL_LISTINGS;"
+        "let storedListings = JSON.parse(localStorage.getItem('property_radar_listings') || 'null') || INITIAL_LISTINGS;"
     ).replace(
         "allListings = [];",
-        "allListings = JSON.parse(localStorage.getItem('2541_rentals') || 'null') || INITIAL_LISTINGS;"
+        "allListings = JSON.parse(localStorage.getItem('property_radar_listings') || 'null') || INITIAL_LISTINGS;"
     )
 
     # In case the iframe cannot talk to /api, fallback to INITIAL_LISTINGS
@@ -108,11 +108,13 @@ def build_embed():
                         pets_count: INITIAL_LISTINGS.filter(l => l.pets_allowed === 1).length,
                         favorites_count: 0,
                         suburbs: [
-                            { suburb: 'Nowra', count: 7 },
-                            { suburb: 'Bomaderry', count: 4 },
-                            { suburb: 'North Nowra', count: 2 },
-                            { suburb: 'West Nowra', count: 2 },
-                            { suburb: 'South Nowra', count: 1 }
+                            { suburb: 'Sydney', count: 18 },
+                            { suburb: 'Melbourne', count: 14 },
+                            { suburb: 'Brisbane', count: 10 },
+                            { suburb: 'Perth', count: 8 },
+                            { suburb: 'Adelaide', count: 6 },
+                            { suburb: 'Hobart', count: 4 },
+                            { suburb: 'Canberra', count: 4 }
                         ]
                     })
                 };
@@ -122,14 +124,13 @@ def build_embed():
                     ok: true,
                     json: async () => ({
                         portals: [
-                            { name: "Realestate.com.au", tagline: "Top Australian rental portal", category: "Major Portals", url: "https://www.realestate.com.au/rent/with-maxPrice-550-in-2541/list-1?activeSort=list-date" },
-                            { name: "Domain.com.au", tagline: "Leading property portal", category: "Major Portals", url: "https://www.domain.com.au/rent/?postcode=2541&price=0-550&sort=dateupdated-desc" },
-                            { name: "Rent.com.au", tagline: "Renter-focused directory", category: "Major Portals", url: "https://www.rent.com.au/properties/2541?price_max=550" },
-                            { name: "Allhomes.com.au", tagline: "Regional NSW listings", category: "Major Portals", url: "https://www.allhomes.com.au/rent/nowra-nsw-2541/?price=0-550" },
-                            { name: "Homely.com.au", tagline: "Nowra reviews & rentals", category: "Alternative Portals", url: "https://www.homely.com.au/for-rent/nowra-nsw-2541/properties?price=0-550" },
-                            { name: "Gumtree Nowra", tagline: "Private landlord listings", category: "Private & Share", url: "https://www.gumtree.com.au/s-property-for-rent/nowra-2541/c18364l3000947?price=__550" },
-                            { name: "Flatmates Nowra", tagline: "Granny flats & studios", category: "Private & Share", url: "https://flatmates.com.au/rent/nowra-2541?max_price=550" },
-                            { name: "Ray White Nowra", tagline: "Local agency rentals", category: "Local Agencies", url: "https://raywhiteshoalhavencentralgroup.com.au/properties/residential-for-rent?price_max=550" }
+                            { name: "Realestate.com.au", tagline: "Top Australian property portal", category: "Major Portals", url: "https://www.realestate.com.au/rent/in-australia/list-1" },
+                            { name: "Domain.com.au", tagline: "Leading national property portal", category: "Major Portals", url: "https://www.domain.com.au/rent/?search=australia" },
+                            { name: "Rent.com.au", tagline: "Renter-focused national directory", category: "Major Portals", url: "https://www.rent.com.au/properties/australia" },
+                            { name: "Allhomes.com.au", tagline: "Leading portal across ACT & NSW", category: "Major Portals", url: "https://www.allhomes.com.au/rent/" },
+                            { name: "Homely.com.au", tagline: "Australian street reviews & rentals", category: "Alternative Portals", url: "https://www.homely.com.au/for-rent/" },
+                            { name: "Soho Real Estate", tagline: "Fast property matching & alerts", category: "Alternative Portals", url: "https://soho.com.au/rent" },
+                            { name: "Ray White Group", tagline: "Australia's largest real estate network", category: "Local Agencies", url: "https://www.raywhite.com/properties/for-rent" }
                         ]
                     })
                 };

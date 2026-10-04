@@ -6,7 +6,7 @@ AUSTRALIA_LISTINGS = [
     # FOR SALE - NSW (Regional & Metro)
     # ==========================
     {
-        "id": "sale_nsw_2541_01",
+        "id": "sale_nsw_now_01",
         "url": "https://www.realestate.com.au/property-house-nsw-nowra-14250101",
         "title": "Charming Renovated 4-Bedroom Coastal Home with Large Yard",
         "street": "28 Shoalhaven Street",
@@ -29,7 +29,7 @@ AUSTRALIA_LISTINGS = [
         "features": ["pets", "pool", "aircon", "yard"]
     },
     {
-        "id": "sale_nsw_2541_02",
+        "id": "sale_nsw_bom_01",
         "url": "https://www.realestate.com.au/property-house-nsw-bomaderry-14250102",
         "title": "Contemporary Low-Maintenance Living Close to Station",
         "street": "42 Cambewarra Road",
@@ -52,7 +52,7 @@ AUSTRALIA_LISTINGS = [
         "features": ["pets", "yard", "aircon"]
     },
     {
-        "id": "sale_nsw_2541_03",
+        "id": "sale_nsw_now_02",
         "url": "https://www.realestate.com.au/property-townhouse-nsw-nowra-14250103",
         "title": "Boutique Modern Townhouse in Quiet Enclave",
         "street": "7/15 Plunkett Street",

@@ -1,7 +1,7 @@
 @echo off
-title Deploy 2541 Rental Radar to Vercel
+title Deploy Radar Realty Australia to Vercel
 echo ===============================================================
-echo   2541 RENTAL RADAR - VERCEL DEPLOYMENT TOOL
+echo   RADAR REALTY AUSTRALIA - VERCEL DEPLOYMENT TOOL
 echo ===============================================================
 echo.
 set "PATH=C:\Users\JED-Tools2\AppData\Local\Python\pythoncore-3.14-64\Scripts;%PATH%"

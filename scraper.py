@@ -333,7 +333,12 @@ def send_webhook_alert(webhook_url: str, new_listings: List[Dict[str, Any]]):
     except Exception as e:
         logger.warning(f"Failed to send webhook notification: {e}")
 
-def run_scraper_and_sync(suburb_or_city: str = "australia", max_price: Optional[int] = None) -> Dict[str, Any]:
+def run_scraper_and_sync(
+    suburb_or_city: str = "australia",
+    max_price: Optional[int] = None,
+    listing_type: str = "rent",
+    state: str = "all"
+) -> Dict[str, Any]:
     """Runs the multi-portal scraper across Australian portals and syncs to database."""
     from scraper.engine import AustralianRentalScraperEngine
     database.init_db()
@@ -345,8 +350,9 @@ def run_scraper_and_sync(suburb_or_city: str = "australia", max_price: Optional[
     engine = AustralianRentalScraperEngine()
     canonical_listings = engine.crawl(
         suburb_or_city=suburb_or_city,
+        state=state,
         max_price=effective_max,
-        listing_type="rent"
+        listing_type=listing_type
     )
 
     # Direct local agency fallback
@@ -363,5 +369,26 @@ def run_scraper_and_sync(suburb_or_city: str = "australia", max_price: Optional[
     }
 
 if __name__ == "__main__":
-    result = run_scraper_and_sync()
-    print("Multi-portal sync complete:", result)
+    import argparse
+    parser = argparse.ArgumentParser(description="Radar Realty Australia - Multi-Portal Property Scraper")
+    parser.add_argument("--suburb", "-s", type=str, default="australia", help="Target suburb, city, or 'australia'")
+    parser.add_argument("--state", type=str, default="all", help="Target state (NSW, VIC, QLD, WA, SA, ACT, TAS)")
+    parser.add_argument("--max-price", "-p", type=int, default=None, help="Maximum price cap ($/wk for rent, or total for sale)")
+    parser.add_argument("--mode", "-m", type=str, choices=["rent", "sale"], default="rent", help="Listing mode: rent or sale")
+    args = parser.parse_args()
+
+    print(f"\n[+] Running multi-portal scraper for '{args.suburb}' (Mode: {args.mode.upper()})...\n")
+    result = run_scraper_and_sync(
+        suburb_or_city=args.suburb,
+        state=args.state,
+        max_price=args.max_price,
+        listing_type=args.mode
+    )
+    print("\n" + "=" * 55)
+    print("   SCRAPER SYNC RESULTS")
+    print("=" * 55)
+    print(f" • Total Properties Found: {result['total_scraped']}")
+    print(f" • New Listings Added:     {result['newly_added']}")
+    print(f" • Existing Updated:       {result['updated']}")
+    print(f" • Price Drops Detected:   {result['price_drops']}")
+    print("=" * 55 + "\n")

@@ -333,36 +333,35 @@ def send_webhook_alert(webhook_url: str, new_listings: List[Dict[str, Any]]):
     except Exception as e:
         logger.warning(f"Failed to send webhook notification: {e}")
 
-def run_scraper_and_sync() -> Dict[str, Any]:
-    """Runs the multi-portal scraper, updates the database, and returns sync summary."""
+def run_scraper_and_sync(suburb_or_city: str = "australia", max_price: Optional[int] = None) -> Dict[str, Any]:
+    """Runs the multi-portal scraper across Australian portals and syncs to database."""
+    from scraper.engine import AustralianRentalScraperEngine
     database.init_db()
     settings = database.get_settings()
-    max_price = int(settings.get("max_price", 550))
+    configured_max = int(settings.get("max_price", 550))
+    effective_max = max_price if max_price is not None else configured_max
     webhook_url = settings.get("webhook_url", "")
-    
-    # 1. Scrape Rent.com.au (Aggregator of all agency CRM feeds)
-    items_rent = scrape_rentals(max_price=max_price)
-    
-    # 2. Scrape Ray White Shoalhaven Central Group (Direct local agency)
-    items_rw = scrape_raywhite_shoalhaven(max_price=max_price)
-    
-    items = items_rent + items_rw
-    new_items = []
-    
-    for it in items:
-        is_new = database.upsert_listing(it)
-        if is_new and it.get("price") and it["price"] <= max_price:
-            new_items.append(it)
-            
-    if new_items and webhook_url:
-        send_webhook_alert(webhook_url, new_items)
-        
+
+    engine = AustralianRentalScraperEngine()
+    canonical_listings = engine.crawl(
+        suburb_or_city=suburb_or_city,
+        max_price=effective_max,
+        listing_type="rent"
+    )
+
+    # Direct local agency fallback
+    items_rw = scrape_raywhite_shoalhaven(max_price=effective_max)
+    for rw in items_rw:
+        database.upsert_listing(rw)
+
+    result = engine.sync_to_database(canonical_listings, webhook_url=webhook_url)
     return {
-        "total_scraped": len(items),
-        "newly_added": len(new_items),
-        "new_listings": new_items
+        "total_scraped": result.get("total_canonical", len(canonical_listings)) + len(items_rw),
+        "newly_added": result.get("new_added", 0),
+        "updated": result.get("existing_updated", 0),
+        "price_drops": result.get("price_drops", 0)
     }
 
 if __name__ == "__main__":
     result = run_scraper_and_sync()
-    print("Sync complete:", result["total_scraped"], "total scraped,", result["newly_added"], "new.")
+    print("Multi-portal sync complete:", result)
